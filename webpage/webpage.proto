@@ -1,0 +1,106 @@
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/webpage/webpage.proto
+
+syntax = "proto3";
+
+package webpage;
+
+//webpage
+service WebPage {
+  // 解析url
+  rpc ParseUrl (ParseUrlRequest) returns (ParseUrlReply) {}
+
+  // 解析url
+  rpc ParseUrlForEncoded(ParseUrlForEncodedRequest) returns (ParseUrlForEncodedReply){}
+
+  rpc ParseUrlAndStore(ParseUrlAndStoreRequest) returns (ParseUrlAndStoreReply) {}
+}
+
+enum ErrCode{
+  OK = 0;                 //解析成功
+  UnknownException = 1;   //未知异常
+  RequestUnreachable = 2; //解析的url请求不可达
+  RequestTimeout = 3;     //解析的url连接超时
+  DisabledResponse = 4;   //解析的url返回码不正确(非200)
+  NotHtmlContent = 5;     //解析的url不是html网页
+  MissingPage = 6;        //解析的url无描述信息
+}
+
+message ParseUrlRequest{
+  string url = 1;      //解析的url
+  int32 user_id = 2;   //用户id（可不填）
+}
+
+message ParseUrlReply{
+  ErrCode err_code = 1;     // 错误码
+  int64 id = 2;             // url唯一id
+  PageInfo page = 3;        // WebPage详情
+  PhotoInfo photo = 4;      // Photo
+}
+
+message PageInfo {
+  string url = 1;               // url网址
+  string display_url = 2;       // 格式化url
+  int32 hash = 3;               // hash
+  string type = 4;              // 类型
+  string site_name = 5;         // 网站名
+  string title = 6;             // 标题
+  string description = 7;       // 描述
+  string author = 8;            // 作者
+  UploadPhoto photo = 9 ;       // 已上传的图片信息（注：该字段暂不可用，请忽略）
+  VideoInfo video = 10;        // 视频
+}
+
+message VideoInfo{
+  string play_addr = 1;
+  int32 width = 2;
+  int32 height = 3;
+}
+
+message PhotoInfo{
+  bytes data = 1;    // photo二进制数据
+  int32 width = 2;   // 图片宽
+  int32 height = 3;  // 图片高
+  string type = 4;   // 图片类型,如'png','jpg' 等
+  string url = 5;    // 图片url
+}
+
+//SavedWebPage redis保存的数据
+message SavedWebPage{
+  int64 id = 1;             // url唯一id
+  PageInfo page = 2;        // WebPage详情
+}
+
+//UploadPhoto 已上传的文件id信息（注：该字段暂不可用，请忽略）
+message UploadPhoto{
+  int64 id = 1;           // photo id
+  int64 access_hash = 2;  // photo access_hash
+  int32 width = 3;        // photo宽
+  int32 height = 4;       // photo高
+  int32 size = 5;         // photo大小
+  bytes data = 6;
+}
+
+message ParseUrlForEncodedRequest{
+  string url = 1;      //解析的url
+  int32 user_id = 2;   //用户id（可不填）
+}
+
+message ParseUrlForEncodedReply{
+  ErrCode err_code = 1; // 错误码
+  int64 id = 2;         // url唯一id
+  bytes data = 3;       // TL encode data
+}
+
+message ParseUrlAndStoreRequest{
+  string url = 1;      //解析的url
+  int32 user_id = 2;   //用户id（可不填）
+  string img_Url =3;  //图片url
+}
+
+message ParseUrlAndStoreReply{
+  ErrCode err_code = 1;     // 错误码
+  int64 id = 2;             // url唯一id
+  PageInfo page = 3;        // WebPage详情
+  PhotoInfo photo = 4;      // Photo
+  bytes photoTL = 5;      // Photo
+}

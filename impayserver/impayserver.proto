@@ -1,0 +1,244 @@
+syntax = "proto3";
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+// protoc --gogofast_out=plugins=grpc:. *.proto
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbimuinfoserver/imuinfoserver.proto
+package impayserver;
+
+////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/impayserver/impayclient/ImInterface.proto
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/impayserver/impayserver.proto
+//获取帐号信息的请求
+message GetAccountInfoReq {
+    int32 user_id = 1; //用户ID
+    int64 key_id = 2; //端ID
+    string ip_addr = 3; //客户端的IP
+    int64 req_messagId = 4; //請求的messagId
+    bytes ReqBytes = 5; //请求的端表示
+    string phone = 6; //电话
+}
+
+//获取帐号信息的返回
+message GetAccountInfoResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+
+message GetUserAcctInfoReq {
+    int32 user_id = 1; //用户ID
+    uint64 key_id = 2; //端ID
+    string user_ip = 3; //客户端的IP
+    string phone = 4; //电话
+}
+
+//获取帐号信息的返回
+message GetUserAcctInfoRsp {
+    int32  ResCode = 1;
+    string Message = 2;
+    string ResData = 3; //返回结构
+}
+
+//创建帐号协议请球
+message CreateAccountReq {
+    int32 user_id = 1; //用户ID
+    int64 key_id = 2; //端ID
+    string ip_addr = 3; //客户端的IP
+    int64 req_messagId = 4; //請求的messagId
+    string phone = 5;
+    bytes ReqBytes = 6; //请求的端表示
+}
+message NotificationReq {
+    int32 user_id = 1; //用户ID
+    string msg = 2; //消息
+    int32 msg_type = 3; //消息类型 1,红包到期，2其他支付消息
+}
+message NotificationResp {
+    int32 code = 1; //
+    string msg = 2; //消息
+}
+
+//创建帐号帐号信息的返回
+message CreateAccountResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//查询订单列表协议接口请球
+message GetOrderListReq {
+    int32 user_id = 1; //用户ID
+    int64 key_id = 2; //端ID
+    string ip_addr = 3; //客户端的IP
+    int64 req_messagId = 4; //請求的messagId
+    bytes ReqBytes = 5; //请求的端表示
+}
+
+//查询订单列表协议接口的返回
+message GetOrderListResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//其它帐号支付协议走的协议接口请球
+message OtherTransReq {
+    int32 user_id = 1; //用户ID
+    int64 key_id = 2; //端ID
+    string ip_addr = 3; //客户端的IP
+    int64 req_messagId = 4; //請求的messagId
+    bytes ReqBytes = 5; //请求的端表示
+    string phone = 6; //电话
+}
+
+//其它帐号支付协议走的协议接口的返回
+message OtherTransResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//设置红包/转账请求
+message SetRDPReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+
+//设置红包/转账返回
+message SetRDPResp {
+    bytes RespBytes = 1; //返回结构
+}
+//发送红包请求
+message SendRDPReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+    int32 red_messageId = 4; //請求的messagId
+    int32 red_chanelId = 5; //請求的messagId
+}
+//发送红包/转账返回
+message SendRDPResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//查看红包/转账请求
+message CheckRDPReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+//查看红包/转账返回
+message CheckRDPResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//接收红包/转账请求
+message ReceiveRDPReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+//接收红包/转账返回
+message ReceiveRDPResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//查看红包/转账详情请求
+message QueryRDPReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+//查看红包/转账详情返回
+message QueryRDPResp {
+    bytes RespBytes = 1; //返回结构
+}
+//查看红包/转账历史记录请求
+message QueryRDPHistoryReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+//查看红包/转账历史记录返回
+message QueryRDPHistoryResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//退还红包/转账详情请求
+message RefundRDPReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+//退还红包/转账详情返回
+message RefundRDPResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+message SaveIconReq {
+    pbcomm.Debug Debug = 1;
+    int64 req_messageId = 2; //請求的messagId
+    bytes ReqBytes = 3; //请求的端表示
+}
+//查看红包/转账详情返回
+message SaveIconResp {
+    bytes RespBytes = 1; //返回结构
+}
+
+//创建帐号协议请球
+message CreateWalletReq {
+    int32 user_id = 1; //用户ID
+    string user_ip = 2; //客户端的IP
+    string phone = 3;
+    int64 key_id = 4; //端ID
+}
+//创建帐号协议请球返回
+message CreateWalletRsp {
+    int32 code = 1; //
+    string msg = 2; //消息
+    string data =3; //支付返回数据
+}
+
+service ServerService {
+    //保存文件
+    rpc SaveIcon (SaveIconReq) returns (SaveIconResp) {
+    }
+
+    //查询账号信息协议
+    rpc GetAccountInfo (GetAccountInfoReq) returns (GetAccountInfoResp) {
+    }
+    //查询账号信息协议
+    rpc GetUserAcctInfo (GetUserAcctInfoReq) returns (GetUserAcctInfoRsp) {
+    }
+
+    //创建支付帐号协议
+    rpc CreateAccount (CreateAccountReq) returns (CreateAccountResp) {
+    }
+
+    //、查询订单列表协议接口
+    rpc GetOrderList (GetOrderListReq) returns (GetOrderListResp) {
+    }
+
+    //其它帐号支付协议走的协议接口
+    rpc OtherTrans (OtherTransReq) returns (OtherTransResp) {
+    }
+
+    rpc PayServerNotification (NotificationReq) returns (NotificationResp) {
+    }
+    // setRDP
+    rpc SetRDP (SetRDPReq) returns (SetRDPResp) {
+    }
+    //sendRDP
+    rpc SendRDP (SendRDPReq) returns (SendRDPResp) {
+    }
+    //checkRDP
+    rpc CheckRDP (CheckRDPReq) returns (CheckRDPResp) {
+    }
+    //receiveRDP
+    rpc ReceiveRDP (ReceiveRDPReq) returns (ReceiveRDPResp) {
+    }
+    //queryRDP
+    rpc QueryRDP (QueryRDPReq) returns (QueryRDPResp) {
+    }
+    //queryRDPHistory
+    rpc QueryRDPHistory (QueryRDPHistoryReq) returns (QueryRDPHistoryResp) {
+    }
+    //refundRDP
+    rpc RefundRDP (RefundRDPReq) returns (RefundRDPResp) {
+    }
+    //创建钱包协议请球
+    rpc CreateWallet (CreateWalletReq) returns (CreateWalletRsp) {
+    }
+}

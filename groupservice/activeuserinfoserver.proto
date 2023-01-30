@@ -1,0 +1,83 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/activeuserserver/activeuserserver.proto
+syntax = "proto3";
+
+package groupservice;
+import "gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto";
+
+//活跃用户信息服务
+service ActiveUserInfoService{
+    // 激活用户
+    rpc ActivateUser(ActivateUserReq) returns (ActivateUserReply) {};
+    // 获取两个用户相同的群数量
+    rpc GetTwoUserChatsCount(GetTwoUserChatsCountReq) returns (GetTwoUserChatsCountReply) {};
+    // 获取两个用户相同的群
+    rpc GetTwoUserChats(GetTwoUserChatsReq) returns (GetTwoUserChatsReply) {};
+    // 根据群名称搜索自己所在的群
+    rpc SearchSelfGroup(SearchSelfGroupReq) returns (SearchSelfGroupReply) {};
+    // 判断传入的哪些用户在线
+    rpc CheckOnlineUsers(CheckOnlineUsersReq) returns (CheckOnlineUsersReply) {};
+    // 根据传入ID搜索用户
+    rpc SearchUsersByStr(SearchUsersByStrReq) returns (SearchUsersByStrReply) {};
+}
+
+
+
+// 激活用户
+message ActivateUserReq{
+    int64 KeyId    =1;
+    int32 UserId   =2;
+}
+message ActivateUserReply{
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 根据群名称搜索自己所在的群
+message SearchSelfGroupReq {
+    string Title =1;
+    int32 UserId =2;
+}
+message SearchSelfGroupReply {
+    repeated int32 ChatIds =1;      //普通群Id列表
+    repeated int32 ChannelIds =2;   //超级群、频道Id列表
+    ActiveErrorCode ErrorCode =3;
+}
+
+// 获取两个用户相同的群数量
+message GetTwoUserChatsCountReq {
+    int32 UserOne =1;
+    int32 UserTwo =2;
+}
+message GetTwoUserChatsCountReply {
+    int32 Count =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 获取两个用户相同的群
+message GetTwoUserChatsReq {
+    int32 UserOne =1;
+    int32 UserTwo =2;
+}
+message GetTwoUserChatsReply {
+    repeated int32 ChatIds =1;      //普通群Id列表
+    repeated int32 ChannelIds =2;   //超级群、频道Id列表
+    ActiveErrorCode ErrorCode =3;
+}
+
+// 判断哪些用户在线
+message CheckOnlineUsersReq {
+    repeated int32 UserIds =1;
+}
+message CheckOnlineUsersReply {
+    repeated int32 UserIds =1;      //在线用户
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 根据传入ID搜索用户
+message SearchUsersByStrReq {
+    repeated int32 UserIds =1;      //传入的群成员ID
+    string str=2;                   //需要匹配的字符串
+}
+message SearchUsersByStrReply {
+    repeated int32 UserIds =1;      //匹配到的用户ID
+    ActiveErrorCode ErrorCode =2;
+}

@@ -1,0 +1,237 @@
+syntax = "proto3";
+
+package imvedioappserver;
+
+//  protoc --gogofast_out=plugins=grpc:. *.proto
+
+// 音视频服务
+service VideoServer {
+    // 创建房间
+    rpc CreateRoom (CreateRoomReq) returns (CreateRoomReply) {
+    }
+    // 获取进入房间的Token
+    rpc GetToken (GetTokenReq) returns (GetTokenReply) {
+    }
+    // 批量获取Token
+    rpc BatchGetToken (BatchGetTokenReq) returns (BatchGetTokenReply) {
+    }
+    // 校验Token
+    rpc VerifyToken (VerifyTokenReq) returns (VerifyTokenReply) {
+    }
+    // 通过room_id获取房间里的用户列表
+    rpc GetUsersByRoomId (GetUsersByRoomIdReq) returns (GetUsersByRoomIdReply) {
+    }
+    // 获取房间创建者信息
+    rpc GetRoomAdminUser (GetRoomAdminUserReq) returns (GetRoomAdminUserReply) {
+    }
+    // 保存参与者id
+    rpc SaveParticipantKeyId (SaveParticipantKeyIdReq) returns (SaveParticipantKeyIdReply) {
+    }
+    rpc GetParticipantKeyId (GetParticipantKeyIdReq) returns (GetParticipantKeyIdReply) {
+    }
+
+    rpc GetUserMeeting (UserIdReq) returns (BoolResult) {
+    }
+
+    rpc LetUserOffLine (UsersIdReq) returns (BoolResult) {
+    }
+
+    rpc KeepLive (IdReq) returns (BoolResult) {
+    }
+
+    rpc ChangeModel (ChgModelReq) returns (BoolResult) {
+    }
+
+    rpc GetModel (ModelReq) returns (ModelRsp) {
+    }
+}
+message ChgModelReq {
+    // room id
+    string room_id = 1;
+    int32 Video = 2;
+}
+
+message ModelRsp {
+    // room id
+    string room_id = 1;
+    int32 Video = 2;
+
+    int32 code =3;
+    string msg =4;
+}
+message ModelReq {
+    // room id
+    string room_id = 1;
+}
+message IdReq {
+    // room id
+    string room_id = 1;
+}
+message UserIdReq {
+    // 用户id
+    int32 user_id = 1;
+}
+message UsersIdReq {
+    // 用户id
+    repeated int32 user_id = 1;
+    string room_id = 2;
+}
+
+message BoolResult {
+    // 用户id
+    ErrorCode code = 1;
+    bool result = 2;
+}
+// 错误码
+enum ErrorCode {
+    // 成功
+    SUCCESS = 0;
+    // 内部错误
+    INTERNAL_ERROR = 1;
+    // 房间不存在
+    ROOM_NOT_EXIST = 2;
+}
+
+// 创建房间请求
+message CreateRoomReq {
+    // 房间创建者id
+    int32 admin_id = 1;
+    // 创建者key id
+    int64 admin_key_id = 2;
+    // 加入房间的用户
+    repeated int32 user_ids = 3;
+
+    int32 Video = 4;
+}
+
+// 创建房间回复
+message CreateRoomReply {
+    // 错误码
+    ErrorCode code = 1;
+    // 房间id
+    string room_id = 2;
+    // Token， key：用户id，value：用户对应Token
+    map<int32, RtcToken> tokens = 3;
+}
+
+// 音视频通信Token
+message RtcToken {
+    // 阿里rtc appId
+    string app_id = 1;
+    // 阿里rtc服务地址
+    repeated string gslb = 2;
+    // 房间id
+    string room_id = 3;
+    // 随机值以“AK-”（使用app key验证方式）开头，,格式：AK-xxx
+    string nonce = 4;
+    // Token过期时间
+    int64 timestamp = 5;
+    // 用户id
+    int32 user_id = 6;
+    // token
+    string token = 7;
+}
+
+// 获取Token请求
+message GetTokenReq {
+    // 用户id
+    int32 user_id = 1;
+    // 房间id
+    string room_id = 2;
+}
+
+// 获取Token响应
+message GetTokenReply {
+    // 错误码
+    ErrorCode code = 1;
+    // Token
+    RtcToken token = 2;
+}
+
+// 批量获取Token请求
+message BatchGetTokenReq {
+    // 用户id列表
+    repeated int32 user_ids = 1;
+    // 房间id
+    string room_id = 2;
+}
+
+// 批量获取Token请求
+message BatchGetTokenReply {
+    // 错误码
+    ErrorCode code = 1;
+    // Token， key：用户id，value：用户对应Token
+    map<int32, RtcToken> tokens = 2;
+}
+
+// 校验Token请求
+message VerifyTokenReq {
+    // 房间id
+    string room_id = 1;
+    // 用户ID
+    int32 user_id = 2;
+    // Token值
+    string token = 3;
+    // 随机值以“AK-”（使用app key验证方式）开头，,格式：AK-xxx
+    string nonce = 4;
+    // Token过期时间
+    int64 timestamp = 5;
+}
+
+// 校验Token响应
+message VerifyTokenReply {
+    ErrorCode code = 1;
+    // 是否是有效的
+    bool is_valid = 2;
+}
+
+// room_id 获取用户请求
+message GetUsersByRoomIdReq {
+    // 房间ID
+    string room_id = 1;
+}
+
+// room_id 获取用户回复
+message GetUsersByRoomIdReply {
+    ErrorCode code = 1;
+    // 房间创建者id
+    int32 admin_id = 2;
+    // 房间里的用户列表
+    repeated int32 user_ids = 3;
+}
+
+// 获取房间创建者信息请求
+message GetRoomAdminUserReq {
+    // 房间ID
+    string room_id = 1;
+}
+// 获取房间创建者信息响应
+message GetRoomAdminUserReply {
+    ErrorCode code = 1;
+    // 房间创建者id
+    int32 user_id = 2;
+    // 房间创建者 key id
+    int64 key_id = 3;
+}
+
+// 保存参与者key id
+message SaveParticipantKeyIdReq {
+    string room_id = 1;
+    // 参与者key id
+    map<int32, int64> key_ids = 2;
+}
+// 保存参与者 key ID 响应
+message SaveParticipantKeyIdReply {
+    ErrorCode code = 1;
+    bool ok = 2;
+}
+
+// 获取参与者key id
+message GetParticipantKeyIdReq {
+    string room_id = 1;
+}
+
+message GetParticipantKeyIdReply {
+    ErrorCode code = 1;
+    map<int32, int64> key_ids = 2;
+}

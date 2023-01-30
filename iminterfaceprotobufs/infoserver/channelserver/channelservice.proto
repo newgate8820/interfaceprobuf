@@ -1,0 +1,386 @@
+syntax = "proto3";
+import "chatcommon/chatcommon.proto";
+package channelserver;
+
+//协议文件用途:  超级群、频道基础信息的获取和操作
+//作者：liuxinlei
+//日期: 2017/7/10
+//版本：0.0.1
+//修改日期：
+//修改日志：
+//2017/12/1 hujian 增加日志  返回code  规范代码
+//*********************channel 基本信息结构 *******************************
+
+//管理员相关权限
+message AdminRights {
+    bool change_group_info = 1; //如果是管理员的话，是否有修改群信息权限
+    bool delete_messages = 2; //如果是管理员的话，是否有删除消息的权限
+    bool ban_users = 3; //如果是管理员的话，是否有禁止成员的权限的权限
+    bool pin_messages = 4; //如果是管理员的话，是否有置顶消息的权限
+    bool add_new_admin = 5; //如果是管理员的话，是否有添加新管理员的权限
+    int32 promoted_by = 6; //如果是管理员的话，被XX升级为管理员
+    bool post_messages = 7; //频道是否可以发消息
+    bool edit_messages = 8; //编辑消息
+    bool invite_users = 9; //邀请用户
+    bool invite_link = 10; //邀请链接
+}
+//Post_messages     bool //70
+//Edit_messages     bool //70
+//Invite_users      bool //70
+//Invite_link       bool //70
+//bannner用户的权限
+message BannerRights {
+    bool can_read_messages = 1; //如果是banner的话，是否有读取消息的权限
+    bool can_send_messge = 2; //如果是banner的话，是否发送文本消息的权限
+    bool can_send_media = 3; //如果是banner的话，是否发送媒体消息的权限
+    bool can_send_sticker = 4; //如果是banner的话，是否发送sticker和gif的权限
+    bool can_embed_links = 5; //如果是banner的话，是否有此权限
+    int32 kicked_by = 6; //如果是bannned用户的话，被谁禁止部分权限的
+    int32 until_date = 7; //如果是banner的话，什么时候解除此禁止权限
+    bool can_send_gifs = 8;
+    bool can_send_games = 9;
+    bool can_send_inline = 10;
+}
+//Can_send_sticker  bool //70
+//Can_send_gifs     bool //70
+//Can_send_games    bool //70
+//Can_send_inline   bool //70
+
+
+
+
+//*********************有关超级群、频道操作相关的接口 和结构体***********************
+//-----------------------------------------------------------------------------111
+//创建频道的请求包
+message CreateChannelReq {
+    int32 channel_id = 1; //超级群的ID
+    int64 access_hash = 2; //哈希值
+    int32 creator_id = 3; //创建者的ID
+    string title = 4; //群名称
+    string about = 5;
+    bool broadcast = 6;
+    bool megagroup = 7;
+    int32 cluster = 8; //所在域
+    int32 date = 9; //创建时间
+    chatcommon.ChatLogPrefix dlog = 10 ;//日志
+}
+//响应 channel基础信息结构
+message ChannelInfoBase {
+    int32 channel_id = 1; //超级群、频道ID
+    int64 access_hash = 2;
+    bool encry = 3; //是否是加密群
+    bool broadcast = 4; //是否是频道
+    bool verified = 5;
+    bool megagroup = 6; //	是否是超级群的标识
+    bool restricted = 7; //是否被限制
+    bool democracy = 8; //是否民主（设置管理员的时候需要用）
+    bool signatures = 9;
+    bool min = 10;
+    string title = 11; //群名称
+    string username = 12; //超级群的唯一标识名称
+    string photo = 13; //用户头像 json格式
+    int32 date = 14; //创建时间
+    int32 version = 15; //版本
+    string restriction_reason = 16; //被限制的原因
+    int32 cluster = 17; //超级群创建的cluster
+    bool moderator = 18; //是不是主持人
+    bool editor = 19; //是否是管理员
+    bool left = 20; //是否是已经离开此超级群
+    bool kicked = 21; //是否是被踢人
+    int32 migrated_from_chat_id = 22;
+    chatcommon.ChatResultCode resultcode = 23 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+//升级为超级群的结构包
+message MigrateCreateReq {
+    int32 channel_id = 1; //超级群的ID
+    int64 access_hash = 2; //哈希值
+    int32 creator_id = 3; //创建者的ID
+    int32 chat_id = 4; //升级为超级群的普通群的Id
+    int32 cluster = 5; //所在域
+    int32 date = 6; //创建时间
+    chatcommon.ChatLogPrefix dlog = 7;//日志
+}
+//------------------------------------------------------------------------------
+
+//channel最基础的请求
+message ChannelReq {
+    int32 channel_id = 1; //channle的Id
+    int32 user_id = 2; //请求者的用户Id
+    int64 access_hash = 3; //哈希值
+    chatcommon.ChatLogPrefix dlog = 4;//日志
+}
+//channelfull相关的基础数据
+message ChannelFull {
+    ChannelInfoBase channelinfo = 1;
+    string exported_invite_link = 2; //邀请链接
+    int32  participants_count   = 3; //成员个数
+    int32  admins_count     = 4; //管理员个数
+    int32  kicked_count     = 5; //被踢个数
+    int32  banned_count     = 6; //被禁止的个数（68层使用）
+    int32  pinned_msg_id    = 7; //置顶的消息的ID
+    int32  migrated_from_chat_id = 8; //如果是超级群的话从这个普通群升级而来，默认为0
+    AdminRights admin_rights    = 9; //是否可以设置username
+    BannerRights ban_rights     = 10; //是否可以查看群成员列表
+    string about = 11; //群简要
+    int32 bot_count = 12; //机器人个数，如果大于0，就从机器人服务那边去取
+    repeated int32 bot_id = 13; //机器人id的数组
+    chatcommon.ChatResultCode resultcode = 14 ;     //返回结果码
+}
+//群成员的基础信息
+message ChannelParticipant {
+    int32 user_id = 1; //群成员的iD
+    int32 invite_id = 2; //邀请者的ID
+    bool can_set_username = 3; //是否可以更改超级群的username 默认为true
+    bool can_view_participants = 4; //是否可以查看超级群的成员列表默认为true
+    bool is_creator = 5; //是否是群的创建者
+    bool is_admin = 6; //是否是超级群的管理员
+    bool is_ban = 7; //是否是被禁权的成员
+    int32 join_time = 8; //进群时间
+    AdminRights ad_right = 9; //如果是管理员的话有此权限
+    BannerRights ban_right = 10; //bannner用户的权限
+    chatcommon.ChatResultCode resultcode = 11 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+//更新超级群/频道的 邀请链接
+message ChannleId {
+    int32 channel_id = 1;
+    chatcommon.ChatLogPrefix dlog = 2;//日志
+}
+message ChannelLittleInfo {
+    int32 channel_id = 1; //超级群、频道ID
+    string title = 2; //群名称
+    string exported_invite_link = 3; //邀请链接
+    chatcommon.ChatResultCode resultcode = 4 ;     //返回结果码
+}
+message ChannleUsersId {
+    int32 channel_id = 1;
+    repeated int32 user_id = 2;
+    chatcommon.ChatResultCode resultcode = 3 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+//批量获取channel基础信息的操作
+message GetChannelsReq {
+    int32 user_id = 1; //请求者的用户Id
+    repeated int32 channel_id = 2; //channle的Id
+    chatcommon.ChatLogPrefix dlog = 3;//日志
+}
+//channel基础信息的数组
+message ChannelBaseArr {
+    repeated ChannelInfoBase channel = 1; //channel的基础信息
+    chatcommon.ChatResultCode resultcode = 2 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+//添加(主动加入)超级群、频道的用户的请求
+message AddChannelUserReq {
+    int32 channel_id = 1; //channle的Id
+    int32 invitor_id = 2; //邀请者的用户ID（如果是自己加入invitor_id 为自己的用户ID）
+    int64 access_hash = 3;
+    repeated InvitedUsers users = 4;
+    chatcommon.ChatLogPrefix dlog = 5;//日志
+}
+message BoolResult {
+    bool b = 1;
+    chatcommon.ChatResultCode resultcode = 2 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+//踢人或者主动离开超级群、频道的的请求接口
+message DelChannelUserReq {
+    int32 channel_id = 1; //channle的Id
+    int32 user_id = 2; //要进离开/被踢 超级群/频道的成员的用户ID
+    bool is_bot_user = 3; //被邀请者是不是机器人
+    bool is_kicked = 4; // 是否是离开超级群\频道
+    int32 Kicked_id = 5; //如果是超级群被踢的话将，此用户保存到被踢列表中
+    chatcommon.ChatLogPrefix dlog = 6;//日志
+}
+//------------------------------------------------------------------------------
+//新增管理员的接口
+message AddChannelAdminReq {
+    int32 channel_id = 1; //channle的Id
+    int32 user_id = 2; //要进离开/被踢 超级群/频道的成员的用户ID
+    bool is_bot_user = 3; //如果是新增用户的话被邀请者是不是机器人
+    AdminRights ad_right = 4; //该有的管理员权限们
+    int32 invitor_id = 5; //如果是直接添加新成员为管理员的话需要
+    chatcommon.ChatLogPrefix dlog = 6;
+}
+//添加管理结果
+message AddAdminResult {
+    bool success = 1; //是否设置管理员成功
+    bool is_add = 2; //是否是新增成员操作（重要）
+    chatcommon.ChatResultCode resultcode = 3 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+//超级群/频道 的按类型的偏移获取
+message ParticipantReq {
+    int32 channel_id = 1; //成员的ID
+    int32 offset = 2; //偏移地址
+    int32 limit = 3; //每次能够取的最大个数
+    int32 part_type = 4; //成员类型 1 代表 channelParticipantsRecent  2、代表 channelParticipantsAdmins 3代表channelParticipantsKicked 4代表channelParticipantsBots 5代表channelParticipantsBanned
+    chatcommon.ChatLogPrefix dlog =5;
+}
+//群成员的列表
+message ChannelParticipantArr {
+    int32 TotalCount = 1;
+    repeated ChannelParticipant part = 2;
+    chatcommon.ChatResultCode resultcode = 3 ;     //返回结果码
+}
+//------------------------------------------------------------------------------
+message ChannelUserName {
+    string user_name = 1; //生成的邀请链接
+    chatcommon.ChatLogPrefix dlog =2;
+}
+
+//------------------------------------------------------------------------------
+message ChannelLink {
+    string export_link = 1; //生成的邀请链接
+    chatcommon.ChatLogPrefix dlog =2;
+    chatcommon.ChatResultCode resultcode = 3 ;     //返回结果码
+}
+
+//------------------------------------------------------------------------------
+//更新群about请求
+message UpdateAbout {
+    int32 channel_id = 1;
+    string about = 2; //超级群/频道的简略说明
+    chatcommon.ChatLogPrefix dlog =3;
+}
+//------------------------------------------------------------------------------
+//更新群名称请求
+message UpdateTitle {
+    int32 channel_id = 1;
+    string title = 2; //超级群/频道的简略说明
+    chatcommon.ChatLogPrefix dlog =3;
+}
+//更新群头像请求
+message UpdatePhoto {
+    int32 channel_id = 1;
+    string photo = 2; //超级群/频道的简略说明 json的格式
+    chatcommon.ChatLogPrefix dlog =3;
+}
+//更新群名称UserName
+message UpdateUserName {
+    int32 channel_id = 1;
+    string username = 2;
+    chatcommon.ChatLogPrefix dlog =3;
+}
+//更新pin msg id 的请求
+message UpdatePinMsgId {
+    int32 channel_id = 1;
+    int32 pin_msgid = 2; //置顶的消息的ID
+    chatcommon.ChatLogPrefix dlog =3;
+}
+//------------------------------------------------------------------------------
+//更新超级群/频道的 邀请链接
+message UpdateChannelDemo {
+    int32 channel_id = 1;
+    bool democracy = 2; //民主性
+    chatcommon.ChatLogPrefix dlog =3;
+}
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+message InvitedUsers {
+    int32 user_id = 1; //要进入此超级群/频道的ID
+    bool is_bot_user = 2; //被邀请者是不是机器人
+     chatcommon.ChatLogPrefix dlog =3;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//服务接口
+service ChannelServerService {
+    //创建频道
+    rpc CreateChannel (CreateChannelReq) returns (ChannelInfoBase) {
+    }
+    //由普通群升级为超级群，将原来为加密的群就平移到加密，名称、成员依次同等级权限的移动
+    rpc MigrateCreate (MigrateCreateReq) returns (ChannelInfoBase) {
+    }
+    //获取超级群/channel基础信息的完整信息
+    rpc GetFullChannel (ChannelReq) returns (ChannelFull) {
+    }
+    //获取超级群基本信息的操作
+    rpc GetChannelInfo (ChannelReq) returns (ChannelInfoBase) {
+    }
+    rpc GetChannelBaseInfo (ChannleId) returns (ChannelInfoBase) {
+    }
+    //机器人获取基本信息
+    rpc GetChannelLittleInfo (ChannleId) returns (ChannelLittleInfo) {
+    }
+    //批量获取channel的基础信息
+    rpc GetChannelInfoArr (GetChannelsReq) returns (ChannelBaseArr) {
+    }
+    //加普通成员到超级群/频道
+    rpc AddChannelUser (AddChannelUserReq) returns (BoolResult) {
+    }
+    //群成员减少的接口
+    rpc DelChannelUser (DelChannelUserReq) returns (BoolResult) {
+    }
+    //设置管理员/新增成员直接是管理员
+    rpc AddChannelAdmin (AddChannelAdminReq) returns (AddAdminResult) {
+    }
+    //撤销管理员权限
+    rpc RevokeChannelAdmin (ChannelReq) returns (BoolResult) {
+    }
+    //解散超级群/频道的操作(需要判断userId 是不是创建者)
+    rpc DeleteChannel (ChannelReq) returns (BoolResult) {
+    }
+    //偏移获取超级群/频道成员列表
+    rpc GetChannelParticipants (ParticipantReq) returns (ChannelParticipantArr) {
+    }
+    //通过username来查找超级群
+    rpc GetChannelByUserName (ChannelUserName) returns (ChannelBaseArr) {
+    }
+    //根据群链接来查询超级群/频道信息
+    rpc GetChannelByLink (ChannelLink) returns (ChannelInfoBase) {
+    }
+    //编辑群about
+    rpc UpdateChannelAbout (UpdateAbout) returns (BoolResult) {
+    }
+    //编辑群名称
+    rpc UpdateChannelTitle (UpdateTitle) returns (BoolResult) {
+    }
+    //编辑群头像
+    rpc UpdateChannelPhoto (UpdatePhoto) returns (BoolResult) {
+    }
+    //更新群的username
+    //编辑群头像
+    rpc UpdateChannelUserName (UpdateUserName) returns (BoolResult) {
+    }
+    //更新群邀请链接
+    rpc UpdateChannelLink (ChannleId) returns (ChannelLink) {
+    }
+    //更新群民主性
+    //更新群邀请链接
+    rpc UpdateChannelDemocracy (UpdateChannelDemo) returns (BoolResult) {
+    }
+    //获取频道所有用户id
+    rpc GetChannelUsersid (ChannleId) returns (ChannleUsersId) {
+    }
+    //获取成员信息
+    rpc GetChannelPaticipantInfo (ChannelReq) returns (ChannelParticipant) {
+    }
+
+}

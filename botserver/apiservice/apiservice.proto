@@ -1,0 +1,836 @@
+/**
+ * 定义提供给机器人路由服务的API
+ * 原则上只能由机器人路由服务来调用
+ */
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/im/iminterfaceprotobufs/botserver/apiservice/apiservice.proto
+syntax = "proto3";
+
+package apiservice;
+
+import "gitlab.chatserver.im/im/iminterfaceprotobufs/botserver/basetypes/basetypes.proto";
+
+// 定义机器人服务
+service Bot {
+    // GetMe 获取自身信息
+    rpc GetMe (GetMeRequest) returns (GetMeReply) {
+    }
+    // GetUpdates 获取更新数据
+    rpc GetUpdates (GetUpdatesRequest) returns (GetUpdatesReply) {
+    }
+    // SendTextMessage 发送文本消息
+    rpc SendTextMessage (SendTextMessageRequest) returns (SendTextMessageReply) {
+    }
+    // SendLocation 发送地理位置
+    rpc SendLocation (SendLocationRequest) returns (SendLocationReply) {
+    }
+    // SendVenue 发送详细地址
+    rpc SendVenue (SendVenueRequest) returns (SendVenueReply) {
+    }
+    // SendPhoto 发送照片
+    rpc SendPhoto (SendPhotoRequest) returns (SendPhotoReply) {
+    }
+    // SendDocument 发送文档
+    rpc SendDocument (SendDocumentRequest) returns (SendDocumentReply) {
+    }
+    // ForwardMessage 转发消息
+    rpc ForwardMessage (ForwardMessageRequest) returns (ForwardMessageReply) {
+    }
+    // AnswerCallbackQuery 应答回调查询
+    rpc AnswerCallbackQuery (AnswerCallbackQueryRequest) returns (AnswerCallbackQueryReply) {
+    }
+    // EditMessageText 编辑消息文本
+    rpc EditMessageText (EditMessageTextRequest) returns (EditMessageTextReply) {
+    }
+    // EditMessageCaption 编辑消息标题
+    rpc EditMessageCaption (EditMessageCaptionRequest) returns (EditMessageCaptionReply) {
+    }
+    // DeleteMessage 删除消息
+    rpc DeleteMessage (DeleteMessageRequest) returns (DeleteMessageReply) {
+    }
+    // SetWebhook 设置webhook
+    rpc SetWebhook (SetWebhookRequest) returns (SetWebhookReply) {
+    }
+    // DeleteWebhook 删除webhook
+    rpc DeleteWebhook (DelWebhookRequest) returns (DelWebhookReply) {
+    }
+    //send message to phone
+    rpc SendPhoneMessage (SendPhoneMessageRequest) returns (SendTextMessageReply) {
+    }
+    //音樂查詢
+    rpc QueryMusicInfo (MusicQueryRequest) returns (MusicQueryReply) {
+    }
+    //save uploaded music info to db
+    rpc SaveMusicInfo (MusicSaveReq) returns (MusicSaveRsp) {
+    }
+    //根据查询ID查询音乐信息
+    rpc BaseQuertIdGetMusicFileInfo (GetMusicFileInfoReq) returns (GetMusicFileInfoReply) {
+    }
+    //获取机器人列表
+    rpc GetBotList (GetBotListReq) returns (GetBotListResult) {
+    }
+    //获取机器人详细信息
+    rpc GetBotDetail (GetBotDetailReq) returns (GetBotDetailResult) {
+    }
+    //用户收藏机器人
+    rpc BotLike (BotLikeReq) returns (BotLikeResult) {
+    }
+    //获取自建机器人列表
+    rpc GetBotListMine (GetBotListMineReq) returns (GetBotListResult) {
+    }
+    // 分享游戏
+    rpc sendGame (sendGameReq) returns (sendGameReply) {
+    }
+    // 设置游戏分数
+    rpc SetGameScore (SetGameScoreReq) returns (SetGameScoreReply) {
+    }
+    // getGameHighScores 获取用户当前分数排行
+    rpc GetGameHighScores (GetGameHighScoresReq) returns (GetGameHighScoresReply) {
+    }
+    // 内联查询回调
+    rpc AnswerInlineQuery (answerInlineQueryRequest) returns (ReplyBotInlineCall) {
+    }
+    // 机器人普通群 超级群 踢人接口
+    rpc KickChatMember (KickChatMemberRequest) returns (KickChatMemberReply) {
+    }
+    // 获取群中用户最后登陆时间
+    rpc GetGroupInactiveUsers (GetGroupInactiveUsersReq) returns (GetGroupInactiveUsersResult) {
+    }
+    // 删除超级群某个用户的历史消息
+    rpc DeleteChannelHistoryMessage (DeleteChannelHistoryMessageReq) returns (DeleteChannelHistoryMessageReply) {
+    }
+    // 机器人自动退出群组
+    rpc LeaveChat (LeaveChatReq) returns (LeaveChatReply) {
+    }
+    // 獲取群訊息
+    rpc GetChat (GetChatReq) returns (GetChatReply) {
+    }
+    // 獲取群成員數目
+    rpc GetChatMembersCount (GetChatMembersCountReq) returns (GetChatMembersCountReply) {
+    }
+    // 獲取群管理員
+    rpc GetChatAdministrators (GetChatAdministratorsReq) returns (GetChatAdministratorsReply) {
+    }
+    // 修改群名字
+    rpc SetChatTitle (SetChatTitleReq) returns (SetChatTitleReply) {
+    }
+    // 修改群简介
+    rpc SetChatDescription (SetChatDescriptionReq) returns (SetChatDescriptionReply) {
+    }
+    // 置顶群消息
+    rpc PinChatMessage (PinChatMessageReq) returns (PinChatMessageReply) {
+    }
+    // 取消置顶群消息
+    rpc UnPinChatMessage (UnPinChatMessageReq) returns (UnPinChatMessageReply) {
+    }
+    // 發送Action
+    rpc SendChatAction (SendChatActionReq) returns (SendChatActionReply) {
+    }
+    // 發送名片
+    rpc SendContact (SendContactReq) returns (SendContactReply) {
+    }
+    // 获取群组消息
+    rpc GetGroups (GetGroupsReq) returns (GetGroupsReply) {
+    }
+    // 获取用户是哪些群的管理员的群列表
+    rpc GetAdminGroups (GetAdminGroupsReq) returns (GetAdminGroupsReply) {
+    }
+    // 超级群禁言
+    rpc LipBlock (LipBlockReq) returns (LipBlockReply) {
+    }
+    // 超级群解除禁言
+    rpc LipUnBlock (LipBlockReq) returns (LipBlockReply) {
+    }
+    // 剔除超级群 可重新加入
+    rpc KickNotBan (KickNotBanReq) returns (KickNotBanReply) {
+    }
+    // 获取机器人广场信息
+    rpc GetBotPlazaInfo (GetBotPlazaInfoReq) returns (GetBotPlazaInfoReply) {
+    }
+    // 设置机器人是否能加入群组
+    rpc SetJoinGroups (SetJoinGroupsReq) returns (SetJoinGroupsReply) {
+    }
+    // 获取单个广场机器人信息
+    rpc GetBotPlazaInfoById (GetBotPlazaInfoByIdReq) returns (GetBotPlazaInfoByIdReply) {
+    }
+}
+
+//获取自建机器人列表
+message GetBotListMineReq {
+    uint32 user_id = 1;
+    string hash = 2;
+    uint32 offset_id = 3;
+    uint32 limit = 4;
+}
+
+//获取机器人列表请求
+message GetBotListReq {
+    string hash = 1;
+    bool offcial = 2;
+    uint32 offset_id = 3;
+    uint32 limit = 4;
+}
+
+//机器人列表信息
+message BotInfo {
+    uint32 bot_id = 1;
+    uint32 id = 2;
+    string name = 3;
+    uint32 type = 4;
+    string description = 5;
+    uint32 hot = 6;
+}
+
+//获取机器人列表回应
+message GetBotListResult {
+    Errorcode errCode = 1;
+    string hash = 2;
+    repeated BotInfo boInfoArr = 3;
+    enum Errorcode {
+        Success = 0;
+        NotExist = 1;
+        NotModify = 3;
+    }
+}
+
+// 获取单个广场机器人信息
+message GetBotPlazaInfoByIdReq {
+    uint32 id = 1; // 机器人 id
+    string language = 2;
+}
+
+message GetBotPlazaInfoByIdReply {
+    uint32 error_code = 1; // 错误码 0 成功
+    BotPlazaInfo bot_plaza_info = 2; // 机器人广场列表信息
+}
+
+// 获取机器人广场信息
+message GetBotPlazaInfoReq {
+    string language = 1;
+}
+
+message BotPlazaInfo {
+    uint32 id = 1; // 机器人 id
+    string classify = 2; // 类别 --> 热门 娱乐 图片 工具
+    string name = 3;
+    string description = 4; // 机器人描述 点start展示的详情
+    string about = 5; // 简介 slogan
+    string lang = 6; // 語言 en-zh
+}
+
+message GetBotPlazaInfoReply {
+    uint32 error_code = 1; // 错误码 0 成功
+    repeated BotPlazaInfo bot_plaza_info = 2; // 机器人广场列表信息
+}
+
+// GetBotDetailRequest 获取机器人信息请求
+message GetBotDetailReq {
+    uint32 id = 1; // 机器人ID
+}
+
+//机器人详细信息
+message BotDetail {
+    uint32 id = 1;
+    string botname = 2;
+    string firstname = 3;
+    uint32 owerid = 4;
+    uint32 level = 5;
+    string commands = 6;
+    string description = 7;
+    string about = 8;
+    bool chat_history = 9;
+    bool nochats = 10;
+    uint32 info_version = 11;
+    string inline_placeholder = 12;
+    string token = 13;
+    string webhook = 14;
+    bytes certificate = 15;
+    uint64 inserted_at = 16;
+    uint32 type = 17;
+    uint32 official = 18;
+    uint32 hot = 19;
+}
+
+//获取机器人详细信息请求
+message GetBotDetailResult {
+    Errorcode errCode = 1;
+    BotDetail detail = 2;
+    enum Errorcode {
+        Success = 0;
+        NotExist = 1;
+        OtherError = 2;
+    }
+}
+
+//收藏机器人请求,like = 0为取消收藏，like=1为收藏
+message BotLikeReq {
+    uint32 id = 1;
+    uint32 like = 2;
+}
+
+//收藏机器人请求返回
+message BotLikeResult {
+    Errorcode errCode = 1;
+    enum Errorcode {
+        Success = 0;
+        NotExist = 1;
+        OtherError = 2;
+    }
+}
+
+message MusicSaveReq {
+    repeated MusicDataInfo MusicInfo = 1;
+}
+
+message MusicSaveRsp {
+    uint32 error_code = 1; // 错误代码
+    uint64 id = 2;
+}
+
+// GetMeRequest 获取自身信息请求
+message GetMeRequest {
+    uint32 id = 1; // 机器人ID
+}
+
+// GetMeReply 获取自身信息响应
+message GetMeReply {
+    uint32 error_code = 1; // 错误代码
+    uint32 id = 2; // 用户唯一ID
+    string first_name = 3; // 用户First name
+    string last_name = 4; // 用户Last name
+    string username = 5; // 用户名
+}
+
+// GetUpdatesRequest 获取更新数据请求
+message GetUpdatesRequest {
+    uint32 id = 1; // 机器人ID
+    uint64 timeout = 2; // 超时时间(time.Duration)
+}
+
+// GetUpdatesReply 获取更新数据响应
+message GetUpdatesReply {
+    uint32 error_code = 1; // 错误代码
+    bytes messages = 2; // 数据列表
+}
+
+// SendTextMessageRequest 发送文本消息请求
+message SendTextMessageRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 聊天类型
+    int32 chat_id = 3; // 会话ID
+    string text = 4; // 消息文本
+    uint64 reply_to_message_id = 5; // 回复消息ID
+    bool markdown = 6; // 是否使用MarkDown渲染
+    bytes reply_markup = 7; // 回复标记
+}
+
+// SendTextMessageReply 发送文本消息响应
+message SendTextMessageReply {
+    uint32 error_code = 1; // 错误代码
+    uint64 message_id = 2; // 消息唯一ID
+}
+
+// SendLocationRequest 发送地理位置请求
+message SendLocationRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 聊天类型
+    int32 chat_id = 3; // 会话ID
+    double latitude = 4; // 纬度
+    double longitude = 5; // 经度
+    uint64 reply_to_message_id = 6; // 回复消息ID
+    bytes reply_markup = 7; // 回复标记
+}
+
+// SendLocationReply 发送地理位置响应
+message SendLocationReply {
+    uint32 error_code = 1; // 错误代码
+    uint64 message_id = 2; // 消息唯一ID
+}
+
+// SendVenueRequest 发送详细地址请求
+message SendVenueRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 聊天类型
+    int32 chat_id = 3; // 会话ID
+    double latitude = 4; // 纬度
+    double longitude = 5; // 经度
+    string title = 6; // 标题
+    string address = 7; // 地址
+    string foursquare_id = 8; // Foursquare标识符
+    uint64 reply_to_message_id = 9; // 回复消息ID
+    bytes reply_markup = 10; // 回复标记
+}
+
+// SendVenueReply 发送详细地址响应
+message SendVenueReply {
+    uint32 error_code = 1; // 错误代码
+    uint64 message_id = 2; // 消息唯一ID
+}
+
+// SendPhotoRequest 发送照片请求
+message SendPhotoRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 聊天类型
+    int32 chat_id = 3; // 会话ID
+    bytes media = 4; // 媒体摘要
+    uint64 reply_to_message_id = 5; // 回复消息ID
+    bytes reply_markup = 6; // 回复标记
+}
+
+// SendPhotoReply 发送照片响应
+message SendPhotoReply {
+    uint32 error_code = 1; // 错误代码
+    uint64 message_id = 2; // 消息唯一ID
+    uint64 file_id = 3; // 文件ID
+}
+
+// SendDocumentRequest 发送文档请求
+message SendDocumentRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 聊天类型
+    int32 chat_id = 3; // 会话ID
+    bytes media = 4; // 媒体摘要
+    uint64 reply_to_message_id = 5; // 回复消息ID
+    bytes reply_markup = 6; // 回复标记
+}
+
+// SendDocumentReply 发送文档响应
+message SendDocumentReply {
+    uint32 error_code = 1; // 错误代码
+    uint64 message_id = 2; // 消息唯一ID
+    uint64 file_id = 3; // 文件ID
+}
+
+// ForwardMessageRequest 转发已有消息请求
+message ForwardMessageRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 目标聊天类型
+    int32 chat_id = 3; // 目标会话ID
+    basetypes.ChatType from_chat_type = 4; // 来源目标会话类型
+    int32 from_chat_id = 5; // 来源会话ID
+    uint64 message_id = 6; // 被转发消息唯一ID
+}
+
+// ForwardMessageReply 转发已有消息响应
+message ForwardMessageReply {
+    uint32 error_code = 1; // 错误代码
+    uint64 message_id = 2; // 消息唯一ID
+}
+
+// AnswerCallbackQueryRequest 回答回调查询请求
+message AnswerCallbackQueryRequest {
+    uint32 id = 1; // 机器人ID
+    string inline_message_id = 2; // 标识符
+    string text = 3; // 通知文本
+    bool show_alert = 4; // 是否显示警告
+    string url = 5; // 打开URL
+    uint32 cache_time = 6; // 缓存有效时间
+}
+
+// AnswerCallbackQueryReply 回答回调查询响应
+message AnswerCallbackQueryReply {
+    uint32 error_code = 1; // 错误代码
+}
+
+// EditMessageTextRequest 编辑消息文本请求
+message EditMessageTextRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 目标聊天类型
+    int32 chat_id = 3; // 会话ID
+    uint64 message_id = 4; // 被编辑消息唯一ID
+    string inline_message_id = 5;
+    string text = 6; // 消息文本
+    bool markdown = 7; // 是否使用MarkDown渲染
+    bytes reply_markup = 8; // 回复标记
+}
+
+// EditMessageTextReply 编辑消息文本响应
+message EditMessageTextReply {
+    uint32 error_code = 1; // 错误代码
+}
+
+// EditMessageCaptionRequest 编辑消息标题请求
+message EditMessageCaptionRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 目标聊天类型
+    int32 chat_id = 3; // 会话ID
+    uint64 message_id = 4; // 被编辑消息唯一ID
+    string caption = 5; // 媒体标题
+    bytes reply_markup = 6; // 回复标记
+}
+
+// EditMessageCaptionReply 编辑消息标题响应
+message EditMessageCaptionReply {
+    uint32 error_code = 1; // 错误代码
+}
+
+// DeleteMessageRequest 删除消息请求
+message DeleteMessageRequest {
+    uint32 id = 1; // 机器人ID
+    basetypes.ChatType chat_type = 2; // 目标聊天类型
+    int32 chat_id = 3; // 会话ID
+    uint64 message_id = 4; // 被删除消息唯一ID
+}
+
+// DeleteMessageReply 删除消息响应
+message DeleteMessageReply {
+    uint32 error_code = 1; // 错误代码
+}
+
+// SetWebhookRequest 设置webhook请求
+message SetWebhookRequest {
+    uint32 id = 1; // 机器人ID
+    string url = 2; // 回调地址
+    bytes certificate = 3; // 证书
+}
+
+// SetWebhookReply 设置webhook响应
+message SetWebhookReply {
+    uint32 error_code = 1; // 错误代码
+}
+
+// DelWebhookRequest 删除webhook请求
+message DelWebhookRequest {
+    uint32 id = 1; // 机器人ID
+}
+
+// DelWebhookReply 删除webhook响应
+message DelWebhookReply {
+    uint32 error_code = 1; // 错误代码
+}
+
+message SendPhoneMessageRequest {
+    uint32 id = 1; // 机器人ID
+    string phone = 2; // 手机号码
+    string text = 3; // 消息文本
+    uint64 reply_to_message_id = 4; // 回复消息ID
+    bool markdown = 5; // 是否使用MarkDown渲染
+    bytes reply_markup = 6; // 回复标记
+}
+
+//请求
+message MusicQueryRequest {
+    string context = 1; //查询关键字
+    int32 user_id = 2; //用户id
+    int64 key_id = 3; //用户key_id
+    int32 offset = 4; //查询偏移位置
+    int32 count = 5; //查询数量
+}
+
+//响应
+message MusicQueryReply {
+    uint32 error_code = 1; // 错误代码
+    repeated MusicDataInfo music_info = 2; // 数据列表
+}
+//查询内容
+message MusicDataInfo {
+    string query_id = 1; //查询id
+    string music_name = 2; //音乐名称
+    string music_performer = 3; //歌曲演唱者
+    string music_album = 4; //唱片集
+    int64 music_file_id = 5; //文件id
+    int64 music_access_hash = 6; //文件hash
+    int64 music_size = 7; //文件大小
+    int32 music_duration = 8; //歌曲时长
+    int32 music_rate = 9; //比特率
+    int32 music_hot = 10; //歌曲热度
+}
+
+message GetMusicFileInfoReq {
+    string query_id = 1; //查询id
+    int32 user_id = 2; //用户id
+    int64 key_id = 3; //用户key_id
+}
+message GetMusicFileInfoReply {
+    uint32 error_code = 1; // 错误代码
+    MusicDataInfo music_info = 2; // 数据列表
+}
+
+message sendGameReq {
+    int32 chat_id = 1; // Unique identifier for the target chat
+    basetypes.ChatType chat_type = 2;
+    string game_short_name = 3; // Short name of the game
+    int32 bot_id = 4; // the owner of the game
+    bool disable_notification = 5; // Users will receive a notification with no sound.
+    uint64 reply_to_message_id = 6; // If the message is a reply, ID of the original message
+    bytes reply_markup = 7;
+}
+
+message sendGameReply {
+    uint32 error_code = 1; // error code
+    uint64 message_id = 2; // the sent Message is returned
+}
+
+// 调用设置分数
+message SetGameScoreReq {
+    int32 userid = 1; // 用户id
+    int32 score = 2; // 新分数（非负数）
+    bool force = 3; // 如果为true 则覆盖原分数  如果为false则新分数大于旧的分数才会更新
+    bool disable_edit_message = 4; // 为true则不编辑
+    int32 chat_id = 5; // 如果未指定inline_message_id，这里就需要填chatid
+    basetypes.ChatType chat_type = 6; //
+    int32 message_id = 7; // 如果未指定inline_message_id，则需要填这里的message_id
+    string inline_message_id = 8; // 如果未指定chatid或者message_id 就需要填写inline_message_id
+    int32 botid = 9; // 请求的机器人id
+}
+
+// 设置分数返回
+message SetGameScoreReply {
+    bool succeed = 1;
+    string error = 2;
+    int32 errorcode = 3;
+}
+
+message answerInlineQueryRequest {
+    string type = 1;
+    string inline_query_id = 2;
+    bytes results = 3;
+    int32 cache_time = 4;
+    bool is_personal = 5;
+    string next_offset = 6;
+    string switch_pm_text = 7;
+    string switch_pm_parameter = 8;
+}
+
+// 机器人返回接口-Inline
+message ReplyBotInlineCall {
+    bytes result = 1;
+    int32 error = 2;
+}
+
+// 获取用户当前的游戏分数排行
+message GetGameHighScoresReq {
+    int32 user_id = 1; // 用户ID
+    int32 chat_id = 2; // 会话ID
+    basetypes.ChatType chat_type = 3; // 会话类型
+    int32 message_id = 4; // 如果未指定inline_message_id，则需要填这里的message_id
+    string inline_message_id = 5; // 内联消息ID
+}
+
+message GameHighScore {
+    int32 position = 1; // Position in high score table for the game
+    basetypes.User user = 2; // user
+    int32 score = 3; // score
+}
+
+message GetGameHighScoresReply {
+    repeated GameHighScore game_highscore = 1;
+}
+
+message KickChatMemberRequest {
+    int32 from_id = 1; // 踢人的机器人ID
+    int32 banned_id = 2; // 被踢的用户ID
+    int32 chat_id = 3; // 会话ID
+    basetypes.ChatType chat_type = 4; // 会话类型
+    int32 util_date = 5; // 解禁日期
+}
+
+message KickChatMemberReply {
+    int32 error_code = 1; // error code
+}
+message GroupInactiveUser {
+    int32 id = 1; // 用户ID
+    string name = 2; // 用户名
+    int32 time = 3; // 活跃时间
+    string timeStr = 4; // 活跃时间格式化字符串
+}
+
+message GetGroupInactiveUsersReq {
+    int32 chat_id = 1;
+    basetypes.ChatType chat_type = 2; // 会话类型
+    int32 limit = 3;
+    int32 botid = 4;
+}
+
+message GetGroupInactiveUsersResult {
+    repeated GroupInactiveUser users = 1;
+    int32 count = 2; // 群当前总人数
+    int32 error_code = 3; // error code
+}
+
+message DeleteChannelHistoryMessageReq {
+    int32 bot_id = 1; // 机器人ID
+    int32 user_id = 2; // 用户ID
+    int32 chat_id = 3; // 会话ID
+    basetypes.ChatType chat_type = 4; // 会话类型
+}
+
+message DeleteChannelHistoryMessageReply {
+    int32 error_code = 1; // error code
+}
+
+message LeaveChatReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+}
+
+message LeaveChatReply {
+    int32 error_code = 1;
+}
+
+message GetChatReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+}
+
+message GetChatReply {
+    int32 error_code = 1;
+    bytes chat = 2; // 数据列表
+}
+
+message GetChatMembersCountReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+}
+
+message GetChatMembersCountReply {
+    int32 error_code = 1;
+    int32 count = 2;
+}
+
+message GetChatAdministratorsReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+    int32 user_id = 4; // 用户id
+}
+
+message GetChatAdministratorsReply {
+    int32 error_code = 1;
+    bytes chat_member = 2; //
+}
+
+message SetChatTitleReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+    string title = 4;
+}
+
+message SetChatTitleReply {
+    int32 error_code = 1;
+}
+
+message SetChatDescriptionReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+    string description = 4;
+}
+
+message SetChatDescriptionReply {
+    int32 error_code = 1;
+}
+
+message PinChatMessageReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+    int32 message_id = 4;
+    bool disable_notification = 5;
+}
+
+message PinChatMessageReply {
+    int32 error_code = 1;
+}
+
+message UnPinChatMessageReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+}
+
+message UnPinChatMessageReply {
+    int32 error_code = 1;
+}
+
+message SendChatActionReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+    string action = 4;
+}
+
+message SendChatActionReply {
+    int32 error_code = 1;
+}
+
+message SendContactReq {
+    int32 bot_id = 1;
+    int32 chat_id = 2;
+    basetypes.ChatType chat_type = 3; // 会话类型
+    string phone_number = 4;
+    string first_name = 5;
+    string last_name = 6;
+    string vcard = 7;
+    bool disable_notification = 8;
+    uint64 reply_to_message_id = 9;
+    bytes reply_markup = 10;
+}
+
+message SendContactReply {
+    int32 error_code = 1;
+}
+
+message GetGroupsReq {
+    int32 bot_id = 1;
+    int32 peer_filter = 2; // 2：只要普通群 4：只要超级群 8：只要频道 （可相互组合 ex: 2|4|8 暂时不支持单聊)
+}
+
+message Peer {
+    int32 PeerID = 1;
+    string PeerName = 2;
+}
+
+message GetGroupsReply {
+    int32 error_code = 1;
+    repeated Peer Groups = 2; // 普通群
+    repeated Peer SuperGroups = 3; // 超级群
+    repeated Peer Channels = 4; // 频道
+}
+
+message LipBlockReq {
+    int32 user_id = 1;
+    // 禁言时间
+    int64 blockTime = 2;
+    int64 group_id = 3;
+    int32 bot_id = 4;
+}
+
+message LipBlockReply {
+    int32 error_code = 1;
+}
+
+message KickNotBanReq {
+    int32 bot_id = 1; // 踢人的机器人ID
+    int32 user_id = 2; // 被踢的用户ID
+    int32 chat_id = 3;
+    basetypes.ChatType chat_type = 4;
+}
+
+message KickNotBanReply {
+    int32 error_code = 1;
+}
+
+message GetAdminGroupsReq {
+    int32 bot_id = 1;
+    int32 user_id = 2;
+}
+
+message GetAdminGroupsReply {
+    int32 error_code = 1;
+    repeated Peer Groups = 2; // 普通群
+    repeated Peer SuperGroups = 3; // 超级群
+    repeated Peer Channels = 4; // 频道
+}
+
+message SetJoinGroupsReq {
+    int32 bot_id = 1;
+    bool enable = 2; // true 允许加入 false 不允许加群
+}
+
+message SetJoinGroupsReply {
+    int32 error_code = 1; // 0 成功 其余失败
+}

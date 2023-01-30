@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package imgeoserver;
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imgeoserver/imgeoserver.proto
+
+service ServerService {
+
+    //超找附近的人或者群的操作
+    rpc GetNearContactAndChannel (GetNearContactAndChannelReq) returns (GetNearContactAndChannelResp) {
+    }
+
+    // 管理段设置群地理位置
+    rpc SetChnlGeo(SetChnlGeoReq) returns (SetChnlGeoRsp) {
+    }
+
+    // 管理端设置用户地理位置
+    rpc SetUserGeo(SetUserGeoReq) returns (SetUserGeoRsp) {
+    }
+
+    // 查询
+    rpc QueryNearbyVenues(QueryNearbyVenuesReq) returns (QueryNearbyVenuesRsp) {}
+    // 存储
+    rpc StoreNearbyVenues(StoreNearbyVenuesReq) returns (StoreNearbyVenuesRsp) {}
+}
+
+enum GeoResCode {
+    Successful = 0; // 成功
+    UnknownErr = 1; // 未知错误
+    InParamErr = 2; // 传入参数错误
+    ModelOpErr = 3; // model operation error
+    CacheOpErr = 4; // cache operation error
+}
+
+message Location {
+    double lng = 1; // longitude
+    double lat = 2; // latitude
+}
+
+message GetNearContactAndChannelResp {
+    bytes respbyts = 1;
+}
+
+message GetNearContactAndChannelReq {
+    int32 user_id = 1;
+    int64 key_id = 2;
+    int64 reqMessageId = 3;     //请求的msgId
+    bytes ReqBytes = 4;         //请求结构的二进制
+    bool IsAllowedChgGeo = 5;   //是否允许修改地理位置
+    pbcomm.Debug ReqDebug = 6;
+}
+
+// 设置群地理信息
+message SetChnlGeoReq {
+    int32       Chnl_id = 1;
+    double      Geo_lng = 2;
+    double      Geo_lat = 3;
+    string      GeoAddr = 4;
+}
+
+message SetChnlGeoRsp {
+    GeoResCode   ErrCode = 1;
+    string       ErrInfo = 2;
+}
+
+// 设置用户地理信息
+message SetUserGeoReq {
+    int32       User_id = 1;
+    int64       UserKey = 2;    // user key id.
+    double      Geo_lng = 3;    // longitude.
+    double      Geo_lat = 4;    // latitude.
+    pbcomm.Debug ReqDebug = 5;
+}
+
+message SetUserGeoRsp {
+    GeoResCode   ErrCode = 1;
+    string       ErrInfo = 2;
+}
+
+//
+
+message QueryNearbyVenuesReq {
+    int32 User_id = 1;
+    int64 Hash_id = 2;
+    double Geo_lng = 3;
+    double Geo_lat = 4;
+    string Keyword = 5;
+}
+
+message QueryNearbyVenuesRsp {
+    GeoResCode ErrCode = 1;
+    string ErrInfo = 2;
+    repeated VenueInfo Venues = 3;
+}
+
+message VenueInfo {
+   string VenueId   =1;
+   string VenueName =2;
+   string VenueType =3;
+   double GeoLat    =4;
+   double GeoLng    =5;
+   string Region    =6;
+   string Street    =7;
+   string Address   =8;
+   string Country   =9;
+   string Locality  =10;
+   string PostTown  =11;
+   string Timezone  =12;
+}
+
+// store venue information.
+message StoreNearbyVenuesReq {
+    repeated VenueInfo Venues = 1;
+}
+
+message StoreNearbyVenuesRsp {
+    GeoResCode ErrCode = 1;
+    string ErrInfo = 2;
+}

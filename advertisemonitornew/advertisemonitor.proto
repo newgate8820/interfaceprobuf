@@ -1,0 +1,198 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/advertisemonitornew/advertisemonitor.proto
+syntax = "proto3";
+
+package pbadvertisemonitor;
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+service AdvertiseMonitor {
+
+    //獲取所有禁言用戶
+    rpc GetBlockList(ReqGetBlockList) returns (ReplyGetBlockList) {}
+
+    // 解除單個用户限制
+    rpc UnBlockSingleUser(ReqUnBlockBannedUser) returns (ReplyData) {}
+
+    // 解除所有用户限制
+    rpc UnBlockAllUser(ReqUnBlockAllUser) returns (ReplyData) {}
+
+    // 獲取群成員消息發送條件限制
+    rpc GetSendMessageRuleSettings(ReqGetSendMessageRuleSettings) returns (ReplyGetSendMessageRuleSettings) {}
+
+    // 設定某個群的發消息規則
+    rpc UpdateMessageSendingLimit(ReqUpdateMessageSendingLimit) returns (ReplyData) {}
+
+    // 設定某個群的發消息規則
+    rpc UpdateMessageMaskWord(ReqUpdateMessageMaskWord) returns (ReplyData) {}
+
+    // 新增手動禁言名單
+    rpc SetManualBlockList(ReqSetManualBlockList) returns (ReplyData) {}
+
+    // 獲取手動禁言名單
+    //rpc GetManualBlockList(ReqUserId) returns (ReplyData) {}
+
+    // 刪除手動禁言名單
+    rpc DelManualBlockList(ReqDelManualBlockList) returns (ReplyData) {}
+
+    //    // 解除所有用户限制
+//    rpc SendMsgInfo(ReqSendMsgInfo) returns (ReplyData) {}
+}
+
+message ReqDelManualBlockList{
+    BlockUser UnBlockUser =1;
+    int32 bot_id = 2;
+    pbcomm.Debug Debug = 3;
+}
+
+message ReqSetManualBlockList{
+    BlockUser BlockUser =1;
+    int32 bot_id = 2;
+    pbcomm.Debug Debug = 3;
+}
+
+//獲取所有禁言用戶
+message ReqGetBlockList {
+}
+
+message ReplyGetBlockList {
+    repeated BlockUser BlockUserList =1;
+    int32 errorCode = 2;
+}
+
+//取消單個用戶
+message ReqUnBlockBannedUser{
+    repeated int32 userId =1;
+}
+
+// 解除所有用户限制
+message ReqUnBlockAllUser {
+}
+
+//管理員DuringTime秒內 , 同一用戶只允許發送MaxMsgCount條消息，超過群內禁言BlockTime小時
+//ex.管理員1秒內 , 同一用戶只允許發送2條消息，超過群內禁言１小時
+message MessageSendingLimit{
+    int64 DuringTime=3;  //時間間隔
+    int32 MaxMsgCount=4;     //最大消息數量
+    int64 BlockTime=5;  //被禁言的時間
+}
+
+message MessageMaskWord{
+    repeated string MaskWord=1; //屏蔽詞庫
+}
+
+message ReqGetSendMessageRuleSettings{
+    int64 GroupId =1;   // 群ID
+}
+
+message SendMessageRuleSettings{
+    int64 GroupId =1;
+    MessageSendingLimit MessageSendingLimit=2;
+    MessageMaskWord MessageMaskWord=3;
+}
+
+message ReplyGetSendMessageRuleSettings{
+   SendMessageRuleSettings SendMessageRuleSettings=1;
+}
+
+message ReqUpdateMessageSendingLimit{
+    int32 userId =1;
+    int64 GroupId =2;
+    MessageSendingLimit MessageSendingLimit=3;
+}
+
+message ReqUpdateMessageMaskWord{
+    int32 userId =1;
+    int64 GroupId =2;
+    MessageMaskWord MessageMaskWord=3;
+}
+
+////IM向AdvertiseMonitor發送msg的結構體
+//message ReqSendMsgInfo{
+//    int32 UserID  =1;    // 消息查询者
+//    int64 GroupId =2;   // 群ID
+//    string MessageContent  =3;  //消息内容
+//}
+
+message ReplyData{
+    bytes replyData = 1;
+    bool reply = 2;
+    int32 errorCode = 3;
+}
+
+//////////////////////////////////////////
+//                NATS
+//////////////////////////////////////////
+
+enum ProtocolType {
+    //一般禁言
+    BlockUserList_TYPE               = 0;       //禁言某用戶
+    UnBlockUserList_TYPE             = 1;       //解禁某用戶
+    MsgInfo_TYPE                     = 2;       //IM向AdvertiseMonitor發送msg的結構體
+    MsgInfoList_TYPE                 = 3;       //IM向AdvertiseMonitor發送msg list的結構體
+    UnBlockAllUser_TYPE              = 4;       //解禁所有用戶
+
+    //各別群設定(消息限制)
+    UnBlockGroupUser_TYPE              = 5;       //根據群id解禁所有用戶
+
+    //回覆確認
+    BlockUserList_CONFIRM_TYPE               = 6;           //禁言某用戶
+    UnBlockUserList_CONFIRM_TYPE             = 7;          //解禁某用戶
+    MsgInfo_CONFIRM_TYPE                     = 8;          //IM向AdvertiseMonitor發送msg的結構體
+    UnBlockAllUser_CONFIRM_TYPE               = 9;         //解禁所有用戶
+
+}
+
+enum BlockListType{
+    //禁言名單類型
+    NormalBlockList_TYPE = 0;   //一般禁言名單
+    ManualBlockList_TYPE = 1;   //手動禁言名單
+    GroupBlockList_TYPE = 2;    //群設定禁言名單
+}
+
+//發送請求
+message ReqNatsData {
+    ProtocolType Type = 1;
+    bytes data = 2;
+    int64 MessageId = 3;
+    string Hostname = 4;    //節點名稱
+    BlockListType BlockListType = 5;
+}
+
+//確認請求的回覆
+message ReplyNatsData{
+   bool Enable = 1;
+   int64 MessageId = 2;
+   string Hostname = 3;     //節點名稱
+}
+
+//禁言某用戶
+message BlockUser {
+    int32 userId =1;
+    int64 blockTime =2;  //禁言时间
+    int64 groupId =3;
+}
+
+//禁言多个用户
+message BlockUserList{
+    repeated BlockUser UserList = 1;
+}
+
+//解禁某用戶
+message UnBlockUserList {
+    repeated int32 userId =2;
+    repeated BlockUser UserList = 1;
+    int64 GroupId=3;
+}
+
+//IM向AdvertiseMonitor發送msg的結構體
+message MsgInfo{
+    int32 UserID  =1;    // 消息查询者
+    int64 GroupId =2;   // 群ID
+    string MessageContent  =3;  //消息内容
+    string phone = 4;
+    int32 ContentType = 5; //消息类型 0表示普通文本消息 1 表示图片
+}
+
+//IM向AdvertiseMonitor發送msg list的結構體
+message MsgInfoList{
+    repeated MsgInfo MsgInfoList =2;
+}

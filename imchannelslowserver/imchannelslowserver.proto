@@ -1,0 +1,42 @@
+syntax = "proto3";
+//protoc --gogofast_out=plugins=grpc:. imchannelslowserver.proto
+package imchannelslowserver;
+
+service imChanneSlowServerService {
+    // 更新调用慢速模式
+    rpc updateChannelSlowModule (updateChannelSlowModuleReq) returns (updateChannelSlowModuleResp) {
+    }
+
+    //校验是否慢速模式
+    rpc CheckIsSlowModel (CheckIsSlowModelReq) returns (CheckIsSlowModelResp) {
+    }
+
+}
+
+//检查慢速模式
+message CheckIsSlowModelReq {
+    int32 userId = 1;
+    int32 ChannelId = 2; //超级群ID
+    int32 sendTime = 3; //发送时间
+}
+
+//慢速模式返回,能不能发送消息
+message CheckIsSlowModelResp {
+    bool canSendMessage = 1; //是否能够发送消息
+    int32 nextTime = 2; //下一次发送还剩下时长
+}
+
+//设置或者修改群是否为慢速模式
+message updateChannelSlowModuleReq {
+    int32 OpId = 1; //操作者的ID
+    int64 keyId = 2;
+    int32 ChannelId = 4; //超级群的ID
+    bool IsSlowModule = 5; // 是否慢速模式
+    int32 PeerSlowSecond = 6; // 再慢速模式下
+}
+
+
+message updateChannelSlowModuleResp {
+    bool result = 1;
+}
+

@@ -1,0 +1,105 @@
+
+syntax = "proto3";
+
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/gameapi/gameapi.proto
+package gameapi;
+service gameapi {
+    // 游戏登录
+    rpc Login(ReqLogin) returns (ReplyLogin) {};
+}
+
+message ReqLogin {
+    string username    = 1;  // 用户名
+    string password    = 2;  // 密码
+    string ip          = 3;  // 登录ip
+}
+
+
+message ReplyLogin  {
+	int32               Status    = 1;           			//状态值：1 成功，其他数值代表失败	1
+	string              Msg       = 2;           			//接口请求的状态信息	SUCCESS
+	LoginRespData       Data      = 3;
+}
+
+message LoginRespData  {
+	int64           CreationTime         = 1;		//创建时间	2011-11-11 11:11:11
+	string        CreationBy           = 2;		//创建人
+	int64           LastUpdatedTime      = 3;		//新时间	2011-11-11 11:11:11
+	string        LastUpdatedBy        = 4;		//更新人	Test1
+	string        DataSourceKey        = 5;		//分库键	8bet
+	string        CurrentUser          = 6;		//当前登录用户	Test1
+	int32           UserId               = 7;		//用户id	3423
+	string        UserSystemId         = 8;		//系统生成的用户唯一标识(分库键+用户名)	8bet_423424
+	string        ProxyLinkCode        = 9;		//代理链	_342423_423423
+	string        ParentId             = 11;		//上级id	53453
+	string        ProxyAccount         = 12;		//父级代理信息
+	int32           UserLevelId          = 13;		//会员层级	1
+	string        MemberLevelName      = 14;		//会员层级名称
+	string        UserAccount          = 15;		//用户账号	Test1
+	string        UserPassword         = 16;		//密码
+	string        OldUserPassword      = 17;		//旧的用户秘密
+	string        RegisterIp           = 18;		//注册ip	0.0.0.0
+	string        RegisterSource       = 19;		//注册来源1:PC 2:IOS 3:安卓 4.H5	1
+	string        RegisterSourceName   = 20;		//来源名称 APPNAME(App Id) 或PC DOMAIN 	DOMAIN
+	string        RegisterMethodId     = 21;		//注册方式	1
+	string        Sex                  = 22;		//性别【1男0女】	1
+	string        Birthday             = 23;		//生日	19990909
+	string        NickName             = 24;		//昵称	放松
+	string        Email                = 25;		//电子邮件	131231@163.com
+	string        UserName             = 26;		//姓名	张三
+	string        Telephone            = 27;		//电话	132312312
+	string        UserQq               = 28;		//Qq	423423423
+	string        UserWx               = 29;		//微信	23423423
+	int32           IsFrist              = 30;		//是否首充【0否1是】	1
+	int32           IsOwner              = 31;		//是否内部会员【0否1是】	1
+	int32           IsEnable             = 32;		//是否启用【0否1是】	1
+	int32           IsFrozen             = 33;		//是否冻结【0否1是】	1
+	string        BundleVersionId      = 34;		//App版本id	42342
+	string        AppUuid              = 35;		//App序号	42342
+	string        ValidCode            = 36;		//验证码	23423
+	float       Balance              = 37;		//余额	100
+	float       Recharge             = 38;		//充值	100
+	string        CompanyInfo          = 39;		//公司信息
+	string        WithdrawPassword     = 40;		//取款密码
+	string        OldWithdrawPassword  = 41;		//旧的取款密码
+	string        LoginIp              = 42;		//登录ip	0.0.0.0
+	string        LoginRealAddress     = 43;		//登录真实地址	菲律宾
+	int64           LoginDate            = 44;		//登录时间
+	string        FGQP                 = 45;		//平台编码	T48BETFGQP3A116623
+	string        KAIYUAN600           = 46;		//平台编码	600w3A116623
+	string        ZILLIONAIRE          = 47;		//平台编码	8000233A116623
+	string        SSOCHESS             = 48;		//平台编码	2003223A116623
+	string        FGBY                 = 49;		//平台编码	T48BETFGBY3A116623
+	string        KYQP                 = 50;		//平台编码	713623A116623
+	string        StartDate            = 51;		//开始日期	2011-11-11 11:11:11
+	string        EndDate              = 52;		//结束日期	2011-11-11 11:11:11
+	string        MemberLevelVIP       = 53;		//会员vip等级	1
+	string        MemberLevelVIPID     = 54;		//会员vip等级id	13123
+	string        MemberLevelVIPName   = 55;		//会员vip等级名称	VIP5
+	string        DepositTotalMax      = 56;		//最大总存款	1
+	string        DepositTotalMin      = 57;		//最小总存款	1
+	string        WithdrawTotalMax     = 58;		//最大总提款	1
+	string        WithdrawTotalMin     = 59;		//最小总提款	1
+	string        TotalPayoffMax       = 61;		//最大总盈利	1
+	string        TotalPayoffMin       = 62;		//最小总盈利	1
+	string        WithdrawNumberMax    = 63;		//最大提款次数	1
+	string        WithdrawNumberMin    = 64;		//最小提款次数	1
+	string        DepositNumberMax     = 65;		//最大存款次数	1
+	string        DepositNumberMin     = 66;		//最小存款次数	1
+	string        Suffix               = 67;		//表后缀	0909
+	string        Note                 = 68;		//备注	备注
+	string        DebitType            = 69;      //
+	string        Token                = 70;		//认证信息	aedc4ff7-f2e5-460b-b3de-9ad258b33a7f
+	string        IntegralStartDate    = 71;		//打码量开始日期	2011-11-11 11:11:11
+	string        IntegralEndDate      = 72;		//打码量结束日期	2011-11-11 11:11:11
+	int32           BankCardCount       = 73;		//绑定银行卡数量	3
+	string        IsCapital            = 74;		//是否包含本金【0不包含1包含】	1
+	string        DamaMultiple         = 75;		//打码倍数	1
+	string        NeedDama             = 76;		//更改需求打码	100
+	string        InspectionStatus     = 77;		//稽查状态【0：未稽查1：稽查通过2：稽查未通过】
+	string        InspectionId         = 78;		//打码主键	111
+	string        IsHaveSubordinate    = 79;		//直属成员数量	1
+	string        TeamCounts           = 80;		//下级成员数量	1
+	bool          VerifyRedis         = 81;		//判断是否是直接开户验证码校验	false
+	string        OrderCode            = 82;		//会员订单号	3123123
+};

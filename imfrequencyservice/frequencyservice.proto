@@ -1,0 +1,93 @@
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/imfrequencyservice/frequencyservice.proto
+//protoc --gogofast_out=plugins=grpc:. *.proto
+syntax = "proto3";
+
+package imfrequencyservice;
+
+//Frequency服务
+service FrequencyService {
+
+    //根据crc和keyid判断频率
+    rpc CheckFrequencyByCRC (CheckFrequencyByCRCReq) returns (CheckFrequencyResult) {
+    };
+
+    //判断sendmessage
+    rpc CheckSendMessageFrequency (CheckSendMessageReq) returns (CheckFrequencyResult) {};
+
+    // 获取监控配置
+    rpc GetConfig(GetConfigRequest) returns (GetConfigResult){};
+    // 上报异常频率
+    rpc ReportFrequency(ReportFrequencyRequest) returns (ReportFrequencyResult) {};
+
+    // 计数api call
+    rpc IncAPICall(IncAPICallRequest) returns (IncAPICallResult);
+}
+
+enum ResultType {
+    Status_OK = 0; //没有异常, 可以正常调用
+    CrcOverflowType = 1; //用户调用当前协议频率异常,不要继续调用
+    KeyOverflowType = 2; //用户调用协议总次数频率异常, 不要继续调用
+    IsRepeatRequest = 3; //是重复的请求
+}
+
+message CheckSendMessageReq {
+    uint64 keyId = 1;
+    uint32 crcId = 2;
+    uint64 messageId = 3;
+    int32 userId = 4;
+    bytes messageObjBin = 5;
+    string clientIp = 6;
+}
+
+//CheckFrequencyReq
+message CheckFrequencyByCRCReq {
+    uint64 keyId = 1;
+    uint32 crcId = 2;
+    uint64 messageId = 3;
+    int32 userId = 4;
+    string clientIp = 5;
+}
+
+//CheckFrequencyResult
+message CheckFrequencyResult {
+    ResultType resultCode = 1; //返回结果类型
+    int64 blockTime = 2; // 封禁时间, 如果=0,则没有被封 单位: 秒
+}
+
+message FrequencyConfig{
+    double qps = 1;
+}
+
+message GetConfigRequest{}
+message GetConfigResult{
+    map<uint32, FrequencyConfig> config = 1; // crc对应的配置
+}
+
+message ReportFrequencyRequest{
+    uint32 crc = 1; // 协议id
+    double avg_qps = 2;  // 平均每秒频率
+    double avg_qpm = 3;  // 平均每分钟频率
+    double avg_qph = 4;  // 平均每小时频率
+    double instant_qps = 5; // 最近60s频率
+    int32 user_id = 6;   // 用户id
+    int64 key_id = 7;    // 客户端keyid
+}
+message ReportFrequencyResult{
+    int64 report_after = 1; // 下次上报时间点控制 unix时间戳
+}
+
+message IncAPICallRequest{
+    int32 user_id = 1;
+    uint32 crc = 2;
+}
+message IncAPICallResult{
+    Code code = 1;
+    int32 tpm = 2;
+    int32 tph = 3;
+    int32 tpd = 4;
+
+    enum Code{
+        Unlimited = 0;
+        Limited = 1;
+    }
+}

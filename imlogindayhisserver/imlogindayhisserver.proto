@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package imlogindayhisserver;
+
+service ImLoginDayHisServer {
+    //设置本日登录
+    rpc SetLoginHisDay (SetLoginHisDayReq) returns (SetLoginHisDayResult) {
+    };
+    //判断本日是否登录
+    rpc GetNowDayHisDay (GetNowDayHisDayReq) returns (GetNowDayHisDayResult) {
+    };
+    //获取历史数量
+    rpc GetHisCount (GetHisCountReq) returns (GetHisCountResult) {
+    };
+}
+
+message SetLoginHisDayReq {
+    int32 user_id = 1; // 请求者id
+}
+
+message SetLoginHisDayResult {
+    bool result = 1; //
+    int32 count = 2; //登录数量
+    ResultCode code = 3; //接口标识
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message GetNowDayHisDayReq {
+    int32 user_id = 1; // 请求者id
+}
+
+message GetNowDayHisDayResult {
+    bool result = 1; //
+    ResultCode code = 2; //接口标识
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message GetHisCountReq {
+    int32 user_id = 1; // 请求者id
+}
+
+message GetHisCountResult {
+    int32 count = 1;
+    ResultCode code = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+

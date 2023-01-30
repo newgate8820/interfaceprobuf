@@ -1,0 +1,61 @@
+syntax = "proto3";
+package infoserver;
+// protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/im/iminterfaceprotobufs/infoserver/grouplive.proto
+message GroupLiveInfo {
+    int32   BeginAt   = 1;
+    int32   CloseAt   = 2;
+    int32   GroupId   = 3;
+    int32   MediaId   = 4; // 开播消息媒体ID
+    int32   LiveType  = 5;
+    int32   LiveUser  = 6;
+    string  LiveFlag  = 7;
+    string  LiveName  = 8;
+    string  LiveIcon  = 9;
+    int64   InviteCnt = 10 ;
+    string  InviteQRC = 11;
+}
+
+enum ErrorCode {
+    Successfuly = 0;
+    UserUnknown = 1; // 用户不存在
+    ChanUnknown = 2; // 群组不存在
+    IllegalArgs = 3; // 非法参数
+    HaveNoPower = 4; // 没有权限
+    InternalErr = 5; // 服务内部错误
+}
+
+
+// @ for start group live
+message GroupLiveStartReq {
+
+}
+message GroupLiveStartRsp {
+    ErrorCode   ReplyCode = 1;
+}
+
+// @ for stop group live
+message GroupLiveCloseReq {
+    int32 GroupId = 1;
+    int32 UserId = 2;
+}
+message GroupLiveCloseRsp {
+    ErrorCode     ReplyCode = 1;
+    GroupLiveInfo FinalInfo = 2;
+}
+
+// @ for edit group live info.
+message EditGroupLiveReq {
+    string LiveName = 1;
+    string LiveIcon = 2;
+}
+message EditGroupLiveRsp {
+    ErrorCode     ReplyCode = 1;
+}
+
+// @ for join group from live counter
+message JoinFromLiveReq {
+    string LiveCode = 1;
+}
+message JoinFromLiveRsp {
+    ErrorCode   ReplyCode = 1;
+}

@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package storagebfss;
+
+// 文件存储RPC接口
+service FileStorageBFSS {
+    // 获取文件下载信息
+    rpc BFSSGetFilePt(BFSSGetFilePtReq) returns (BFSSGetFilePtResp) {}
+
+    // BFSS上传小文件
+    rpc BFSSSaveFilePartPt(BFSSSaveFilePartPtReq) returns (BFSSSaveFilePartPtResp) {}
+
+    // BFSS上传大文件
+    rpc BFSSSaveBigFilePartPt(BFSSSaveBigFilePartPtReq) returns (BFSSSaveBigFilePartPtResp) {}
+
+    // 上传BFSS文件完成通知
+    rpc BFSSSaveFileComplete(BFSSSaveFileCompleteReq) returns (BFSSSaveFileCompleteResp) {}
+
+    // 上传BFSS文件完成通知
+    rpc BFSSResetObjectId(BFSSResetObjectIdReq) returns (BFSSResetObjectIdResp) {}
+}
+
+// 块信息
+message ObjectBlockInfo {
+    uint32                  BlockSize       = 1;        // 当前块在这个对象中所占的数据大小（由于块是加密的，所以这里的大小是按16字节块对齐的）
+    uint32                  DataOff         = 2;        // 当前块在这个对象中的数据偏移（由于块是加密的，所以这里的偏移是按16字节块对齐的）
+    bytes                   BlockKey        = 3;        // 块对应的密钥
+}
+
+// 请求文件下载信息
+message BFSSGetFilePtReq {
+    uint64                  FileId             = 1;     // 文件ID
+}
+
+// 返回文件下载信息
+message BFSSGetFilePtResp {
+    uint32                      ObjectSize          = 1;        // 对象大小
+    string                      AccessHash          = 2;        // hash
+    repeated ObjectBlockInfo    ObjectBlockInfos    = 3;        // 块信息，一个对象需要很多块存储，跨块
+}
+
+// 请求上传小文件
+message BFSSSaveFilePartPtReq {
+    uint64                 FileId           = 1;        // 文件ID
+    uint32                 FileSize         = 2;        // 文件大小
+    uint32                 FilePart         = 3;        // 当前块
+    uint32                 Offset           = 4;        // 平移
+    bytes                  Data             = 5;        // buff
+}
+
+// 上传小文件返回
+message BFSSSaveFilePartPtResp {
+    bool                   Success          = 1;        // 返回是否上传成功
+}
+
+// 请求上传大文件
+message BFSSSaveBigFilePartPtReq {
+    uint64                 FileId           = 1;        // 文件ID
+    uint32                 FileSize         = 2;        // 文件大小
+    uint32                 FileTotalParts   = 3;        // 总块数
+    uint32                 FilePart         = 4;        // 当前块
+    uint32                 Offset           = 5;        // 平移
+    bytes                  Data             = 6;        // buff
+}
+
+// 上传大文件返回
+message BFSSSaveBigFilePartPtResp {
+    bool                   Success          = 1;        // 返回是否上传成功
+}
+
+// 上传文件完成通知
+message BFSSSaveFileCompleteReq {
+    uint64                 FileId           = 1;        // 文件ID
+    uint32                 FileSize         = 2;        // 文件大小
+    uint32                 Flag             = 3;        // Flag=1小文件，Flag=2大文件
+}
+
+// 上传文件完成返回
+message BFSSSaveFileCompleteResp {
+    bool                   Success          = 1;        // 返回是否上传成功
+}
+
+// 上传文件完成通知
+message BFSSResetObjectIdReq {
+    uint64                 FileId           = 1;        // 文件ID
+    uint64                 NewId            = 2;        // 新ID
+    string                 NewTag           = 3;        // Flag=1小文件，Flag=2大文件
+}
+
+// 上传文件完成返回
+message BFSSResetObjectIdResp {
+    bool                   Success          = 1;        // 返回是否上传成功
+}

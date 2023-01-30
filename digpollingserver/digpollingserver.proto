@@ -1,0 +1,50 @@
+syntax = "proto3";
+// protoc --gogofast_out=plugins=grpc:. *.proto
+package digpollingserver;
+
+service ServerService {
+    //
+    rpc ManualCollect (ManualCollectReq) returns (ManualCollectResp) {
+    };
+
+    rpc DivideMultiSig (DivideMultiSigReq) returns (DivideMultiSigRsp) {
+    }
+}
+
+
+message UserPrivate {
+    string Address =1;
+    string EncryPriv = 2;
+}
+message ManualCollectReq {
+    int32 CurrencyId=1;
+    int32 ThresholdRelation=2;
+    float Threshold=3;
+    float CollectRatio=4;
+    string  ToAddress=5;
+
+}
+message ManualCollectResp {
+
+    int32 errorCode = 1;
+}
+
+//获取此次交易手续费請求
+message DivideMultiSigReq {
+    int32  DivideId = 1; //數字貨幣類型
+    int32 CurrencyId = 2; // 發送方地址
+    string FromAddress = 3; // 加密的私鑰
+    int32 ToWalletType = 4; // 发送方的userId
+    string ToAddress = 5; //转向的地址
+    string Amount = 6; //交易余额  比如 BTC: 0.0001 BTC
+    int32 CreateTimestamp=7;
+    repeated UserPrivate Signs=8;
+    int32 M=9;
+}
+
+//获取此次交易手续费返回
+message DivideMultiSigRsp {
+    int32 errCode = 1; // 返回状态
+    string TxId = 2;
+
+}

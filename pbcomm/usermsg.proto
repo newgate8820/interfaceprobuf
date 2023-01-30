@@ -1,0 +1,51 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+syntax = "proto3";
+package pbcomm;
+
+// 用户消息
+message UserMsg {
+    int64   Id              = 1;  // 唯一键
+    int32   UserId          = 2;  // 用户ID
+    int32   WithId          = 3;  // 消息交互方
+    int32   WithIdType      = 4;  // 消息交互方类型 1.user 2:chat 3:channel
+    int32   MessageType     = 5;  // 消息类型
+    int32   Flags           = 6;  // 消息标识
+    bool    Out             = 7;  // 是否为自己发送
+    bool    Mentioned       = 8;  // 是否提及他人
+    bool    MediaUnread     = 9;  // 媒体是否已读
+    bool    Silent          = 10; // 是否静音
+    bool    Post            = 11; // 是否邮递
+    int64   GroupId         = 12; // 图片组ID
+    int32   MsgId           = 13; // 消息id
+    int32   ToId            = 14; // 接收方id
+    int32   Pts             = 15; // 消息的pts
+    bytes   FwdFrom         = 16; // 引用
+    int32   ViaBotId        = 17; // 机器人id
+    int32   ReplyToMsgId    = 18; // 回复id
+    int32   Date            = 19; // 时间
+    string  Message         = 20; // 消息内容
+    int64   Media           = 21; // 媒体id
+    bytes   MediaData       = 22; // 媒体二进制
+    bytes   ReplyMarkup     = 23; // 小键盘
+    repeated bytes Entities = 24; // 高亮
+    int32   FromId          = 25; // 发送方
+    int32   Views           = 26; // 查看人数
+    int32   EditDate        = 27; // 编辑时间
+    bytes   Action          = 28; // 行为
+    int64   RandomId        = 29; // 随机id
+    int64   Uuid            = 30; // 消息全局唯一id
+    int32   InsertDate      = 31; // 插入时间
+    int32   UpdateDate      = 32; // 更新时间
+    int32   Encry           = 33; // 是否加密信息 0: 不加密 1：加密
+    Combination Combination = 34; // 预留字段,生成的时候需要在结果地方追加 xorm:"json"
+}
+
+message MentionStatus {
+    int32 UserId = 1;
+    int32 Status = 2;
+}
+
+message Combination {
+    repeated MentionStatus MentionedSlice = 1; // @人 二进制
+    repeated int64 KeyId                  = 2; // keyId 判断
+}

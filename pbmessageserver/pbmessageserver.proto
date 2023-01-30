@@ -1,0 +1,2822 @@
+//protoc --gogofast_out=plugins=grpc:. *.proto
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbmessageserver/pbmessageserver.proto
+syntax = "proto3";
+package pbmessageserver;
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+// import "gitlab.chatserver.im/interfaceprobuf/pbcomm/usermsg.proto";
+import "gitlab.chatserver.im/interfaceprobuf/pbmessagedb/messagedb.proto";
+
+service MessageServer {
+    // 机器人调用接口
+    rpc BotCall (ReqBotCall) returns (ReplyBotCall) {
+    }
+    rpc BotInlineCall (ReqBotInlineCall) returns (ReplyBotInlineCall) {
+    }
+    // 设置游戏分数
+
+    rpc SetGameScore (ReqSetGameScore) returns (ReplySetGameScore) {
+    }
+    // 踢人
+    rpc RemoveConn (ReqRemoveConn) returns (ReplyRemoveConn) {
+    }
+    // 注册激活系统号
+    rpc SignUpMsg (ReqSignUpMsg) returns (ReplyBool) {
+    }
+    // 发送短信消息接口
+    rpc SendCodeMsg (ReqSendCodeMsg) returns (ReplyBool) {
+    }
+    // 登录成功其他端发送登录ip消息
+    rpc SignInMsg (ReqSignInMsg) returns (ReplyBool) {
+    }
+    // 多端同步发送
+    rpc SendSynMsg (ReqSendSynMsg) returns (ReplyBool) {
+    }
+    // 发送给对方所有端
+    rpc SendUserMsg (ReqSendUserMsg) returns (ReplyBool) {
+    }
+    // 给单端发消息
+    rpc SendUserOneClientMsg (ReqSendUserOneClientMsg) returns (ReplyBool) {
+    }
+    // 群发多人 (其他服务)
+    rpc SendMoreUserMsg (ReqSendMoreUserMsg) returns (ReplyBool) {
+    }
+    // 发送打电话消息 (其他服务)
+    rpc SendCallMsg (ReqSendCallMsg) returns (ReplyBool) {
+    }
+    // 打电话推送调用
+    rpc CallPush (ReqCallPush) returns (ReplyCallPush) {
+    }
+    //    获取对话框
+    rpc GetDialog (RequestDialog) returns (ReplyDialog) {
+    }
+    // 获取最近操作的对话框 limit 个
+    rpc GetLastLimitDialog (messagedb.ReqGetLastLimitDialog) returns (ReplyGetLastLimitDialog) {
+    }
+    // 获取pinned对话框
+    rpc GetPinnedDialogs (ReqPinnedDialogs) returns (ReplyDialog) {
+    }
+    // 获取单独对话框
+    rpc GetPeerDialogs (ReqPeerDialogs) returns (ReplyDialog) {
+    }
+    // 获取最近位置
+    rpc GetRecentLocations (ReqRecentLocations) returns (ReplyResult) {
+    }
+    // 置顶对话框
+    rpc PinDialog (ReqPinDialog) returns (ReplyBool) {
+    }
+    // ios 置顶对话框
+    rpc ReorderPinnedDialogs (ReqReorderPinnedDialogs) returns (ReplyBool) {
+    }
+    // get status 获取状态信息
+    rpc GetState (ReqGetState) returns (ReplyResult) {
+    }
+    //    发送消息
+    rpc SendMessage (RequestSendMessage) returns (ReplyResult) {
+    }
+    // 系统号发消息
+    rpc SYSSendMessage (RequestSySSendMessage) returns (ReplyResult) {
+    }
+    //    发送媒体消息
+    rpc SendMedia (ReqSendMedia) returns (ReplyResult) {
+    }
+    // 上传媒体
+    rpc UploadMedia (ReqUploadMedia) returns (ReplyResult) {
+    }
+    // 获取部分消息
+    rpc GetMsg (ReqGetMsgs) returns (ReplyGetMsgs) {
+    }
+    //    获取历史
+    rpc GetHistory (ReqHistory) returns (ReplyHistory) {
+    }
+    //    创建普通群
+    rpc CreateChat (ReqCreateChat) returns (ReplyCreateChat) {
+    }
+    //    普通群添加成员
+    rpc AddChatUser (ReqAddChatUser) returns (ReplyAddChatUser) {
+    }
+    //    普通群删除成员
+    rpc DeleteChatUser (ReqDeleteChatUser) returns (ReplyDeleteChatUser) {
+    }
+    // 编辑群管理员
+    rpc EditChatAdmin (ReqEditChatAdmin) returns (ReplyEditChatAdmin) {
+    }
+    // 编辑群头像
+    rpc EditChatPhoto (ReqEditChatPhoto) returns (ReplyEditChatPhoto) {
+    }
+    //    编辑群名称
+    rpc EditChatTitle (ReqEditChatTitle) returns (ReplyEditChatTitle) {
+    }
+    // 获取所有群 (除去部分)
+    rpc GetAllChats (ReqGetAllChats) returns (ReplyGetAllChats) {
+    }
+    // 获取群的完整信息
+    rpc GetFullChat (ReqGetFullChat) returns (ReplyGetFullChat) {
+    }
+    //    普通群升级超级群
+    rpc MigrateChat (ReqMigrateChat) returns (ReplyMigrateChat) {
+    }
+    //    转发消息
+    rpc ForwardMessages (ReqForwardMessages) returns (ReplyForwardMessages) {
+    }
+    // 消息服务内部发消息
+    rpc S2SSendMsg (ReqS2SMsg) returns (ReplyS2SMsg) {
+    }
+    // 获取pts
+    rpc GetPts (ReqGetPts) returns (ReplyGetPts) {
+    }
+    // 读取历史
+    rpc ReadHistory (ReqReadHistory) returns (ReplyReadHistory) {
+    }
+    // 更新双勾
+    rpc UpdateReadOutBox (ReqUpdateReadOut) returns (ReplyUpdateReadOut) {
+    }
+    // pts矫正
+    rpc GetDiffByPts (ReqDiffByPts) returns (ReplyDiffByPts) {
+    }
+    // 删除历史
+    rpc DeleteHistory (ReqDeleteHistory) returns (ReplyDeleteHistory) {
+    }
+    // 删除消息
+    rpc DeleteMessages (ReqDeleteMessages) returns (ReplyDeleteMessages) {
+    }
+    // 编辑消息
+    rpc EditMessage (ReqEditMessage) returns (ReplyEditMessage) {
+    }
+    // 获取对话框特殊信息
+    rpc GetNotifySettings (ReqNotifySettings) returns (ReplyNotifySettings) {
+    }
+    // 更新特殊对话框信息
+    rpc UpdateNotifySettings (ReqUpdateNotifySettings) returns (ReplyUpdateNotifySettings) {
+    }
+    // 获取消息编辑的数据
+    rpc GetMessageEditData (ReqMessageEditData) returns (ReplyMessageEditData) {
+    }
+    // 存储草稿
+    rpc SaveMsgDraft (ReqSaveMsgDraft) returns (ReplySaveMsgDraft) {
+    }
+    // 获取未读数
+    rpc GetUserUnRead (ReqGetUserUnRead) returns (ReplyUserUnread) {
+    }
+    // 搜索媒体
+    rpc SearchMedia (ReqMessageSearch) returns (ReplyResult) {
+    }
+    rpc CheckChatInvite (ReqCheckChatInvite) returns (ReplyResult) {
+    }
+    //###############################channel#####################################
+    //    rpc SendChannelMessage (RequestSendMessage) returns (ReplySendMessage) {
+    //    }
+    //    rpc SendChannelMedia (ReqSendMedia) returns (ReplySendMedia) {
+    //    }
+    //创建频道
+    rpc CreateChannel (RequestChannel) returns (ReplyChannel) {
+    }
+    //邀请用户进入超级群或者频道
+    rpc InviteChannelMember (RequestChannelInvite) returns (ReplyChannelInvite) {
+    }
+    //踢人出超级群或者频道
+    rpc KickFromChannel (ReqChannelKick) returns (ReplyChannelKick) {
+    }
+    //离开超级群或者频道
+    rpc LeaveChannel (ReqLeaveChannel) returns (ReplyLeaveChannel) {
+    }
+    //编辑超级群或者频道的标题
+    rpc EditChannelTitle (ReqEditChannelTitle) returns (ReplyEditChannelTitle) {
+    }
+    //升级或降级超级群或者频道的用户权限
+    rpc EditChannelAdmin (ReqEditChannelAdmin) returns (ReplyEditChannelAdmin) {
+    }
+    //修改超级群或者频道的头像
+    rpc EditChannelPhoto (ReqEditChannelPhoto) returns (ReplyEditChannelPhoto) {
+    }
+    //修改超级群或者频道的描述信息
+    rpc EditChannelAbout (ReqEditChannelAbout) returns (ReplyEditChannelAbout) {
+    }
+    //删除超级群或者频道的消息
+    rpc DeleteChannelMessages (ReqDeleteChannelMessages) returns (ReplyDeleteChannelMessages) {
+    }
+    rpc DeleteChannelSelfHistory (ReqDeleteChannelSelfHistory) returns (ReplyBool) {
+    }
+    //清除超级群或者频道某用户的历史
+    rpc DeleteChannelHistory (ReqDeleteChannelHistory) returns (ReplyDeleteChannelHistory) {
+    }
+    //置顶超级群或者频道的消息
+    rpc UpdatePinnedChannelMessage (ReqUpdatePinnedChannelMessage) returns (ReplyUpdatePinnedChannelMessage) {
+    }
+    //    rpc MigrateChatEvent (ReqMigrateChat) returns (ReplyMigrateChat) {
+    //    }
+    //修改超级群或者频道的消息读取状态
+    rpc UpdateChannelReadHistory (ReqReadChannelHistory) returns (ReplyReadChannelHistory) {
+    }
+    //获取超级群或者频道的修正信息
+    rpc GetChannelDifference (ReqGetchannelDifference) returns (ReplyChannelDiffCommon) {
+    }
+    //获取超级群或者频道的历史
+    //    rpc GetChannelHistory (ReqGetChannelMsgHistory) returns (ReplyChannelMsgs) {
+    //    }
+    //通过消息ID获取超级群或者频道的消息
+    rpc GetChannelMessagesByMsgsId (ReqGetChannelMsgsByMsgsId) returns (ReplyChannelMsgs) {
+    }
+    //主动加入超级群或者频道
+    rpc JoinChannel (ReqJoinChannel) returns (ReplyJoinChannel) {
+    }
+    //解散超级群或者频道
+    rpc DeleteChannel (ReqDeleteChannel) returns (ReplyDeleteChannel) {
+    }
+    //通过用户ID获取超级群或者频道的最后一条消息
+    rpc GetChannelsLastMsgsByUserId (ReqGetChannelsLastMsgsByUserId) returns (ReplyGetChannelsLastMsgsByUserId) {
+    }
+    //获取超级群或者频道的管理记录
+    rpc GetChannelAdminLog (ReqChannelAdminLog) returns (ReplyChannelAdminLog) {
+    }
+    //通过link加入超级群或者频道
+    rpc ImportChatInvite (ReqImportChatInvite) returns (ReplyImportChatInvite) {
+    }
+    //踢人并进组其再次加入超级群或者频道，或者解除该禁止
+    rpc EditBanChannelUser (ReqBanChannelUser) returns (ReplyBanChannelUser) {
+    }
+    //获取full channel
+    rpc GetFullChannel (ReqFullchannel) returns (ReplyFullChannel) {
+    }
+    rpc GetParticipant (ReqParticipant) returns (ReplyParticipant) {
+    }
+    rpc GetParticipants (ReqParticipants) returns (ReplyParticipants) {
+    }
+    rpc ExportChannelLink (ReqExportChannelLink) returns (ReplyExportChannelLink) {
+    }
+    rpc ChannelToggleInvite (ReqChannelToggleInvite) returns (ReplyChannelToggleInvite) {
+    }
+    rpc Getchannels (ReqGetChannels) returns (ReplyGetChannels) {
+    }
+    rpc UpdateChannelUserName (ReqChannelUpdateUserName) returns (ReplyChannelUpdateUserName) {
+    }
+    rpc CheckChannelUserName (ReqChannelCheckUserName) returns (ReplyChannelCheckUserName) {
+    }
+    //变更群主
+    rpc ChangeGroupAndChannelCrator (ReqChangeGroupAndChannelCrator) returns (ReplyChangeGroupAndChannelCrator) {
+    }
+    // ====================================================== 为机器人服务提供数据 ======================================================
+    // 根据 消息id和用户id 获取单聊消息\普通群消息
+    rpc GetMessageByUserIdMsgId (ReqGetMessageByUserIdMsgId) returns (ReplyGetMessageByUserIdMsgId) {
+    }
+
+    // 根据 uuid和用户id 获取单聊消息\普通群消息
+    rpc GetMessageByUserIdUuid (ReqGetMessageByUserIdUuid) returns (ReplyGetMessageByUserIdUuid) {
+    }
+
+    // 根据 超级群ID和消息ID查询超级群信息
+
+    rpc GetChannelMessageByChannelIdMsgId (ReqGetChannelMessageByChannelIdMsgId) returns (ReplyGetChannelMessageByChannelIdMsgId) {
+    }
+    // ================== 存储 电话信息 联系人 加密聊天请求 二进制信息 ==================
+    // infoService 调用存储信息
+    rpc StoreOtherInfoMsg (messagedb.ReqStoreOtherInfoMsg) returns (ReplyStoreOtherInfoMsg) {
+    }
+
+    // 批量 存储 otherInfoMsg
+    rpc BatchStoreOtherInfoMsg (messagedb.ReqBatchStoreOtherInfoMsg) returns (ReplyBatchStoreOtherInfoMsg) {
+    }
+
+    //    // 获取infoMsg信息
+    //    rpc GetOtherInfoMsg (messagedb.ReqGetOtherInfoMsg) returns (pbmessageserver.liiu) {
+    //    }
+
+    //发送加密聊天请求
+    rpc RequestEncryption (RequestEncryptionReq) returns (RequestEncryptionResult) {
+    }
+    //接收加密聊天
+    rpc AcceptEncryption (AcceptEncryptionReq) returns (AcceptEncryptionResult) {
+    }
+    //发送加密聊天普通消息
+    rpc SendEncrypted (SendEncryptedReq) returns (SendEncryptedResult) {
+    }
+    //发送加密聊天媒体消息
+    rpc SendEncryptedFile (SendEncryptedFileReq) returns (SendEncryptedFileResult) {
+    }
+    //发送加密聊天action消息
+    rpc SendEncryptedService (SendEncryptedServiceReq) returns (SendEncryptedServiceResult) {
+    }
+    //发送加密聊天取消
+    rpc DiscardEncryption (DiscardEncryptionReq) returns (DiscardEncryptionResult) {
+    }
+    //加密聊天双钩
+    rpc ReadEncryptedHistory (ReadEncryptedHistoryReq) returns (ReadEncryptedHistoryResult) {
+    }
+    //加密聊天settyping
+    rpc SetEncryptedTing (SetEncryptedTypingReq) returns (SetEncryptedTypingResult) {
+    }
+    //LogOut后删除所有的加密聊天
+    rpc LogoutDisCardAllSecurity (LogoutDisCardAllSecurityReq) returns (LogoutDisCardAllSecurityResult) {
+    }
+    //获取加密聊天的randomId 们
+    rpc GetSecurityRandomIds (GetSecurityRandomIdsReq) returns (GetSecurityRandomIdsResult) {
+    }
+
+    rpc ReceiveRedPacket (ReqReceiveRedPacket) returns (ReplyReceiveRedPacket) {
+    }
+
+    rpc GetChannelInactiveUsers (GetChannelInactiveUsersReq) returns (GetChannelInactiveUsersResult) {
+    }
+
+    // 105 add 归档对话框
+    rpc FoldersEditPeerFolders (FoldersEditPeerFoldersReq) returns (FoldersEditPeerFoldersReply) {
+    }
+
+    // 105 删除归档对话框
+    rpc FoldersDeleteFolder (FoldersDeleteFolderReq) returns (FoldersDeleteFolderReply) {
+    }
+
+    // 105 发送投票
+    rpc SendVote (SendVoteReq) returns (SendVoteReply) {
+    }
+
+    //发送支付结果通知 接口，为支付定制
+    rpc SendPaymentNotifyMsg (ReqSendPaymentNotifyMsg) returns (RspSendPaymentNotifyMsg) {
+    }
+
+
+    rpc SendBatchUsersMsg (ReqSendMoreUserMsg) returns (ReplyBool) {
+    }
+    //加好友成功后的相互通知消息
+    rpc SendAddMutulContactNotify (ReqSendAddMutulContactNotify) returns (RespSendAddMutulContactNotify) {
+    }
+
+    //单方面加好友通知消息
+    rpc SendAddSingleContactNotify (ReqSendAddSingleContactNotify) returns (RespSendAddSingleContactNotify) {
+    }
+
+    // 朋友圈通知消息
+    rpc SendMediaSysNotify (ReqSendMediaSysNotify) returns (RespSendMediaSysNotify) {
+    }
+
+    // 编辑媒体消息 by ty 2020.09.27
+    rpc EditMessageMedia (ReqEditMessageMedia) returns (RespEditMessageMedia) {
+    }
+}
+
+
+// 系统号推送富文本消息请求接口
+message ReqSendMediaSysNotify {
+    string msgId = 1; //后台管理记录数据id
+    int32 fromId = 2;
+    int32 sourceCode = 3;
+    bytes request = 4;
+    int32 layer = 5;
+    pbcomm.Debug debug = 6;
+}
+
+// 系统号推送富文本消息返回接口
+message FailUser{
+    int32 user = 1;
+    string msg = 2;
+}
+
+message SucceedUser{
+    int32 user = 1;
+    string msg = 2;
+}
+
+// 后台管理回调填充数据
+message CallBackRespSendMediaSysNotify{
+    repeated FailUser failUsers = 2;
+    repeated SucceedUser SucceedUsers = 3;
+}
+
+message RespSendMediaSysNotify {
+    int32 errorCode = 1;
+    string errorMsg = 2;
+}
+// 编辑媒体消息
+message ReqEditMessageMedia {
+    int32 form_id = 1; // 编辑方id
+    uint64 from_keyid = 2;
+    bytes peer = 3; // 框
+    int32 id = 4; // id
+    bytes media = 5; //inputMedia
+    pbcomm.Debug debug = 6;
+}
+
+message RespEditMessageMedia {
+    bytes UpdateEditMessage = 1;
+    int32 error = 2; // 1.获取消息失败 2.编辑失败
+}
+
+message InlineCall {
+    int32 MsgId = 1;
+    int32 FromId = 2;
+    int32 ChatId = 3;
+    int32 ChatType = 4;
+    int32 BotId = 5;
+}
+
+message ChannelInactiveUser {
+    int32 id = 1; //用户ID
+    string name = 2; //用户名
+    int32 time = 3; //活跃时间
+    string timeStr = 4; //活跃时间格式化字符串
+}
+
+message GetChannelInactiveUsersReq {
+    int32 channelId = 1;
+    int32 limit = 2;
+    int32 userid = 3;
+}
+
+message GetChannelInactiveUsersResult {
+    repeated ChannelInactiveUser users = 1;
+    int32 count = 2; //群当前总人数
+}
+
+//获取加密聊天的randomId的请求
+message GetSecurityRandomIdsReq {
+    int64 key_id = 1; //取消方的端的标识
+    int32 max_qts = 2; //获取需要的qts
+    pbcomm.Debug debug = 3;
+}
+
+//获取加密聊天的randomId 们的返回值
+message GetSecurityRandomIdsResult {
+    ErrorCode errcode = 1; //错误码
+    repeated int64 random_ids = 2; //查询到的Id的列表
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+
+//LogOut后删除所有的加密聊天的请求
+message LogoutDisCardAllSecurityReq {
+    int32 user_id = 1; //取消方的用户的Id
+    int64 key_id = 2; //取消方的端的标识
+    pbcomm.Debug debug = 3;
+}
+//LogOut后删除所有的加密聊天的返回
+message LogoutDisCardAllSecurityResult {
+    ErrorCode errcode = 1;
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+
+//加密聊天settyping状态
+message SetEncryptedTypingReq {
+    int32 user_id = 1; //阅读消息方的Id
+    int64 key_id = 2; //阅读方的端标识
+    int32 chat_id = 3; //所读的加密聊天的Id
+    int64 access_hash = 4; //加密聊天哈希值
+    pbcomm.Debug debug = 5;
+}
+
+//加密聊天settyping返回
+message SetEncryptedTypingResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        failed = 1; //失败
+        AccessHashErr = 2; //错误的哈希值
+    }
+}
+
+//加密聊天双钩的请求
+message ReadEncryptedHistoryReq {
+    int32 user_id = 1; //阅读消息方的Id
+    int64 key_id = 2; //阅读方的端标识
+    int32 chat_id = 3; //所读的加密聊天的Id
+    int64 access_hash = 4; //加密聊天哈希值
+    int32 max_date = 5;
+    pbcomm.Debug debug = 6;
+}
+
+//加密聊天双钩的返回
+message ReadEncryptedHistoryResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        failed = 1; //失败
+        AccessHashErr = 2; //错误的哈希值
+    }
+}
+
+//加密聊天取消请求
+message DiscardEncryptionReq {
+    int32 user_id = 1; //取消方的用户的Id
+    int64 key_id = 2; //取消方的端的标识
+    int32 chat_id = 3; //需要取消的加密聊天id
+    pbcomm.Debug debug = 4;
+}
+
+//加密聊天取消返回
+message DiscardEncryptionResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        failed = 2; //删除失败
+        AccessHashErr = 3; //错误的哈希值
+    }
+}
+
+//发送加密聊天发送service请求
+message SendEncryptedServiceReq {
+    int32 send_id = 1; //消息发送者的Id
+    int64 key_id = 2; //消息发送者的key_id
+    int32 chat_id = 3; //加密聊天的id
+    int64 access_hash = 4; //加密聊天哈希值
+    int64 random_id = 5; //消息的randmon_id
+    bytes Data = 6; //加密聊天的发送的加密消息
+    pbcomm.Debug debug = 7;
+}
+
+//发送加密聊天发送service的返回
+message SendEncryptedServiceResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        Repeatedhandle = 1; //重复的处理
+        ChatNotExist = 2; //加密聊天已经不存在
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+    }
+}
+
+//发送加密聊天发送没提 消息的请求
+message SendEncryptedFileReq {
+    int32 send_id = 1; //消息发送者的Id
+    int64 key_id = 2; //消息发送者的key_id
+    int32 chat_id = 3; //加密聊天的id
+    int64 access_hash = 4; //加密聊天哈希值
+    int64 random_id = 5; //消息的randmon_id
+    bytes Data = 6; //加密聊天的发送的加密消息
+    bytes file = 7; //加密聊天文件信息 mtproto.TL 的二进制
+    pbcomm.Debug debug = 8;
+}
+
+//发送媒体消息的返回
+message SendEncryptedFileResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        Repeatedhandle = 1; //重复的处理
+        ChatNotExist = 2; //加密聊天已经不存在
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+    }
+}
+
+//发送加密聊天发送普通文本消息的请求
+message SendEncryptedReq {
+    int32 send_id = 1; //消息发送者的Id
+    int64 key_id = 2; //消息发送者的key_id
+    int32 chat_id = 3; //加密聊天的id
+    int64 access_hash = 4; //加密聊天哈希值
+    int64 random_id = 5; //消息的randmon_id
+    bytes Data = 6; //加密聊天的发送的加密消息
+    pbcomm.Debug debug = 7;
+}
+
+//发送加密聊天发送普通文本消息的返回
+message SendEncryptedResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        Repeatedhandle = 1; //重复的处理
+        ChatNotExist = 2; //加密聊天已经不存在
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+
+    }
+}
+
+//B端接收的请求
+message AcceptEncryptionReq {
+    int32 participart_id = 1; //加密聊天请求接收者的Id
+    int64 participart_key_id = 2;
+    int32 chat_id = 3; //加密聊天的聊天id
+    int64 access_hash = 4; //加密聊天的哈希值
+    bytes G_b = 5; //接收方的公钥
+    int64 Key_fingerprint = 6; //加密聊天的指纹
+    pbcomm.Debug debug = 7;
+}
+
+//B端接收的请求的返回
+message AcceptEncryptionResult {
+    int32 admin_id = 1; //发起者的ID
+    bytes G_a_or_b = 2; //GA 发起方的秘钥
+    int64 keyFingerPrint2 = 3; //指纹(不是劫持流程就是原来的指纹)
+    int32 chat_id = 4; //机密聊天 的Id
+    int64 access_hash = 5; //加密聊天的哈希值
+    Errcode error_code = 6; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        AlreadyAccept = 1; //加密聊天已经被自己的其他端接收
+        Repeatedhandle = 2; //重复的处理
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+    }
+
+}
+
+//发起加密聊天请求
+message RequestEncryptionReq {
+    int32 admin_id = 1; //发起者的ID
+    int64 admin_key_id = 2; //发起方的端标识
+    int32 participant_id = 3; //被邀请者的ID
+    int64 access_hash = 4; //被邀请者的用户的哈希值
+    bytes g_a = 5; //发起方的指纹
+    pbcomm.Debug debug = 6;
+}
+
+//发起加密聊天的返回结果
+message RequestEncryptionResult {
+    int32 chat_id = 1; //加密聊天的id
+    int64 access_hash = 2; // 加密聊天的哈希值
+    ErroCode errorCode = 3; //错误码
+    enum ErroCode {
+        SusscessFull = 0; //发起成功
+        GenIdFailed = 1; //生成Id失败
+        DbError = 2; //数据库错误 (调用数据库存储加密聊天失败)
+        Restricted = 3; // blocked or privacy restricted
+        ParticipantBlocked = 4; // participant is blocked by you
+    }
+}
+
+
+service GetWebPagePreview {
+    // 获取网页预览信息
+    rpc GetWebPagePreview (RequestWebPMessage) returns (ReplyRequestWebPagePreview) {
+    }
+}
+
+
+service PushServer {
+    // 调用推送
+    rpc CallPush (Reqpushusermsg) returns (ReplyPush) {
+    }
+}
+
+// 机器人调用接口
+message ReqBotCall {
+    int32 frombotId = 1;
+    bytes request = 2;
+    int32 layer = 3;
+    pbcomm.Debug debug = 4;
+}
+
+// 机器人返回接口
+message ReplyBotCall {
+    bytes result = 1;
+    int32 error = 2;
+}
+
+// 机器人调用接口-Inline
+message ReqBotInlineCall {
+    pbcomm.Debug debug = 1; // debug
+    int32 user_id = 2; // 用户id
+    int32 bot_id = 3; // 机器人id
+    uint64 message_id = 4; // msg_id
+    uint64 key_id = 5; // keyid
+    uint64 session_id = 6; // sessionid
+    bytes data = 7; // tl encode data
+    string id = 8; // sendInline时客户端带的id
+}
+
+// 机器人返回接口-Inline
+message ReplyBotInlineCall {
+    int32 err_code = 1;
+    string message = 2;
+    InlineCall inlinecall = 3;
+
+}
+
+// 调用设置分数
+message ReqSetGameScore {
+    int32 userid = 1; // 用户id
+    repeated UserScore scores = 2; // 新分数（非负数）
+    bool force = 3; // 如果为true 则覆盖原分数  如果为false则新分数大于旧的分数才会更新
+    bool disable_edit_message = 4; // 为true则不编辑
+    int32 chat_id = 5; // 如果未指定inline_message_id，这里就需要填chatid
+    int32 chat_type = 6; // 1-单聊 2-普通群 3-超级群
+    int32 message_id = 7; // 如果未指定inline_message_id，则需要填这里的message_id
+    string inline_message_id = 8; // 如果未指定chatid或者message_id 就需要填写inline_message_id
+    int32 botid = 9; // 请求的机器人id
+    pbcomm.Debug debug = 10; // debug
+}
+
+// 设置分数返回
+message ReplySetGameScore {
+    bool succeed = 1;
+    string error = 2;
+    int32 errorcode = 3;
+}
+
+message ReqRemoveConn {
+    int32 Userid = 1; //被踢人id
+    uint64 request_key = 2; // 发起踢人方keyid
+    int32 remove_type = 3; // 全踢 还是 踢单个用户
+    uint64 remove_key = 4; // 踢单人时的 keyid
+    pbcomm.Debug debug = 5;
+}
+
+message ReplyRemoveConn {
+    int32 error = 1; // 1: 成功 2: 不成功
+}
+
+// 注册激活系统号
+message ReqSignUpMsg {
+    int32 userid = 1; // 新注册用户id
+    int64 access_hash = 2; // 用户hash
+    pbcomm.Debug debug = 3; // debug日志
+}
+
+// 发送短信
+message ReqSendCodeMsg {
+    int32 userid = 1; // 发送短信用户id
+    int64 access_hash = 2; // 用户hash
+    uint64 keyid = 3; // 当前用户keyid
+    string code = 4; // 验证码
+    pbcomm.Debug debug = 5; // debug日志
+}
+
+// 发送ip消息
+message ReqSignInMsg {
+    int32 userid = 1; // 发送短信用户id
+    int64 access_hash = 2; // 用户hash
+    uint64 keyid = 3; // 当前用户keyid
+    string Name = 4; // 验证码
+    string Device = 5; // 设备
+    string Location = 6; // 地址
+    string IP = 7;
+    pbcomm.Debug debug = 8; // debug日志
+}
+
+// 多端同步发送
+message ReqSendSynMsg {
+    int32 userid = 1; // 同步用户id
+    int64 keyid = 2; // 当前端keyid
+    bytes data = 3; // 发送的MT协议二进制数据
+    pbcomm.Debug debug = 4; // debug日志
+}
+
+// 发送给对方所有端
+message ReqSendUserMsg {
+    int32 fromid = 1; // 发送方id
+    int64 fromKeyId = 2; // 发送方keyid
+    int32 toid = 3; // 接收方id
+    bytes data = 4; // Mt数据
+    pbcomm.Debug debug = 5; // debug日志
+}
+
+// 发送消息给单个端
+message ReqSendUserOneClientMsg {
+    int32 fromid = 1; // 发送方id
+    int64 fromKeyId = 2; // 发送方keyid
+    int32 toid = 3; // 接收方id
+    int64 tokeyid = 4; // 接受对id
+    bytes data = 5; // Mt数据
+    pbcomm.Debug debug = 6; // debug日志
+}
+
+// 群发多人 (其他服务)
+message ReqSendMoreUserMsg {
+    int32 Fromid = 1; // 发送方id
+    int64 FromKeyid = 2; // 发送方keyid
+    repeated int32 toid = 3; // 接收方id
+    bytes data = 5; // Mt数据
+    pbcomm.Debug debug = 6; // debug日志
+}
+
+//######################### 打电话 #############################
+// 发送打电话消息 (其他服务)
+message ReqSendCallMsg {
+    int32 Fromid = 1; // 发送方id
+    int64 FromKeyid = 2; // 发送方keyid
+    int32 toid = 3; // 接收方id
+    bytes callAction = 5; // call action Mt数据
+    pbcomm.Debug debug = 6; // debug日志
+}
+
+
+message ReqCallPush {
+    int32 fromid = 1; // 发起电话请求方
+    int32 toid = 2; // 电话接收方
+    int64 callid = 3;
+    int64 callAccessHash = 4;
+    pbcomm.Debug debug = 5;
+    bytes data = 6; // Mt数据
+}
+
+message ReplyCallPush {
+    bool reply = 1;
+    int32 error = 2;
+}
+
+//#################################################################
+// 获取用户状态数据
+message ReqGetState {
+    int32 userid = 1; // 用户id
+    uint64 keyid = 2; // 用户keyid
+    pbcomm.Debug debug = 3; // debug日志
+}
+
+// 状态返回
+message ReplyResult {
+    bytes result = 1;
+    int32 error = 2; //1: 无法获取 2: 数据过去超时 3: 崩溃 4: 发起id为0
+}
+
+message ReplyNull {
+}
+
+//############################### pts ##########################
+message ReqGetPts {
+    int32 userid = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message ReplyGetPts {
+    int32 pts = 1;
+    int32 error = 2; // 1.数据库获取出错 2.其他错误
+}
+
+//################################ dialohg ######################
+// 获取dialog接口
+message RequestDialog {
+    int32 userid = 1; // 用户id
+    int32 flags = 2; // 标识位
+    int32 folder_id = 3; // 归档id
+    int32 offset_date = 4; // 偏移时间
+    int32 offset_id = 5; // 偏移id
+    bytes offset_peer = 6; // 偏移对象 (mt 协议)
+    int32 limit = 7; // 偏移长度
+    pbcomm.Debug debug = 8;
+}
+
+// 返回dialog
+message ReplyDialog {
+    //    repeated DialogSlice dialog = 1;
+    bytes result = 1; // 对话框数据返回
+    int32 error = 2; // 1: 无法获取到 2: userid 为0  3: 数据库返回超时 4: 消息服务crash
+}
+
+message UserIdRating {
+    int32 UserId = 1; //用户的Id
+    double Rating = 2;
+}
+
+message ReplyGetLastLimitDialog {
+    repeated UserIdRating UserRatingList = 1; // 单聊 withId列表 所对应类型的Id的列表(dialog)
+    repeated int32 channelIdlist = 2; // 超级群 withId列表 所对应类型的Id的列表(暂时不用)
+    repeated int32 chatIdlist = 3; // 普通群 withId列表 所对应普通群的Id的列表(暂时不用)
+    int32 Error = 4; // 返回错误码
+}
+
+// 对话框推送声音设置
+//message PeerNotifySettings {
+//    int32 type = 1; // 1:empty 2:have seing
+//    int32 flags = 2;
+//    int32 mute_until = 3; // 截止时间
+//    string sound = 4; //  声音
+//}
+
+// 获去pinned dialog
+message ReqPinnedDialogs {
+    int32 userid = 1;
+    int32 folder_id = 2;
+    pbcomm.Debug debug = 3;
+}
+
+// 获取单独对话框
+message ReqPeerDialogs {
+    int32 userid = 1; // 用户id
+    repeated bytes peers = 2; // 对话框
+    pbcomm.Debug debug = 3;
+}
+
+// 获取最近位置
+message ReqRecentLocations {
+    int32 userid = 1; // 用户id
+    bytes peers = 2; // 具体的框
+    int32 limit = 3;
+    pbcomm.Debug debug = 4;
+}
+
+// 置顶对话框请求
+message ReqPinDialog {
+    int32 userid = 1; // 请求用户
+    bool pinned = 2; // true 置顶 false 取消置顶
+    bytes peer = 3; // 具体的框
+    pbcomm.Debug debug = 4;
+}
+
+// ios 置顶对话框
+message ReqReorderPinnedDialogs {
+    int32 userid = 1; // 请求用户
+    repeated bytes peer = 3; // 具体的框
+    pbcomm.Debug debug = 4;
+}
+
+// 置顶对话框返回
+message ReplyBool {
+    bool result = 1;
+    int32 error = 2; // 1: 对话框不存在  2:无法置顶 3:其他错误
+}
+
+//########################## 发消息 ###############################
+// 发送消息请求
+message RequestSendMessage {
+    int32 fromid = 1; // 发送方id
+    bool no_webpage = 2; // 是否有网页
+    bool silent = 3; // 是否无声音
+    bool background = 4;
+    bool clear_draft = 5; // 是否清除草稿
+    bytes peer = 6; // 发送对象
+    int32 reply_to_msg_id = 7; // 回复消息
+    string message = 8; // 文本内容
+    int64 random_id = 9; // 随机id
+    bytes reply_markup = 10; // 小键盘
+    repeated bytes entities = 11; // 高亮
+    uint64 fromkey_id = 13; // 发送方的key_id
+    pbcomm.Debug debug = 15;
+    bool include_chat = 16;
+    int32 via_bot_id = 17; //via_bot_id
+}
+
+// 发送投票
+message SendVoteReq {
+    int32 fromid = 1; // 发送方id
+    bytes peer = 2; // 发送对象
+    int32 msg_id = 3; // 投票id
+    repeated string options = 4; // 内容
+    int64 fromKey = 5;
+    pbcomm.Debug debug = 6;
+}
+
+message SendVoteReply {
+    bytes reply = 1; //0: ok 1: err
+    int32 error = 2; //1: 存储失败 2:发送失败 3: 其他错误
+}
+
+// 系统号发消息
+message RequestSySSendMessage {
+    int32 fromid = 1; // 发送方id
+    bool no_webpage = 2; // 是否有网页
+    bool silent = 3; // 是否无声音
+    bool background = 4;
+    bool clear_draft = 5; // 是否清除草稿
+    bytes peer = 6; // 发送对象
+    int32 reply_to_msg_id = 7; // 回复消息
+    string message = 8; // 文本内容
+    int64 random_id = 9; // 随机id
+    bytes reply_markup = 10; // 小键盘
+    repeated bytes entities = 11; // 高亮
+    repeated int32 chat_member = 12;
+    uint64 fromkey_id = 13; // 发送方的key_id
+    string Phone = 14;
+    pbcomm.Debug debug = 15;
+}
+
+// 发送消息返回
+//message ReplySendMessage {
+//    int32 sendreply = 1; // 1: 成功    2: 失败
+//    int32 message_id = 2; // 消息id
+//    int32 pts = 3; // 消息pts
+//    int32 date = 4; // 时间
+//    bytes media = 5; // 消息媒体
+//    repeated bytes entities = 6; // 高亮
+//    int32 error = 7; // 1: 发送失败  2: 数据处理错误 3:路由错误 4:其他错误
+//}
+
+
+message ReqS2SMsg {
+    int32 Userid = 1;
+    int32 WithidType = 4; // 1.user 2:chat 3:channel
+    int32 MessageType = 5; // 消息类型
+    int32 Flags = 6; // 消息标识
+    bool Out = 7; // 是否为自己发送
+    bool Mentioned = 8; // 是否提及他人
+    bool MediaUnread = 9; // 媒体是否已读
+    bool Silent = 10; // 是否静音
+    bool Post = 11; // 是否邮递
+    int32 MsgId = 12; // 消息id
+    int32 From_id = 13; // 发送方id
+    int32 To_id = 14; // 接收方id
+    int32 Pts = 15; // 消息的pts
+    bytes Fwd_from = 16; //	引用
+    int32 ViaBotId = 17; //	机器人id
+    int32 ReplyToMsgId = 18; // 回复id
+    int32 Date = 19; // 时间
+    string Message = 20; // 消息内容
+    int64 Media = 21; // 媒体id
+    bytes Meidadata = 22; // 媒体二进制
+    bytes Reply_markup = 23; //	小键盘
+    repeated bytes Entities = 24; // 高亮
+    int32 Views = 25; // 查看人数
+    int32 Edit_date = 26; // 编辑时间
+    bytes Action = 27; // 行为
+    int64 Uuid = 28; // 全局唯一id
+    int32 encry = 29; // 是否为加密消息
+    pbcomm.Debug debug = 30;
+    int64 Groupid = 32;
+    int64 ReplyUuid = 33;
+}
+
+message ReplyS2SMsg {
+    int32 reply = 1; //0: ok 1: err
+    int32 error = 2; //1: 存储失败 2:发送失败 3: 其他错误
+}
+
+//############################# 发送媒体 ##############################
+message ReqSendMedia {
+    int32 fromid = 1; // 发送方id
+    int32 flags = 2;
+    bool silent = 3;
+    bool background = 4;
+    bool clear_draft = 5;
+    bytes peer = 6;
+    int32 reply_to_msg_id = 7;
+    bytes media = 8;
+    string message = 9;
+    repeated bytes multi_media = 10;
+    int64 random_id = 11;
+    bytes reply_markup = 12;
+    int64 newfileid = 13;
+    repeated bytes entities = 14; // @ add by qingsong at 2020.08.06 for high light message.
+    uint64 fromkey_id = 15; // 发送方的key_id
+    repeated int32 chatmeber = 16;
+    pbcomm.Debug debug = 17;
+    int32 via_bot_id = 18; //via_bot_id
+}
+
+//############################# 上传媒体文件 ##########################
+message ReqUploadMedia {
+    int32 fromid = 1; // 发送方id
+    bytes peer = 2;
+    bytes media = 3;
+    pbcomm.Debug debug = 15;
+}
+
+//############################# 转发消息 ##############################
+message ReqForwardMessages {
+    int32 fromid = 1; // 发送方id
+    int32 flags = 2; // 标识
+    bool silent = 3; // 是否无声音
+    bool background = 4;
+    bool with_my_score = 5;
+    bytes from_peer = 6;
+    repeated int32 id = 7;
+    repeated int64 random_id = 8;
+    bytes to_peer = 9;
+    uint64 from_keyid = 10;
+    pbcomm.Debug debug = 11;
+}
+
+message ReplyForwardMessages {
+    bytes result = 1; // 转发返回
+    int32 error = 2; // 1.转发获取失败 2.转发转存失败 3.转发失败
+}
+
+//message ForWardMessages {
+//    int64 randomid = 1;
+//    int32 msgid = 2;
+//    bytes update_newmsg = 3;
+//}
+
+//########################## message ###################################
+// 定义messageFwdHeader协议结构
+//message MessageFwdHeader {
+//    int32 flags = 1;
+//    int32 from_id = 2;
+//    int32 date = 3;
+//    int32 channel_id = 4;
+//    int32 channel_post = 5;
+//}
+
+
+message Msg {
+    int32 type = 1; // 0: empty 1: message 2: messageserver
+    int32 flags = 2;
+    int32 id = 3; // 消息id
+    int32 from_id = 4; // 发送者id
+    bytes to_id = 5; // 接收者
+    bytes fwd_from = 6; // 转发消息
+    int32 via_bot_id = 7; // 机器人
+    int32 reply_to_msg_id = 8; // 回复消息
+    int32 date = 9;
+    string message = 10; // 消息内容
+    bytes media = 11; // 媒体
+    int32 media_type = 12;
+    bytes reply_markup = 13; // 小键盘
+    repeated bytes entities = 14; // 高亮
+    int32 views = 15; // 查看人数
+    int32 edit_date = 16; // 编辑时间
+    bytes action = 17; // 动作
+    int64 Randomid = 18; // 消息随机id
+    int32 Pts = 19; // 消息的pts
+}
+
+// ################################ 获取部分消息 #####################
+message ReqGetMsgs {
+    int32 self_id = 1;
+    uint64 key_id = 2;
+    repeated int32 ids = 3;
+    pbcomm.Debug debug = 4;
+}
+message ReplyGetMsgs {
+    bytes result = 1; // 历史返回
+    int32 error = 2; // 1: 数据库无法获取消息 2:处理历史错误 3:其他错误 101: 获取对象为empty 102: 超级群历史获取 103: 数据库获取出错
+}
+// ################################ 历史获取 ########################
+message ReqHistory {
+    int32 Selfid = 1; // 自己的id
+    bytes peer = 2; // 对象
+    int32 Offset_id = 3; // 偏移id
+    int32 Offset_date = 4; // 偏移时间
+    int32 Add_offset = 5; // 追加偏移
+    int32 Limit = 6; // 限制条数
+    int32 Max_id = 7; // 最大id
+    int32 Min_id = 8; // 最小id
+    pbcomm.Debug debug = 9;
+}
+
+message ReplyHistory {
+    bytes result = 1; // 历史返回
+    int32 error = 2; // 1: 数据库无法获取消息 2:处理历史错误 3:其他错误 101: 获取对象为empty 102: 超级群历史获取 103: 数据库获取出错
+}
+
+//################################# 创建群 #########################
+message ReqCreateChat {
+    int32 chatid = 1; // 群id
+    string title = 2; // 名称
+    int32 creator = 3; // 创建者
+    repeated int32 users = 4; // 用户数据
+    uint64 from_keyid = 5;
+    pbcomm.Debug debug = 6;
+}
+
+message ReplyCreateChat {
+    bytes result = 1; // 创建普通群返回
+    int32 chat_id = 2; //普通群ID
+    int32 error = 5; // 1: 创建者id为0 2: 被加入的成员不允许 3: 成员不允许被添加 4: 其他, 5: 消息处理出错
+}
+
+//################################ 添加群成员 ######################
+message ReqAddChatUser {
+    int32 fromid = 1; // 用户id
+    int32 chatid = 2; // 群id
+    int32 userid = 3; // 被添加人id
+    int32 fwdlimit = 4;
+    uint64 from_keyid = 5;
+    int32 invite_type = 6; //邀请类型 0-链接 1-二维码
+    pbcomm.Debug debug = 7;
+}
+
+message ReplyAddChatUser {
+    bytes result = 1;
+    int32 error = 2; // 1.发起方id为0 2: 群id为0 3: 自增pts和msgid失败
+}
+
+//messages.deleteChatUser#e0611f16 chat_id:int user_id:InputUser = Updates;
+//################################ 删除群成员 ######################
+message ReqDeleteChatUser {
+    int32 fromid = 1; // 用户id
+    int32 chatid = 2; // 群id
+    int32 userid = 3; // 被删除人id
+    uint64 from_keyid = 4;
+    pbcomm.Debug debug = 6;
+}
+
+message ReplyDeleteChatUser {
+    bytes result = 1;
+    int32 error = 2; // 1.发起方id为0 2: 群id为0 3: 自增pts和msgid失败
+}
+
+//################################ 编辑群的管理员 ##################
+message ReqEditChatAdmin {
+    int32 fromid = 1; // 用户id
+    int32 chatid = 2; // 群id
+    int32 userid = 3; // 被删除人id
+    uint64 from_keyid = 4;
+    bool is_admin = 5; // true 增加管理员 false 删除管理员
+    pbcomm.Debug debug = 6;
+}
+
+message ReplyEditChatAdmin {
+    bool result = 1;
+    int32 error = 2; // 1.发起方id为0 2: 群id为0
+}
+
+//################################ 编辑群名字 ######################
+message ReqEditChatTitle {
+    int32 fromid = 1; // 用户id
+    int32 chatid = 2;
+    string title = 3;
+    uint64 from_keyid = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message ReplyEditChatTitle {
+    bytes result = 1;
+    int32 error = 5; //1. 群不存在 2. 编辑失败
+}
+
+// ############################### 获取所有群id ###################
+// 获取所有群 (除去部分)
+message ReqGetAllChats {
+    int32 fromid = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message ReplyGetAllChats {
+    repeated int32 chats = 1;
+    int32 error = 2;
+}
+
+// ############################### 获取群的完整信息 ################
+message ReqGetFullChat {
+    int32 fromid = 1;
+    int32 chatid = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyGetFullChat {
+    bytes result = 1;
+    int32 error = 2;
+}
+// ############################### 编辑群头像 #######################
+message ReqEditChatPhoto {
+    int32 fromid = 1; // 编辑方id
+    uint64 from_keyid = 2;
+    int32 chatid = 3; // 群id
+    bytes photo = 4; // 图片
+    pbcomm.Debug debug = 8;
+}
+
+message ReplyEditChatPhoto {
+    bytes result = 1;
+    int32 error = 6; //1. t图片处理失败 2.存储失败 3.发送失败
+}
+
+//################################ 升级超级群 #######################
+message ReqMigrateChat {
+    int32 fromid = 1; // 邀请者id
+    int32 chatid = 2; //等待升级的普通群ID
+    //    int32 channelid = 3; //升级后的超级群ID
+    //    string title = 4; // 群标题
+    //    repeated int32 members = 5; //现有用户
+    //    string Phone = 6; //电话
+    uint64 fromkeyid = 3; //邀请者的KEYID
+    //    bool isBroadCast = 8; //超级群还是频道
+    pbcomm.Debug debug = 4;
+}
+
+message ReplyMigrateChat {
+    //    int32 msgid = 1; // 消息id
+    //    int64 randomid = 2; // 消息随机id
+    //    int32 date = 3; // 消息时间
+    //    int32 pts = 4; // 消息pts
+    //    int32 channelmsgid = 5; //频道的消息ID
+    //    int32 channelpts = 6; //频道的PTS
+    bytes result = 7; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error = 8; // 1. 普通群处理失败 2. 超级群处理失败 3. 其他错误
+}
+
+//############################### 读取历史 #########################
+message ReqReadHistory {
+    int32 selfid = 1; //自己的ID
+    bytes peer = 2; //对方 user, chat, channel
+    int32 max_id = 3; // 消息ID
+    uint64 from_keyid = 4; //自己的KEYID
+    pbcomm.Debug debug = 8; //debug
+}
+
+message ReplyReadHistory {
+    int32 pts = 1; //返回的PTS
+    int32 max_id = 2; //返回的最新消息ID
+    int32 error = 3; // 1.获取数据失败 2.更新失败
+}
+
+// ############################## 更新双勾 #########################
+message ReqUpdateReadOut {
+    int32 self_id = 1; // 自己id
+    int32 from_id = 2; // 发起更新请求方id
+    int32 peer_type = 3; // 类型
+    pbcomm.Debug debug = 4;
+}
+
+message ReplyUpdateReadOut {
+    int32 maxid = 1;
+    int32 pts = 2;
+    int32 error = 3; // 1. 获取失败 2,更新失败
+}
+
+// ############################# pts 矫正 ##########################
+message ReqDiffByPts {
+    int32 fromid = 1;
+    uint64 from_keyid = 2;
+    int32 pts = 3;
+    int32 flags = 4;
+    int32 Pts_total_limit = 5;
+    int32 Date = 6;
+    int32 Qts = 7;
+    pbcomm.Debug debug = 8;
+}
+
+message ReplyDiffByPts {
+    bytes result = 1;
+    int32 error = 2; // 1. 获取普通历史失败 2. 获取其他特殊操作失败 3. 获取超级群失败 4. 获取加密聊天数据失败 5.服务器出错
+    int32 usetime = 3; // use time
+}
+
+// ############################## 删除历史 ##########################
+message ReqDeleteHistory {
+    int32 fromid = 1;
+    uint64 from_keyid = 2;
+    int32 flags = 3;
+    bool just_clear = 4;
+    bytes peer = 5;
+    int32 max_id = 6;
+    pbcomm.Debug debug = 7;
+}
+
+message ReplyDeleteHistory {
+    int32 pts = 1;
+    int32 pts_count = 2;
+    int32 offset = 3;
+    int32 error = 4; // 1.获取历史失败 2.删除历史失败 3.其他
+}
+
+//############################# 删除消息 ####################
+message ReqDeleteMessages {
+    int32 fromid = 1; // 删除方id
+    uint64 from_keyid = 2;
+    int32 flags = 3; //标识
+    bool revoke = 4; // shifou wei duifang shanchu
+    repeated int32 id = 5;
+    int32 channelid = 6;
+    pbcomm.Debug debug = 8;
+}
+
+message ReplyDeleteMessages {
+    bytes result = 1;
+    int32 error = 2; // 1.获取失败 2.删除失败
+}
+
+// ############################ 编辑消息 ######################
+message ReqEditMessage {
+    int32 form_id = 1; // 编辑方id
+    uint64 from_keyid = 2;
+    int32 flags = 3; // 标识
+    bool no_webpage = 4; // 是否是网页
+    bool Stop_geo_live = 5; // stop update gep live
+    bytes peer = 6; // 框
+    int32 id = 7; // id
+    string message = 8; // 消息内容
+    bytes reply_markup = 9;
+    repeated bytes entities = 10; // 高亮
+    bytes Geo_point = 11; // live GetPoint
+    int32 ViaBotId = 12;
+    pbcomm.Debug debug = 13;
+}
+
+message ReplyEditMessage {
+    bytes UpdateEditMessage = 1;
+    int32 error = 2; // 1.获取消息失败 2.编辑失败
+}
+
+// ############################ 获取对话框特殊信息 ###################
+message ReqNotifySettings {
+    int32 fromid = 1;
+    bytes peer = 2; // 框
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyNotifySettings {
+    int32 flags = 1;
+    bool show_previews = 2;
+    bool silent = 3;
+    int32 mute_until = 4;
+    string sound = 5;
+    int32 error = 6; // 1. 框不存在 2. 获取失败
+}
+
+// ########################### 更新特殊对话框设置信息 #################
+message ReqUpdateNotifySettings {
+    int32 fromid = 1;
+    bytes peer = 2; // 更新对象
+    bytes settings = 3; // 设置信息
+    pbcomm.Debug debug = 4;
+}
+
+message ReplyUpdateNotifySettings {
+    bytes result = 1;
+    int32 error = 2;
+}
+
+// ############################ 获取消息编辑的数据 ###################
+message ReqMessageEditData {
+    int32 layer = 1;
+    int32 fromid = 2;
+    bytes peer = 3;
+    int32 id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message ReplyMessageEditData {
+    int32 flags = 1;
+    bool caption = 2;
+    int32 error = 3; //1. 编辑失败
+}
+
+// ############################ 存储草稿 ###################
+message ReqSaveMsgDraft {
+    int32 selfid = 1; // 自己id
+    int64 fromKeyid = 2;
+    int32 layer = 3; // 层
+    int32 flags = 4;
+    bool no_webpage = 5; // 是否是网页
+    int32 reply_to_msg_id = 6;
+    bytes peer = 7;
+    string message = 8; // 消息内容
+    repeated bytes entities = 9; // 高亮
+    pbcomm.Debug debug = 10;
+}
+
+message ReplySaveMsgDraft {
+    bool reply = 1;
+    int32 error = 2; // 1.存储失败 2.同步失败
+}
+
+
+message ReqGetUserUnRead {
+    int32 Userid = 1;
+    int64 keyid = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyUserUnread {
+    int32 unread = 1;
+    int32 error = 2; // 1.获取总未读数失败 2. 其他
+}
+
+//################################# public #########################
+//message pbcomm.Debug {
+//    int32 userid = 1;
+//    string Phone = 2;
+//    string ip = 3;
+//    uint64 key_id = 4;
+//    uint64 session_id = 5;
+//    int32  layer = 6;
+//    uint32  ostype = 7; //1 是安卓 2 是Iphone/IPAD 3 是PC 4是web
+//}
+//message InputPeer {
+//    int32 type = 1; // 1: empty 2: self 3: chat  4: user 5: channel
+//    int32 chatid = 2;
+//    int32 userid = 3;
+//    int64 access_hash = 4;
+//    int32 channel_id = 5;
+//}
+
+//message InputUser {
+//    int32 type = 1; // 1: empty 2: self 3: user
+//    int32 user_id = 2;
+//    int64 access_hash = 3;
+//}
+
+// 定义inputPeerUser协议结构
+//message InputPeerUser {
+//    int32 user_id = 1; // 用户id
+//    int64 access_hash = 2; //
+//}
+
+//
+//message Peer {
+//    int32 type = 1; // 1:user 2: chat 3: channel
+//    int32 chatid = 2;
+//    int32 channelid = 3;
+//    int32 userid = 4;
+//}
+
+//###################################################### channel ####################################################################
+message InputChannel {
+    int32 type = 1;
+    InputChannelEmpty inputChannelEmpty = 2;
+    InputChannelinputChannel inputChannelinputChannel = 3;
+}
+message InputChannelEmpty {
+}
+message InputChannelinputChannel {
+    int32 channel_id = 1;
+    int64 access_hash = 2;
+}
+
+message MessageActionEditChannelPhoto {
+    int64 id = 1;
+    int64 access_hash = 2;
+    int32 date = 3;
+    bytes pothosize = 4;
+}
+
+message MessageActionEditChannelAbout {
+    string about = 1;
+}
+message MessageActionDeleteChannelMessages {
+    int32 id = 1;
+}
+message MessageActionDeleteChannelHistory {
+    bytes user_id = 1;
+}
+message MessageActionUpdatePinnedChannelMessage {
+
+}
+message MessageActionCheckChannelUsername {
+    string user_name = 1;
+}
+message MessageActionUpdateChannelUsername {
+    string user_name = 2;
+}
+message MessageActionExportChannelInvite {
+
+}
+message MessageActionDeleteChannel {
+
+}
+
+message MessageActionChannelCreate {
+    string title = 1;
+}
+
+message MessageActionAddChannelUser {
+    repeated int32 user_id = 1;
+}
+message MessageActionDeleteChannelUser {
+    int32 user_id = 1;
+}
+message MessageActionUserLeaveChannel {
+    int32 user_id = 1;
+}
+
+message messageActionEditChannelTitle {
+    string title = 1;
+}
+
+message UserStatusOnline {
+    int32 expires = 1;
+}
+message UserStatusOffline {
+    int32 was_online = 1;
+}
+message UserStatusLastMonth {
+    int32 lastMonth = 1;
+}
+message Status {
+    int32 type = 1;
+    UserStatusOnline online = 2;
+    UserStatusOffline offline = 3;
+    UserStatusLastMonth lastMonth = 4;
+}
+message User_info {
+    int32 flags = 1;
+    bool self = 2;
+    bool contact = 3;
+    bool mutual_contact = 4;
+    bool deleted = 5;
+    bool bot = 6;
+    bool bot_chat_history = 7;
+    bool bot_no_chats = 8;
+    bool verified = 9;
+    bool restricted = 10;
+    bool min = 11;
+    bool bot_inline_geo = 12;
+
+    int32 id = 13;
+    int64 access_hash = 14;
+    string firstname = 15;
+    string lastname = 16;
+    string username = 17;
+    string phone = 18;
+    bytes photo = 19;
+    Status status = 20;
+    bool bot_info_version = 21;
+    bool restriction_reason = 22;
+    bool bot_inline_placeholder = 23;
+}
+
+message Channel {
+    int32 flags = 1;
+    bool creator = 2;
+    bool kicked = 3;
+    bool left = 4;
+    bool editor = 5;
+    bool moderator = 6;
+    bool broadcast = 7;
+    bool verified = 8;
+    bool megagroup = 9;
+    bool restricted = 10;
+    bool democracy = 11;
+    bool signatures = 12;
+    bool min = 13;
+    int32 id = 14;
+    int64 access_hash = 15;
+    string title = 16;
+    string username = 17;
+    int32 photo = 18;
+    int32 date = 19;
+    int32 version = 20;
+    bool restriction_reason = 21;
+}
+
+message UpdateNewChannelMessage {
+    int32 flags = 1;
+    bool out = 2;
+    bool mentioned = 3;
+    bool media_unread = 4;
+    bool silent = 5;
+    bool post = 6;
+    int32 id = 7;
+    int32 from_id = 8;
+    int32 to_id = 9;
+    bool reply_to_msg_id = 10;
+    int32 date = 11;
+    bytes action = 12;
+    int32 pts = 13;
+    int32 pts_count = 14;
+}
+//  创建channel
+//  channels.createChannel#f4893d7f flags:# broadcast:flags.0?true megagroup:flags.1?true title:string about:string = Updates;
+message RequestChannel {
+    int32 channelId = 1; // channelid
+    int32 userId = 2; // userid
+    string title = 3; // 群标题
+    string about = 4; // 描述
+    int64 from_keyid = 5; // 创建者的KEYID
+    bool broadCast = 6; // 是否频道
+    bool megagroup = 7; // 是否超级群
+    uint64 replyMsgId = 8; // infoserver给的ID
+    bool ban_add_contact = 9;   // @ add by qingsong at 2019.12.25 for ban channel member add contact.
+    pbcomm.Debug debug = 10;
+}
+
+// 返回create channel
+message ReplyChannel {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+//邀请用户进入超级群
+message RequestChannelInvite {
+    int32 channelId = 1; // 频道超级群ID
+    string title = 2; // 标题
+    int32 userId = 3; // 邀请者的ID
+    repeated int32 peerId = 4; // 被邀请者的ID
+    int64 from_keyid = 5; // 邀请者的KEYID
+    int64 accessHash = 6; // 频道超级群的哈希
+    pbcomm.Debug debug = 7;
+}
+
+//邀请操作的ACK
+message ReplyChannelInvite {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+//邀请用户进入超级群
+message ReqJoinChannel {
+    int32 channelId = 1; //超级群ID
+    int32 userId = 3; // 自己的ID
+    int64 from_keyid = 5; //自己的KEYID
+    int64 accessHash = 6; //超级群的哈希
+    bool byLink = 7; //是否通过链接加入
+    int32 invitor = 8;
+    int32 invite_type = 9; //邀请类型 0-链接 1-二维码
+    pbcomm.Debug debug = 10;
+}
+
+//邀请操作的ACK
+message ReplyJoinChannel {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+// 踢人
+message ReqChannelKick {
+    int32 channelId = 1;
+    int32 kicker = 2; //谁踢人
+    int32 kickee = 3; //谁被踢
+    bool is_bot_user = 4; //被邀请者是不是机器人
+    bool is_kicked = 5; // 是否是离开超级群\频道
+    int32 Kicked_id = 6; //如果是超级群被踢的话将，此用户保存到被踢列表中
+    int64 from_keyid = 7; //踢人者的KEYID
+    pbcomm.Debug debug = 8;
+}
+// 踢人结果
+
+message ReplyChannelKick {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+// 退出超级群
+message ReqLeaveChannel {
+    int32 channelId = 1; //退出的超级群ID
+    int32 userId = 2; // 退出的用户
+    int64 from_keyid = 3; //退出用户的KEYID
+    pbcomm.Debug debug = 4;
+}
+
+// 推出超级群返回
+message ReplyLeaveChannel {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+// edit title
+message ReqEditChannelTitle {
+    int32 channelId = 1;
+    string title = 2;
+    int32 userId = 3;
+    int64 from_keyid = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//ack to the title editing
+message ReplyEditChannelTitle {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+// 请求参数
+message ReqEditChannelAdmin {
+    int32 from_id = 1; //请求者ID
+    int32 channelId = 2; //频道ID
+    int32 userId = 3; //被升级或降级的人
+    int64 fromKeyId = 4; //请求者的KEYID
+    bytes role = 5; //admin rights
+    uint64 keyId = 6;
+    int64 accessHash = 7; //哈希
+    string rank = 8; // 标签
+    pbcomm.Debug debug = 9;
+}
+// 返回参数
+message ReplyEditChannelAdmin {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+//edit photo
+message ReqEditChannelPhoto {
+    int32 channelId = 1;
+    int32 userId = 2;
+    bytes photo = 3;
+    int64 from_keyid = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//ack to edit photo
+message ReplyEditChannelPhoto {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+message chatInviteExported {
+    string link = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//################################ 编辑超级群群说明信息 editAbout ######################
+// 请求参数
+message ReqEditChannelAbout {
+    int32 from_id = 1;
+    int64 fromKeyId = 2;
+    int32 channelId = 3;
+    string about = 4;
+    int64 accessHash = 5;
+    pbcomm.Debug debug = 6;
+}
+// 返回参数
+message ReplyEditChannelAbout {
+    bool succeed = 1;
+    int32 error_code = 2;
+}
+//################################ 超级群删除指定人发送的消息 deleteUserHistory ######################
+// 请求参数
+message ReqDeleteChannelMessages {
+    int32 from_id = 1;
+    int32 channelId = 2;
+    repeated int32 id = 3;
+    int64 from_keyid = 4;
+    int64 accessHash = 5;
+    pbcomm.Debug debug = 6;
+}
+// 返回参数
+message ReplyDeleteChannelMessages {
+    int32 msgid = 1;
+    int32 date = 2;
+    int32 pts = 3;
+    int32 maxId = 4;
+    int32 ptsCount = 5;
+    int32 error_code = 6;
+}
+//################################ 超级群删除自己端的历史 ###################################
+message ReqDeleteChannelSelfHistory {
+    int32 from_id = 1;
+    int32 channelId = 2;
+    int64 access_hash = 3;
+    int64 from_keyid = 5;
+    pbcomm.Debug debug = 6;
+}
+
+//################################ 超级群删除指定条消息 deleteMessages ######################
+// 请求参数
+message ReqDeleteChannelHistory {
+    int32 from_id = 1;
+    int32 channelId = 2;
+    int32 usreId = 3;
+    int64 access_hash = 4;
+    int64 from_keyid = 5;
+    pbcomm.Debug debug = 6;
+}
+// 返回参数
+message ReplyDeleteChannelHistory {
+    bytes result = 1;
+    int32 error_code = 6;
+}
+//################################ 超级群中置顶一条消息 updatePinnedMessage ######################
+// 请求参数
+message ReqUpdatePinnedChannelMessage {
+    int32 from_id = 1;
+    int32 flags = 2;
+    bool silent = 3;
+    //    InputChannel channel = 4;
+    int32 channelId = 4;
+    int32 id = 5;
+    int64 from_keyid = 6;
+    pbcomm.Debug debug = 7;
+
+}
+// 返回参数
+message ReplyUpdatePinnedChannelMessage {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+//################################ 频道设置username checkUsername updateUsername ######################
+//// 请求参数
+//message ReqCheckChannelUsername {
+//    int32 from_id = 1;
+//    InputChannel channel = 2;
+//    string username = 3;
+//    pbcomm.Debug debug = 4;
+//}
+//// 返回参数
+//message ReplyCheckChannelUsername {
+//    int32 msgid = 1;
+//    int32 date = 2;
+//    int32 pts = 3;
+//    bool check_user_name = 4;
+//}
+//// 请求参数
+//message ReqUpdateChannelUsername {
+//    int32 from_id = 1;
+//    InputChannel channel = 2;
+//    string username = 3;
+//    pbcomm.Debug debug = 4;
+//}
+//// 返回参数
+//message ReplyUpdateChannelUsername {
+//    int32 msgid = 1;
+//    int32 date = 2;
+//    int32 pts = 3;
+//    bool update_user_name = 4;
+//}
+////################################ 频道生成邀请链接 exportInvite ######################
+//// 请求参数
+//message ReqExportChannelInvite {
+//    int32 from_id = 1;
+//    InputChannel channel = 2;
+//    string link = 3;
+//    pbcomm.Debug debug = 4;
+//}
+//// 返回参数
+//message ReplyExportChannelInvite {
+//    int32 msgid = 1;
+//    int32 date = 2;
+//    int32 pts = 3;
+//}
+//################################ 删除超级群 deletechannel ######################
+// deletechannel 请求参数
+message ReqDeleteChannel {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    int32 channelId = 3;
+    int64 accessHash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+// deletechannel 返回参数
+message ReplyDeleteChannel {
+    bool send = 1; //是否成功
+    bytes reply = 2;
+    int32 error_code = 3;
+}
+
+//############################### 读取channel历史 #########################
+message ReqReadChannelHistory {
+    int32 fromid = 1;
+    int64 from_keyid = 2;
+    int32 channelId = 3;
+    int32 topMsgId = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message ReplyReadChannelHistory {
+    bool isOk = 1;
+    int32 errorCode = 2;
+}
+
+message ReqUpdateChannelReadOut {
+    int32 channelId = 1;
+    int32 maxId = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyUpdateChannelReadOut {
+    int32 maxid = 1;
+    int32 pts = 2;
+}
+
+//#####################超级群get diff###################
+message ReqGetchannelDifference {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    int32 flags = 3;
+    bool force = 4;
+    int32 channelId = 5;
+    int32 pts = 6;
+    int32 limit = 7;
+    int32 range_MinId = 8;
+    int32 range_MaxId = 9;
+    int32 device = 10; //1, pc 2, android 3, ios
+    pbcomm.Debug debug = 11;
+}
+
+message ReplyChannelDiffCommon {
+    bytes difference = 1; //  1: ReplyGetChannelDifferenceEmpty 2: ReplyGetChannelDifference 3: ReplyGetChannelDifferenceTooLong tooLong
+    int32 error_code = 2;
+}
+
+message ReplyGetChannelDifferenceEmpty {
+    int32 flags = 1;
+    bool final = 2;
+    int32 pts = 3;
+    int32 timeout = 4;
+}
+
+message ReplyGetChannelDifference {
+    int32 flags = 1;
+    bool final = 2;
+    int32 pts = 3;
+    int32 timeout = 4;
+    repeated bytes msgs = 5;
+    int32 error_code = 6;
+}
+
+message ReplyGetChannelDifferenceTooLong {
+    int32 flags = 1;
+    bool final = 2;
+    int32 pts = 3;
+    int32 timeout = 4;
+    int32 top_message = 5;
+    int32 read_inbox_max_id = 6;
+    int32 read_outbox_max_id = 7;
+    int32 unread_count = 8;
+    repeated bytes msgs = 9;
+    int32 error_code = 10;
+}
+
+//######超级群get history##########
+message ReqGetChannelMsgHistory {
+    int32 ChannelId = 1;
+    int32 OffsetId = 2;
+    int32 OffsetDate = 3;
+    int32 AddOffset = 4;
+    int32 MinId = 5;
+    int32 MaxId = 6;
+    int32 Limit = 7;
+    int32 fromId = 8;
+    uint64 keyId = 9;
+    pbcomm.Debug debug = 10;
+}
+
+message ReplyChannelMsgs {
+    //    int32 historyType = 1; // 1:slice 2: all
+    //    int32 count = 2; // 总消息数
+    //    repeated UserMsg userMsgs = 3; // 消息
+    //    int32 pts = 4;
+    //    int32 flags = 5;
+    //    bytes messages = 6;
+    bytes result = 1;
+    int32 errorCode = 7;
+}
+
+//获取participants
+message ReqParticipants {
+    int32 offSet = 1;
+    int32 limit = 2;
+    int32 partiType = 3;
+    int32 channelId = 4;
+    int32 fromId = 5;
+    string q = 6;
+    int32 Hash = 7; // 校验唯一的， 如果不为0 则要进行唯一判断
+    pbcomm.Debug debug = 8;
+}
+
+//返回participants
+message ReplyParticipants {
+    bytes Updates = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+//获取participant
+message ReqParticipant {
+    int32 channelid = 1;
+    int32 fromId = 2;
+    int32 userId = 3;
+    int64 accessHash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//返回participant
+message ReplyParticipant {
+    bytes Updates = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+//#####超级群get messages by messages id#####
+message ReqGetChannelMsgsByMsgsId {
+    int32 channelId = 1;
+    repeated int32 msgsId = 2;
+    int32 fromId = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message ReqGetChannelCommonDialogs {
+    int32 fromId = 1;
+    repeated int32 channIds = 2;
+    pbcomm.Debug debug = 6;
+}
+
+message ChannelDialog {
+    int32 ChannelId = 1; // 超级群唯一ID
+    int32 TopMessage = 2; //
+    int32 MaxReadInId = 3; // 已读最大ID
+    int32 Encry = 4; // 是否加密
+}
+
+message ChannelDialogAndMsg {
+    ChannelDialog ChannelDialog = 1;
+    UserMsg ChannelMsg = 2;
+}
+
+message ChannelDialogAndMsgs {
+    repeated ChannelDialogAndMsg channelDialogAndMsg = 1;
+}
+
+message UserMsg {
+    int64 Id = 1;
+    int32 UserId = 2;
+    int32 WithId = 3; // 消息交互方
+    int32 WithIdType = 4; // 1.user 2:chat 3:channel
+    int32 MessageType = 5; // 消息类型
+    int32 Flags = 6; // 消息标识
+    bool Out = 7; // 是否为自己发送
+    bool Mentioned = 8; // 是否提及他人
+    bool MediaUnread = 9; // 媒体是否已读
+    bool Silent = 10; // 是否静音
+    bool Post = 11; // 是否邮递
+    int32 MsgId = 12; // 消息id
+    int32 ToId = 13; // 接收方id
+    int32 Pts = 14; // 消息的pts
+    bytes FwdFrom = 15; // 引用
+    int32 ViaBotId = 16; // 机器人id
+    int32 ReplyToMsgId = 17; // 回复id
+    int32 Date = 18; // 时间
+    string Message = 19; // 消息内容
+    int64 Media = 20; // 媒体id
+    bytes MediaData = 21; // 媒体二进制
+    bytes ReplyMarkup = 22; // 小键盘
+    repeated bytes Entities = 23; // 高亮
+    int32 FromId = 24; // 发送方
+    int32 Views = 25; // 查看人数
+    int32 EditDate = 26; // 编辑时间
+    bytes Action = 27; // 行为
+    int64 RandomId = 28; // 随机id
+    int64 Uuid = 29; // 消息全局唯一id
+    int32 InsertDate = 30;
+    int32 UpdateDate = 31;
+    int32 Encry = 32; // 0: 不加密 1：加密
+}
+
+
+message RequestWebPMessage {
+    string message = 1;
+    uint64 keyIdNum = 2;
+    int32 dcId = 3;
+}
+
+
+message ReplyRequestWebPagePreview {
+    bytes webPage = 1;
+}
+
+//#########################  推送服务 #################################
+message Reqpushusermsg {
+    int32 PushUserId = 1; // 最终推送抵达的用户id
+    int32 Fromid = 2; // 该推送消息的发送方id
+    string PushType = 3; //1: user 2: chat 3: channel
+    int32 Toid = 4; // 该条消息接收方id 可能是userID chatid channelid
+    string Msg = 5; // 消息的文本内容
+    string MediaType = 6; // 消息的媒体类型 (video, mp3, photo, doc, sticker)
+    int32 Msgid = 7; // 该条消息的消息id
+}
+
+message ReplyPush {
+    bool reply = 1; // 成功true 失败false
+}
+
+//#################################### 搜索服务 ###############################
+service SearchServer {
+    // 消息搜索
+    rpc MessageSearch (ReqMessageSearch) returns (ReplyMessageSearch) {
+    }
+
+    // 联系人搜索
+
+    // 全局搜索
+
+    // gifs查询上传
+    rpc GifQueryAndUpload (ReqGifQueryAndUpload) returns (ReplyGifQueryAndUpload) {
+    }
+    // gifs搜索Api
+    rpc GifSearchApi (ReqGifSearchApi) returns (ReplyGifSearchApi) {
+    }
+    // webpage
+    rpc GetWebPage (ReqGetWebPage) returns (ReplyGetWebPage) {
+    }
+    // getWebPagePreview
+    rpc GetWebPagePreview (ReqGetWebPagePreview) returns (ReplyGetWebPagePreview) {
+    }
+}
+
+message ReqMessageSearch {
+    int32 self_id = 1;
+    bytes peer = 2;
+    string q = 3;
+    int32 from_id = 4;
+    bytes filter = 5;
+    int32 min_date = 6;
+    int32 max_date = 7;
+    int32 offset = 8;
+    int32 max_id = 9;
+    int32 limit = 10;
+    pbcomm.Debug debug = 11;
+}
+
+message ReplyMessageSearch {
+    int32 retype = 1; // 1: 表示完全返回 2: 表示无法完全返回需要分片返回
+    int32 count = 2; // 当需要分片返回的时候 count有值 表示返回的条数
+    repeated UserMsg message = 3;
+}
+
+message ReqCheckChatInvite {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    string hash = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message ReqGetChannelsLastMsgsByUserId {
+    int32 userId = 1;
+    int32 date = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyGetChannelsLastMsgsByUserId {
+    repeated UserMsg userMsgs = 1;
+    int32 error_code = 2;
+}
+
+//#############Admin Logs#############
+message ReqChannelAdminLog {
+    int32 channelId = 1;
+    int32 fromId = 2;
+    int64 fromKeyId = 3;
+    int64 accessHash = 4;
+    string q = 5;
+    ChannelAdminLogEventFilter eventFilter = 6;
+    repeated int32 admins = 7;
+    int32 max_id = 8;
+    int32 min_id = 9;
+    int32 limit = 10;
+    pbcomm.Debug debug = 11;
+}
+
+message ChannelAdminLogEventFilter {
+    int32 flags = 1;
+    bool join = 2;
+    bool leave = 3;
+    bool invite = 4;
+    bool ban = 5;
+    bool unban = 6;
+    bool kick = 7;
+    bool unkick = 8;
+    bool promote = 9;
+    bool demote = 10;
+    bool info = 11;
+    bool setting = 12;
+    bool pinned = 13;
+    bool edit = 14;
+    bool delete = 15;
+}
+
+message ReplyChannelAdminLog {
+    bytes adminLogResults = 1;
+    int32 error_code = 2;
+}
+
+//################Import Chat Invite##################
+message ReqImportChatInvite {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    string hash = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message ReplyImportChatInvite {
+    bytes updates = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+//###############Ban channel user#################
+
+message ReqBanChannelUser {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    int32 channelId = 3;
+    int32 bannedUserId = 4;
+    int64 accessHash = 5;
+    int32 util_date = 6;
+    ChannelBannedRights channelBannedRights = 7;
+    pbcomm.Debug debug = 8;
+}
+
+message ReplyBanChannelUser {
+    bytes Updates = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+
+}
+
+message ChannelBannedRights {
+    int32 flags = 1;
+    bool view_messages = 2;
+    bool send_messages = 3;
+    bool send_media = 4;
+    bool send_stickers = 5;
+    bool send_gifs = 6;
+    bool send_games = 7;
+    bool send_inline = 8;
+    bool embed_links = 9;
+    int32 until_date = 10;
+
+    /* @ add by Qingsong at 2019-11-14 for ban member rights. */
+    bool invite_user = 11; // 邀請用戶
+    bool pin_message = 12; // 置頂消息
+    bool change_group_info = 13; // 修群组信息
+    bool send_polls = 14; // 发起投票权限
+}
+
+//获取fullchannel
+message ReqFullchannel {
+    int32 fromId = 1;
+    int32 channelId = 2;
+    int64 accessHash = 3;
+    pbcomm.Debug debug = 4;
+}
+
+//创建超级群的邀请链接
+message ReqExportChannelLink {
+    int32 channelId = 1;
+    int32 fromId = 2;
+    pbcomm.Debug debug = 4;
+}
+
+//返回超级群的邀请链接
+message ReplyExportChannelLink {
+    bytes exported = 1;
+    int32 error_code = 2;
+}
+
+//是否允许普通成员邀请人
+message ReqChannelToggleInvite {
+    int32 channelId = 1;
+    int32 userId = 2;
+    bool enabled = 3;
+    int64 accessHash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//回复toggle invite
+message ReplyChannelToggleInvite {
+    bytes reply = 1;
+    int32 error_code = 2;
+}
+
+//修改channel user name
+message ReqChannelUpdateUserName {
+    int32 channelId = 1;
+    int64 accessHash = 2;
+    int32 fromId = 3;
+    string userName = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//回复channel user name
+message ReplyChannelUpdateUserName {
+    bool updated = 1;
+    int32 error_code = 2;
+}
+
+//修改channel user name
+message ReqChannelCheckUserName {
+    int32 channelId = 1;
+    int64 accessHash = 2;
+    int32 fromId = 3;
+    string userName = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//回复channel user name
+message ReplyChannelCheckUserName {
+    bool valid = 1;
+    int32 error_code = 2;
+}
+
+//转移群主
+message ReqChangeGroupAndChannelCrator {
+    int32 GroupId = 1;
+    int32 fromId = 2;
+    int32 OperatorId = 3;
+    bool IsChat = 4;
+}
+
+//回复转移群主
+message ReplyChangeGroupAndChannelCrator {
+    bool valid = 1;
+    int32 error_code = 2;
+}
+
+//请求给定channel
+message ReqGetChannels {
+    repeated int32 channelIds = 1;
+    int32 fromId = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//返回get channles
+message ReplyGetChannels {
+    bytes reply = 1;
+    int32 error_code = 2;
+}
+
+//返回fullchannel
+message ReplyFullChannel {
+    bytes Updates = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+message ReqGetMessageByUserIdMsgId {
+    int32 UserId = 1;
+    int32 MsgId = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyGetMessageByUserIdMsgId {
+    messagedb.UserMsg UserMessage = 1;
+    int32 error_code = 2;
+}
+
+message ReqGetMessageByUserIdUuid {
+    int32 UserId = 1;
+    int64 Uuid = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyGetMessageByUserIdUuid {
+    messagedb.UserMsg UserMessage = 1;
+    int32 error_code = 2;
+}
+
+message ReqGetChannelMessageByChannelIdMsgId {
+    int32 ChannelId = 1;
+    int32 MsgId = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message ReplyGetChannelMessageByChannelIdMsgId {
+    messagedb.UserMsg UserMessage = 1;
+    int32 error_code = 2;
+}
+
+
+message ReplyStoreOtherInfoMsg {
+    int32 error_code = 1;
+}
+
+message ReplyBatchStoreOtherInfoMsg {
+    int32 error_code = 1;
+}
+
+message ReplyGetOtherInfoMsg {
+    repeated messagedb.OtherInfoMsg OtherInfoMsgs = 1; // 其他消息二进制列表
+    int32 error_code = 2; // 错误码
+}
+
+//############### 加密聊天 #################
+//// 加密聊天请求握手
+//message ReqRequestEncryption {
+//    int32 to_userid = 1; // 对方userid
+//    int32 self_userid = 2; // 自己userid
+//    int64 self_keyid = 3; // 自己keyid
+//    int64 access_hash = 4; // AccessHash
+//    bytes ga = 5; // GA
+//    pbcomm.Debug debug = 6;
+//}
+//
+//message ReplyRequestEncryption {
+//    int32 to_userid = 1;
+//    int32 self_userid = 2;
+//    int32 chat_id = 3;
+//    int64 access_hash = 4;
+//    bytes users = 5;
+//    bytes chats = 6;
+//    int32 date = 7;
+//    ErrorCode err_code = 8;
+//    string err_desc = 9;
+//
+//    enum ErrorCode {
+//        Success = 0;
+//        InternalError = 1; // 内部错误
+//        AccessHashError = 2; // AccessHash不匹配
+//        InBlockedListError = 3; // 被对方列入黑名单
+//        StoreSeChatError = 4; // 保存加密聊天离线请求错误
+//    }
+//}
+
+//// 加密聊天 接受握手请求
+//message ReqAcceptEncryption {
+//    int32 chat_id = 1; // 加密聊天ID
+//    int64 access_hash = 2; // AccessHash
+//    int32 self_userid = 3; // 自己的userid
+//    int32 to_userid = 4; // 对方的userid
+//
+//    pbcomm.Debug debug = 5;
+//}
+//
+//message ReplyAcceptEncryption {
+//    ErrorCode err_code = 1;
+//    string err_desc = 2;
+//    bytes ga = 3;
+//    securitychatserver.securityChatInfo chat_info = 4;
+//
+//    enum ErrorCode {
+//        Success = 0;
+//        InternalError = 1;
+//        AccessHashError = 2; // AccessHash不匹配
+//        InBlockedListError = 3; // 被对方列入黑名单
+//        AlreadyAcceptedError = 4; // 已被接受
+//    }
+//}
+//
+//// 保存离线接受
+//message ReqStoreSecurityChatAccept {
+//    securitychatserver.SecurityAcceptInfo secinfo = 1;
+//    pbcomm.Debug debug = 2;
+//}
+//
+//message ReqUpdateSecurityChatMemberKeyId {
+//    int32 chat_id = 1;
+//    int64 member_keyid = 2;
+//    bool already_accept = 3;
+//    pbcomm.Debug debug = 4;
+//}
+//
+//// 请求获取加密聊天基础信息
+//message ReqGetSecurityChatInfo {
+//    int32 chat_id = 1;
+//    pbcomm.Debug debug = 2;
+//}
+//// 回复加密聊天基础信息
+//message ReplyGetSecurityChatInfo {
+//    securitychatserver.securityChatInfo chat_info = 1;
+//    ErrorCode err_code = 2;
+//    string err_desc = 3;
+//
+//    enum ErrorCode {
+//        Success = 0;
+//        InternalError = 1;
+//    }
+//}
+//
+//// 检查是否被对方列入黑名单
+//message ReqCheckUserBlocked {
+//    int32 self_id = 1;
+//    int32 to_id = 2;
+//    pbcomm.Debug debug = 3;
+//}
+//// 回复是否被对方列入黑名单
+//message ReplyCheckUserBlocked {
+//    bool is_blocked = 1;
+//    ErrorCode err_code = 2;
+//    string err_desc = 3;
+//
+//    enum ErrorCode {
+//        Success = 0;
+//        InternalError = 2;
+//    }
+//}
+//
+//// 发送加密消息
+//message ReqSendEncryption {
+//    int32 chat_id = 1;
+//    bytes data = 2;
+//    pbcomm.Debug debug = 3;
+//}
+//// 回复发送加密消息
+//message ReplySendEncryption {
+//    securitychatserver.securityChatInfo chat_info = 1;
+//    bytes data = 2;
+//    int32 date = 3;
+//    ErrorCode err_code = 4;
+//    string err_desc = 5;
+//
+//    enum ErrorCode {
+//        Success = 0;
+//        InternalError = 1;
+//    }
+//}
+//
+//// 删除离线请求
+//message ReqDeleteSecurityChatAccept {
+//    int32 user_id = 1;
+//    int32 chat_id = 2;
+//    int64 key_id = 3;
+//    pbcomm.Debug debug = 4;
+//}
+//
+//// 保存离线销毁信息
+//message ReqStoreDiscardMessage {
+//    int32 user_id = 1;
+//    int32 chat_id = 2;
+//    int64 key_id = 3;
+//    int32 date = 4;
+//    pbcomm.Debug debug = 5;
+//}
+//
+//// 更新QTS和保存加密聊天信息
+//message ReqUpdateQtsAndStoreSecMessage {
+//    int64 key_id = 1;
+//    int32 to_userid = 2;
+//    int64 ramdom_id = 3;
+//    MessageType message_type = 4;
+//    int32 date = 5;
+//    string file = 6;
+//    bytes data = 7;
+//    int32 chat_id = 8;
+//    pbcomm.Debug debug = 9;
+//
+//    enum MessageType {
+//        EncryptedMessage = 0;
+//        EncryptedMessageFile = 1;
+//        EncryptedMessageService = 2;
+//    }
+//}
+//message ReplyUpdateQtsAndStoreSecMessage {
+//    int32 qts = 1;
+//    ErrorCode err_code = 2;
+//    string err_desc = 3;
+//
+//    enum ErrorCode {
+//        Success = 0;
+//        InternalError = 1;
+//    }
+//}
+//// 删除小于等于QTS的所有消息
+//message ReqDeleteUserDiffMessages {
+//    int32 user_id = 1;
+//    int64 key_id = 2;
+//    int32 max_qts = 3;
+//    pbcomm.Debug debug = 4;
+//}
+
+message ReqGetUsersChatsMt {
+    int32 self_userid = 1;
+    repeated int32 userid_arr = 2;
+    repeated int32 chatid_arr = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message ReplyGetUsersChatsMt {
+    bytes users = 1;
+    bytes chats = 2;
+    int32 ReplyCode = 3;
+}
+
+//message ReqStoreUserSecurityChatHistory {
+//    securitychatserver.SecReadHistotyInfo sec_read_his_info = 1;
+//    pbcomm.Debug debug = 2;
+//}
+//
+//message ReqGetSecurityChatSecInfo {
+//    securitychatserver.chatId chat_id = 1;
+//}
+//
+//message ReqStoreSecMessage {
+//    securitychatserver.secMessageInfo sec_msg_info = 1;
+//}
+//
+//message ReqNewSecurityChatAcceptSecrtKey {
+//    securitychatserver.acceptSecrtKey key = 1;
+//}
+
+//gif查询上传请求
+message ReqGifQueryAndUpload {
+    string gif_id = 1;
+}
+
+//gif查询上传返回
+message ReplyGifQueryAndUpload {
+    bool error = 1;
+    string message = 2;
+    FidData data = 3;
+
+}
+//gif查询上传数据
+message FidData {
+    uint64 fid = 2;
+    uint64 access_hash = 3;
+    uint64 file_size = 4;
+    int32 result = 5;
+}
+
+//gif搜索请求
+message ReqGifSearchApi {
+    string q = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+//gif搜索返回
+message ReplyGifSearchApi {
+    bool error = 1;
+    string message = 2;
+    repeated SearchData data = 3;
+    Pagination page = 4;
+}
+
+//gif搜索数据
+message SearchData {
+    string type = 1;
+    string id = 2;
+    string title = 3;
+    string url = 4;
+    string thumb_url = 5;
+    string content_url = 6;
+    string content_type = 7;
+    int32 width = 8;
+    int32 height = 9;
+}
+
+//分页数据
+message Pagination {
+    int32 total_count = 1;
+    int32 count = 2;
+    int32 offset = 3;
+}
+
+// 领取红包请求
+message ReqReceiveRedPacket {
+    int64 from_keyid = 1;
+    int32 user_id = 2;
+    int32 peer_id = 3;
+    int32 peer_type = 4;
+    int64 peer_access_hash = 5;
+    int64 red_packet_id = 6;
+    pbcomm.Debug debug = 7;
+}
+//领取红包请求结果
+message ReplyReceiveRedPacket {
+    bytes result = 1;
+    int32 error_code = 2;
+}
+
+//webpage req
+message ReqGetWebPage {
+    string url = 1;
+}
+
+//webpage reply
+message ReplyGetWebPage {
+    bool error = 1;
+    string message = 2;
+    WebPage webPage = 3;
+}
+
+//webpage data
+message WebPage {
+    int64 id = 1;
+    string url = 2;
+    string display_url = 3;
+    string type = 4;
+    string site_name = 5;
+    string title = 6;
+    string description = 7;
+    string photo = 8;
+    string embed_url = 9;
+    string embed_type = 10;
+    int32 embed_width = 11;
+    int32 embed_height = 12;
+    string author = 13;
+}
+
+message ReqGetWebPagePreview {
+    string url = 1;
+}
+
+message ReplyGetWebPagePreview {
+    bool error = 1;
+    string message = 2;
+    WebPage webPage = 3;
+}
+
+// 用户分数
+message UserScore {
+    int32 userid = 1; // 用户id
+    int32 score = 2; // 用户分数
+}
+
+
+message FoldersEditPeerFoldersReq {
+    int32 userid = 1; // 用户id
+    repeated bytes folder_peers = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message FoldersEditPeerFoldersReply {
+    bytes result = 1; // 对话框数据返回
+    int32 error = 2; // 1: 无法获取到 2: userid 为0  3: 数据库返回超时 4: 消息服务crash
+}
+
+message FoldersDeleteFolderReq {
+    int32 userid = 1; // 用户id
+    int32 folder_id = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message FoldersDeleteFolderReply {
+    bytes result = 1; // 对话框数据返回
+    int32 error = 2; // 1: 无法获取到 2: userid 为0  3: 数据库返回超时 4: 消息服务crash
+}
+
+//为红包通知定制系统号发送消息的请求
+message ReqSendPaymentNotifyMsg {
+    int32 user_id = 1; //通知的用户Id
+    int64 access_hash = 2; // 用户hash
+    int32 from_id = 3; //通知浩的Id 777000
+    string message = 4; //通知消息
+    bytes media = 5; // 通知的媒体 mtproto.TL.ENcode
+    int32 media_type = 6; //媒体类型 其中  33 代表支付通知,  37 红包通知
+    pbcomm.Debug debug = 7; // debug日志
+}
+
+//为红包通知定制系统号发送消息的请求返回
+message RspSendPaymentNotifyMsg {
+    bool successful = 1; //是否成功
+}
+
+//定制加好友成功后的相互通知消息  （你们已经是好友了，可以进行聊天了）
+message ReqSendAddMutulContactNotify {
+    int32 user_id = 1; //接受方的ID
+    int32 from_id = 2; // 申请方的userId
+    pbcomm.Debug debug = 7; // debug日志
+}
+
+message RespSendAddMutulContactNotify {
+    bool sucessful = 1; //是否成功
+}
+
+message ReqSendAddSingleContactNotify {
+    int32 user_id = 1;
+    int32 to_id = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message RespSendAddSingleContactNotify {
+    bool successful = 1;
+}

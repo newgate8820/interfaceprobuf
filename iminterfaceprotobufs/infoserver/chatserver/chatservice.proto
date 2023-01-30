@@ -1,0 +1,261 @@
+//协议文件用途:  操作和获取普通群组信息
+//作者：liuxinlei
+//日期: 2017/6/22
+//版本：0.0.1
+//修改日期：20170627
+//修改日志：修改接口中一些错误 by 谭于舟
+//2017/12/1 hujian 增加日志  返回code  规范代码
+
+syntax = "proto3";
+import "chatcommon/chatcommon.proto";
+package chatserver;
+
+//################# 测试数据结构 #############################
+message HelloMessage {
+    string name = 1;
+}
+
+message HelloRespond {
+    string respond = 1;
+}
+
+//#################### 真正协议结构 ###################
+//普通群的基础信息
+
+
+
+
+
+
+//---------------------------------------------------------------------------------
+//创建群的请求数据
+message createRquest {
+    string title = 1;
+    int32 creator = 2; //群创建者的id
+    int32 date = 3; //群创建时间
+    int32 chat_id = 4; //普通群的ID
+    repeated int32 member_id = 5; //创建群的时候邀请人的id的列表
+    chatcommon.ChatLogPrefix dlog = 6 ;//日志
+}
+//响应
+message chatInfo {
+    int32 chat_id = 1;
+    bool admins_enabled = 2;
+    bool deactivated = 3; //群是否活跃
+    string exported_invite = 4;
+    bool encry = 5; //是否加密群
+    int32 creator = 6; //创建者的id
+    string title = 7;
+    string photo = 8; //群头像 json格式
+    int32 version = 9; //群version
+    int32 participants_count = 10; //	群成员个数 （邀请人和踢人都要相应变化）
+    int32 date = 11; //群创建时间
+    string migrate_to = 12; //升级为超级群的时候默认"" 格式为json格式
+    chatcommon.ChatResultCode resultcode = 13 ;     //返回结果码
+}
+//---------------------------------------------------------------------------------
+//获取群的信息请求
+message chatId {
+    int32 chat_id = 1;
+    chatcommon.ChatLogPrefix dlog = 2 ;//日志
+}
+//群成员列表结构
+message chatParticipants {
+    repeated chatMemberInfo member = 1;
+    chatcommon.ChatResultCode resultcode = 2 ;     //返回结果码
+}
+message boolResult {
+    bool b = 1;
+    chatcommon.ChatResultCode resultcode = 2 ;     //返回结果码
+}
+message chatLittleInfo {
+    int32 chat_id = 1;
+    string exported_invite = 2;
+    string title = 3;
+    chatcommon.ChatResultCode resultcode = 4 ;     //返回结果码
+}
+message chatUsersId {
+    int32 chat_id = 1;
+    repeated int32 user_id = 2;
+    chatcommon.ChatResultCode resultcode = 3 ;     //返回结果码
+}
+//---------------------------------------------------------------------------------
+//更新群名称
+message chatTitleReq {
+    int32 chat_id = 1;
+    string title = 2;
+    chatcommon.ChatLogPrefix dlog = 3 ;//日志
+}
+//---------------------------------------------------------------------------------
+//更新群photo
+message chatPhotoReq {
+    int32 chat_id = 1;
+    string photo = 2;
+    chatcommon.ChatLogPrefix dlog = 3 ;//日志
+}
+//---------------------------------------------------------------------------------
+
+message chatMigrateReq {
+    int32 chat_id = 1;
+    string migrate_to = 2;
+    chatcommon.ChatLogPrefix dlog = 3 ;//日志
+}
+//---------------------------------------------------------------------------------
+message chatdeactiveReq {
+    int32 chat_id = 1;
+    bool deactivated = 2;
+    chatcommon.ChatLogPrefix dlog = 3 ;//日志
+}
+//---------------------------------------------------------------------------------
+
+message chatadminEnableReq {
+    int32 chat_id = 1;
+    bool admins_enabled = 2;
+    chatcommon.ChatLogPrefix dlog = 3 ;//日志
+}
+//---------------------------------------------------------------------------------
+//更新邀请链接
+message chatExportLink {
+    int32 chat_id = 1;
+    string link = 2;
+    chatcommon.ChatLogPrefix dlog = 3 ;//日志
+}
+//---------------------------------------------------------------------------------
+//##########群成员的请求结构###################
+message chatMemberBase {
+    int32 invitor = 1; //邀请者或者踢人的id
+    int32 member_id = 2; //被踢或者被邀请者的id
+    int32 date = 3;
+    int32 chat_id = 4;
+    chatcommon.ChatLogPrefix dlog = 5 ;//日志
+}
+//普通群成员信息
+message chatMemberInfo {
+    int32 user_id = 1; //群成员的Id
+    int32 invitor = 2; //邀请者的id
+    int32 admin_level = 3; //管理员权限等级 3 代表创建者， 2 代表管理员 1、代表普通成员
+    int32 join_time = 4; //入群时间
+    int32 leave = 5; //0 为群成员（正常）， 2 被踢 1、主动离开
+    int32 chat_id = 6;
+    chatcommon.ChatResultCode resultcode = 7 ;     //返回结果码
+}
+//---------------------------------------------------------------------------------
+message chatIdsReq {
+    repeated int32 chat_id = 1;
+    int32 user_id = 2;
+    bool except = 3;
+    chatcommon.ChatLogPrefix dlog = 4 ;//日志
+}
+message chatInfos {
+    repeated chatInfo chat_infos = 1;
+    chatcommon.ChatResultCode resultcode = 2 ;     //返回结果码
+}
+//---------------------------------------------------------------------------------
+message commonChatReq {
+    int32 user_id_self = 1;
+    int32 user_id = 2;
+    int32 max_id = 3;
+    int32 limit = 4;
+    chatcommon.ChatLogPrefix dlog = 5 ;//日志
+}
+message commonChatsId {
+    repeated  int32 chat_id = 1;
+    chatcommon.ChatResultCode resultcode = 2 ;     //返回结果码
+ }
+//---------------------------------------------------------------------------------
+message chatVersion {
+    int32 chat_id = 1;
+    int32 version = 2;
+}
+message chatPartCount {
+    int32 chat_id = 1;
+    int32 participants_count = 2;
+}
+
+
+
+
+
+message chatUserReq {
+    int32 chat_id = 1;
+    int32 user_id = 2;
+}
+
+
+//服务接口
+service GroupServerService {
+    //测试接口
+    //rpc HelloServer (HelloMessage) returns (HelloRespond) {
+    // }
+
+    //***********************业务接口 **************************
+    //群创建的接口
+    rpc CreateChat (createRquest) returns (chatInfo) {
+    }
+    //根据chat_id获取群的基本信息
+    rpc GetChatInfo (chatId) returns (chatInfo) {
+    }
+    //更新群名称
+    rpc UpdateChatTitle (chatTitleReq) returns (chatInfo) {
+    }
+    //更新群名称头像
+    rpc UpdateChatPhoto (chatPhotoReq) returns (chatInfo) {
+    }
+    //更新群migrate_to
+    rpc UpdateChatMigrate (chatMigrateReq) returns (chatInfo) {
+    }
+    //更新deactive
+    //rpc UpdateChatDeactice (chatdeactiveReq) returns (chatInfo) {
+    //}
+    //更新admins_enabled
+    rpc UpdateChatAdminsEn (chatadminEnableReq) returns (chatInfo) {
+    }
+    //更新invite link
+    rpc UpdateChatLink (chatExportLink) returns (chatInfo) {
+    }
+    //更新invite link
+    //rpc UpdateChatVersion (chatVersion) returns (chatInfo) {
+    //}
+    //更新participants_count
+    //rpc UpdateChatParticipantsCount (chatPartCount) returns (chatInfo) {
+    //}
+    //删除群信息
+    rpc DelChatInfo (chatId) returns (boolResult) {
+    }
+
+    //############### 有关普通群成员的操作#####################
+    rpc AddChatUser (chatMemberBase) returns (boolResult) {
+    }
+    //删除群成员
+    rpc DelChatUser (chatMemberBase) returns (boolResult) {
+    }
+
+    //设置管理员
+    rpc SetChatUserAdmin (chatMemberBase) returns (boolResult) {
+    }
+    //取消管理员
+    rpc DelChatUserAdmin (chatMemberBase) returns (boolResult) {
+    }
+    //机器人获取基本信息
+    rpc GetChatLittleInfo (chatId) returns (chatLittleInfo) {
+    }
+    //获取群成员列表
+    rpc GetChatParticipants (chatId) returns (chatParticipants) {
+    }
+    //获取指定成员的信息
+    rpc GetChatUserInfo (chatMemberBase) returns (chatMemberInfo) {
+    }
+    //获取群成员用户id
+    rpc GetChatUsersId (chatId) returns (chatUsersId) {
+
+    }
+    rpc GetChatInfos (chatIdsReq) returns (chatInfos) {
+
+    }
+    rpc GetParticipants (chatIdsReq) returns (chatParticipants) {
+
+    }
+    rpc GetCommonChats (commonChatReq) returns (commonChatsId) {
+
+    }
+}

@@ -1,0 +1,476 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+syntax = "proto3";
+
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/messagedb/messagedb.proto
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/usermsg.proto";
+package messagedb;
+
+service MessageDb {
+    //=========================================== HeartBeating =========================================================
+    // HeartBeating
+    rpc HeartBeating(ReqHeartBeating) returns (ReplyHeartBeating) {};
+
+    //=========================================== UserMsg =========================================================
+    // 插入单条 usermsg 内容
+    rpc InsertOrUpdateUserMsg(ReqInsertOrUpdateUserMsg) returns(DialogIsCreated) {};
+
+    // 查询转发消息
+    rpc GetForwardUserMsg(ReqGetForwardUserMsg) returns(ForWardUserMsgList) {};
+
+    // 查询历史消息
+    rpc GetUserMsgHistory(ReqGetUserMsgHistory) returns(UserMsgList) {};
+
+    // 查询用户消息UUID
+    rpc GetUserMsgUUID(ReqGetUserMsgUUID) returns(UUID) {};
+
+    // 查询用户消息 通过 UUID
+    rpc GetUserMsgIdByUUID(ReqGetUserMsgIdByUUID) returns(MsgId) {};
+
+    // 获取 消息UUID数组
+    rpc GetUserMsgListByUUIDs(ReqGetUserMsgListByUUIDs) returns(UserMsgList) {};
+
+    // 删除用户信息
+    rpc DeleteUserMsg(ReqDeleteUserMsg) returns(ReplyNull) {};
+
+    // 批量删除用户信息
+    rpc BatchDeleteUserMsg(ReqBatchDeleteUserMsg) returns(ReplyNull) {};
+
+    // 查询一条用户信息通过ID
+    rpc GetOneUserMsgByUserIdAndMsgId(ReqGetOneUserMsgByUserIdAndMsgId) returns(pbcomm.UserMsg) {};
+
+    // 删除信息
+    rpc DeleteUserMsgByUserIdAndWithIdAndEncry(ReqDeleteUserMsgByUserIdAndWithIdAndEncry) returns(ReplyNull) {};
+
+    // 清除历史  用于清楚历史每次从最底部删除消息 每次删除100条 如果仍然有消息将最新的消息id返回 如没有消息将0返回 count=本次删除的消息条数
+    rpc ClearHistory (ReqClearHistory) returns (MsgIDList) {};
+
+    // 查询打电话消息历史记录
+    rpc GetMessageHistoryPageByMedia(ReqGetMessageHistoryPageByMedia) returns (ReplyGetMessageHistoryPageByMedia) {};
+
+    //=========================================== UserMediaMessageStatistics =========================================================
+    // 根据userId、withId、withType、media获取UserMediaMessageStatistics
+    rpc GetUserMediaMessageStatisticsByMedia(ReqGetUserMediaMessageStatisticsByMedia) returns (ReplyGetUserMediaMessageStatisticsByMedia) {};
+
+    // 获取最近操作的对话框 limit 个
+    rpc GetLastLimitDialog(ReqGetLastLimitDialog) returns (ReplyGetLastLimitDialog) {};
+
+    //=========================================== msg_random(发消息去重) =================================================
+    // 获取random 状态 如果有则返回true 没有就插入缓存 并且 返回false
+    rpc GetRandomStatus(ReqGetRandomStatus) returns (ReplyGetRandomStatus) {};
+
+    // 设置超级群消息
+    rpc SetSuperGroupMsg(ReqSetSuperGroupMsg) returns (ReplySetSuperGroupMsg) {};
+
+    // 获取超级群消息
+    rpc GetSuperGroupMsg(ReqGetSuperGroupMsg) returns (ReplyGetSuperGroupMsg) {};
+
+    // 设置messagedb.user_dialog.unread_metions_count
+    rpc UserDialogSetUnreadMetionsCount(ReqUserDialogSetUnreadMetionsCount) returns (ReplyUserDialogSetUnreadMetionsCount) {};
+
+    // 获取messagedb.user_dialog.unread_metions_count
+    rpc UserDialogGetUnreadMetionsCount(ReqUserDialogGetUnreadMetionsCount) returns (ReplyUserDialogGetUnreadMetionsCount) {};
+
+    // 改变messagedb.user_dialog.unread_metions_count
+    rpc UserDialogChangeUnreadMetionsCount(ReqUserDialogChangeUnreadMetionsCount) returns (ReplyUserDialogChangeUnreadMetionsCount) {};
+
+    // add for messagedb.user_message_at
+    rpc UserMessageAtAdd(ReqUserMessageAtAdd)  returns (ReplyUserMessageAtAdd) {};
+
+    // get for messagedb.user_message_at
+    rpc UserMessageAtGet(ReqUserMessageAtGet)  returns (ReplyUserMessageAtGet) {};
+
+    // delete for messagedb.user_message_at
+    rpc UserMessageAtDel(ReqUserMessageAtDel)  returns (ReplyUserMessageAtDel) {};
+
+    // GetMessageByMsgIDs 根据 UserID、MsgIDs 查询消息
+    rpc GetMessageByMsgIDs(GetMessageByMsgIDsReq) returns (GetMessageByMsgIDsResp) {};
+
+    //=================================================== search =======================================================
+    rpc UpdateMessageMediaUnread(ReqUpdateMessageMediaUnread) returns (ReplyNull) {};
+
+    rpc GetUserMessageByUserIDRandomID(ReqGetUserMessageByUserIDRandomID) returns (pbcomm.UserMsg) {}
+
+    rpc SearchMessage(ReqSearch) returns (ReplySearch) {}
+
+    rpc GetUserMsgByUserIDMsgIDs(ReqGetUserMsgByUserIDMsgIDs) returns (ReplyGetUserMsgByUserIDMsgIDs) {}
+
+    rpc GetUserMsgByUserIDMsgIDsHotData(ReqGetUserMsgByUserIDMsgIDsHotData) returns (ReplyGetUserMsgByUserIDMsgIDs) {}
+    //=================================================== search =======================================================
+
+}
+
+message GetMessageByMsgIDsReq {
+    int32 UserID          = 1;
+    repeated int32 MsgIDs = 2;
+}
+
+message GetMessageByMsgIDsResp {
+    repeated pbcomm.UserMsg Messages = 1;
+}
+
+// 返回空结构体
+message ReplyNull {}
+
+message ReplyErr {
+    uint32 ErrCode = 1; // 錯誤碼 200 成功 201-300 緩存錯誤 301-400 database錯誤
+    string ErrMsg  = 2; // 錯誤信息描述
+}
+
+enum HeartBeating {
+    RpcExcept       = 0; // 包异常
+    PackageType     = 1; // 包类型
+    Identification  = 2; // 服务标识
+    ResultSuccess   = 3; // 返回成功
+}
+
+message ReqHeartBeating {
+    HeartBeating Type = 1; // 包类型
+    HeartBeating Identification = 2; // 服务标识
+}
+
+message ReplyHeartBeating {
+    HeartBeating Type = 1; // 包类型
+    HeartBeating Result = 2; // 服务标识
+}
+
+message ReqInsertOrUpdateUserMsg{
+    pbcomm.UserMsg UserMsg    = 1;  // 聊天消息
+    pbcomm.Debug Debug = 2; // 日志前缀信息
+}
+
+message DialogIsCreated {
+    bool DialogIdCreated = 1; // 是否新建的dialog
+}
+
+message ReqGetForwardUserMsg {
+    int32 UserId          = 1; // 用户ID
+    int32 WithId          = 2; // 消息交互方ID
+    int32 WithIdType      = 3; // 对话框类型
+    int32 Encry           = 4; // 是否加密 0: 不加密 1：加密
+    repeated int32 MsgIds = 5; // 消息ID集合
+    pbcomm.Debug Debug    = 11; // 日志前缀信息
+}
+
+message ForWardUserMsg {
+    int32 Date              = 1; // 时间
+    string Message          = 2; // 消息内容
+    int64 Media             = 3; // 媒体id
+    bytes MediaData         = 4; // 媒体二进制
+    bytes ReplyMarkup       = 5; // 小键盘
+    repeated bytes Entities = 6; // 高亮
+    int32 FromId            = 7; // 发送方
+    int32 Encry             = 8; // 是否加密 0: 不加密 1：加密
+    bytes FwdFrom           = 9; // 原始转发信息
+    int64 GroupId           = 10; // 图片组ID
+    int32 ViaBotId          = 11; // 机器人id
+    int32 MsgID             = 12; // 消息ID
+}
+
+message ForWardUserMsgList {
+    repeated ForWardUserMsg ForWardUserMsg = 1; // 转发消息集合
+}
+
+message ReqGetUserMsgHistory {
+    int32 Selfid       = 1;  // 自身用户ID
+    int32 Withid       = 2;  // 消息交互方ID
+    int32 Type         = 3;  // 对话框类型 1:user 2: chat 3: channel
+    int32 OffsetId     = 4;  // 消息ID， 查询小于OFfsetID limit- addoffset条 如果offsetID 等于0 则取最新的limit条
+    int32 OffsetDate   = 5;  // 未使用字段
+    int32 AddOffset    = 6;  // 向下取消息条数， 如果不等于0 则取 大于且等于OffsetId addOffset绝对值条
+    int32 MinId        = 7;  // 未使用字段
+    int32 MaxId        = 8;  // 未使用字段
+    int32 Limit        = 9;  // 查询条数
+    int32 Encry        = 10; // ReqUserMsgHis是否加密 0: 不加密 1：加密
+    int32 DeletMark    = 11; // 超级群删除历史标记
+    pbcomm.Debug Debug = 12; // 日志前缀信息
+}
+
+message UserMsgList {
+    repeated pbcomm.UserMsg UserMsgs = 1; // 消息集合
+    int32 pts                 = 2; // 当前PTS
+}
+
+message ReqGetUserMsgUUID {
+    int32 UserId       = 1; // 用户ID
+    int32 MsgId        = 2; // 消息ID
+    pbcomm.Debug Debug = 3; // 日志前缀信息
+}
+
+message UUID {
+    int32 Userid = 1; // 用户ID
+    int64 UUID   = 2; // 消息UUID
+}
+
+message ReqGetUserMsgIdByUUID {
+    int32 Userid       = 1; // 用户ID
+    int64 UUID         = 2; // 消息UUID
+    pbcomm.Debug Debug = 3; // 日志前缀信息
+}
+
+message MsgId {
+    int32 MsgId = 1; // 消息ID
+}
+
+message ReqGetUserMsgListByUUIDs {
+    int32 userid         = 1; // 用户ID
+    repeated int64 UUIDS = 2; // 消息UUID集合
+    pbcomm.Debug Debug   = 3; // 日志前缀信息
+}
+
+message ReqDeleteUserMsg {
+    int32 UserId       = 1; // 用户ID
+    int32 MsgId        = 2; // 消息ID
+    pbcomm.Debug Debug = 3; // 日志前缀信息
+}
+
+message ReqBatchDeleteUserMsg {
+    int32 UserId          = 1; // 用户ID
+    int32 WithId          = 2; // 消息交互方ID
+    repeated int32 MsgIds = 3; // 消息ID集合
+    pbcomm.Debug Debug    = 4; // 日志前缀信息
+}
+
+message ReqGetOneUserMsgByUserIdAndMsgId {
+    int32 UserId       = 1; // 用户ID
+    int32 MsgId        = 2; // 消息ID
+    pbcomm.Debug Debug = 3; // 日志前缀信息
+}
+
+message ReqDeleteUserMsgByUserIdAndWithIdAndEncry {
+    int32 UserId       = 1; // 用户ID
+    int32 WithId       = 2; // 消息交互方
+    int32 WithIdType   = 3; // 对话框类型
+    int32 Encry        = 4; // 是否加密 0: 不加密 1：加密
+    pbcomm.Debug Debug = 5; // 日志前缀信息
+}
+
+message ReqClearHistory {
+    int32 UserId       = 1; // 用户ID
+    int32 WithId       = 2; // 消息交互方
+    int32 WithIdType   = 3; // 对话框类型
+    int32 Encry        = 4; // 是否加密 0: 不加密 1：加密
+    pbcomm.Debug Debug = 5; // 日志前缀信息
+}
+
+message MsgIDList {
+    repeated int32 MsgId = 1; // 消息ID
+    repeated int32 Pts   = 2; // pts
+    int32 LastMsgId      = 3; // 删除的最大消息ID
+    int32 Count          = 4; // 删除消息条数
+}
+
+// 查询打电话历史消息记录config 当 withid == withtype == 0 时 只搜索userid
+message GetMessageHistoryPageByMediaConfig {
+    int32 UserId          = 1; // 用户ID
+    int32 WithId          = 2; // 消息交互方
+    int32 WithType        = 3; // 对话框类型
+    int32 MaxId           = 4; // 消息Id 如果为0 则从最后一条开始查询
+    int32 Encry           = 5; // 是否加密
+    repeated int32 Medias = 6; // 媒体类型 20 电话
+    int32 Limit           = 7; // 分页查询条数
+}
+
+message ReqGetMessageHistoryPageByMedia {
+    GetMessageHistoryPageByMediaConfig GetMessageHistoryPageByMediaConfig = 1; // 查询打电话历史消息记录config
+    pbcomm.Debug Debug                                                    = 2; // 日志前缀信息
+}
+
+message ReplyGetMessageHistoryPageByMedia {
+    repeated pbcomm.UserMsg UserMsgs = 1; // 消息集合
+}
+
+message ReqGetUserMediaMessageStatisticsByMedia {
+    int32 UserId          = 1; // 用户ID
+    int32 WithId          = 2; // 消息接收方ID
+    int32 WithType        = 3; // 对话框类型
+    int32 Media           = 4; // 媒体类型
+    pbcomm.Debug Debug    = 5; // 日志前缀信息
+}
+
+message UserMediaMessageStatistics {
+    int32 UserId   = 1; // 用户ID
+    int32 WithId   = 2; // 消息接收方ID
+    int32 WithType = 3; // 对话框类型
+    int32 Media    = 4; // 媒体消息类型
+    int32 Count    = 5; // 媒体消息计数
+}
+
+message ReplyGetUserMediaMessageStatisticsByMedia {
+    UserMediaMessageStatistics UserMediaMessageStatistics = 1; // 媒体消息统计
+}
+
+message ReqGetLastLimitDialog {
+    int32 UserId       = 1; // 用户ID
+    int32 Limit        = 2; // 查询条数
+    pbcomm.Debug Debug = 3; // 日志前缀信息
+}
+
+message UserRating {
+    int32 UserId  = 1; // 联系人用户ID
+    double Rating = 2; // 联系人亲密度
+}
+
+message ReplyGetLastLimitDialog {
+    repeated UserRating UserRatingList = 1; // 返回对话框切片
+}
+
+message ReqGetRandomStatus {
+    uint64 KeyID       = 1; // 用户id
+    int64 RandomID     = 2; // randomid
+    pbcomm.Debug Debug = 4; // 日志前缀信息
+}
+
+message ReplyGetRandomStatus {
+    bool status = 1;  // 查询接口处理状态 true: 正在处理  false： 未处理
+}
+
+message ReqSetSuperGroupMsg {
+    int64 Date = 1;
+    bytes Msg  = 2;
+    int32 UserId = 3;
+    pbcomm.Debug Debug = 4; // 日志前缀信息
+}
+
+message ReplySetSuperGroupMsg {
+}
+
+message ReqGetSuperGroupMsg {
+    int64 Date = 1;
+    int32 UserId = 2;
+    int32 Limit = 3; // 分页查询条数
+    pbcomm.Debug Debug = 4; // 日志前缀信息
+}
+
+message ReplyGetSuperGroupMsg {
+    repeated bytes Msg  = 1;
+    int64 Date = 2;
+    bool  GetAll = 3;
+}
+
+message ReqUserDialogSetUnreadMetionsCount {
+    int32 UserId       = 1;
+    int32 ChannelID    = 2;
+    int32 Type         = 3;
+    int32 UnreadMetionsCount = 4;
+    pbcomm.Debug Debug = 5;
+}
+
+message ReplyUserDialogSetUnreadMetionsCount {
+    ReplyErr ReplyErr = 1;
+}
+
+message ReqUserDialogGetUnreadMetionsCount {
+    int32 UserId       = 1;
+    int32 ChannelID    = 2;
+    int32 Type         = 3;
+    pbcomm.Debug Debug = 4;
+}
+
+message ReplyUserDialogGetUnreadMetionsCount {
+    int32 UnreadMetionsCount = 1;
+    ReplyErr ReplyErr = 2;
+}
+
+message ReqUserDialogChangeUnreadMetionsCount {
+    int32 UserId       = 1;
+    int32 ChannelID    = 2;
+    int32 Type         = 3;
+    int32 UnreadMetionsCountChangeValue = 4; // UnreadMetionsCount变化值
+    pbcomm.Debug Debug = 5;
+}
+
+message ReplyUserDialogChangeUnreadMetionsCount {
+    ReplyErr ReplyErr = 1;
+}
+
+message ReqUserMessageAtAdd {
+    int32 UserId    = 1;
+    int32 WithId    = 2;
+    int32 MsgId     = 3;
+    int32 Encry     = 4;
+    pbcomm.Debug Debug = 5;
+}
+
+message ReplyUserMessageAtAdd {
+    ReplyErr ReplyErr = 1;
+}
+
+message ReqUserMessageAtGet {
+    int32 UserId    = 1;
+    int32 WithId    = 2;
+    int32 MsgId     = 3;
+    int32 AddOffset = 4;
+    int32 Limit     = 5;
+    pbcomm.Debug Debug = 6;
+}
+
+message ReplyUserMessageAtGet {
+    repeated pbcomm.UserMsg Messages = 1;
+    ReplyErr ReplyErr = 2;
+}
+
+message ReqUserMessageAtDel {
+    int32 UserId    = 1;
+    int32 WithId    = 2;
+    int32 MsgId     = 3;
+    pbcomm.Debug Debug = 4;
+}
+
+message ReplyUserMessageAtDel {
+    ReplyErr ReplyErr = 1;
+}
+
+//=================================================== search =======================================================
+message ReqUpdateMessageMediaUnread {
+    int32           UserID  = 1;
+    repeated int32  MsgIDs  = 2;
+    int32           Encry   = 3;
+}
+
+message ReqGetUserMessageByUserIDRandomID {
+    int32   UserID      = 1;
+    int64   RandomID    = 2;
+    int32   Encry       = 3;
+}
+
+message ReqSearch {
+    int32   UserID          = 1;    // 用户ID
+    int32   WithID          = 2;    // 消息接收者
+    int32   WithType        = 3;    // 对话框类型
+    int32   FromID          = 4;    // 消息发送者
+    repeated int32 Medias   = 5;    // 媒体类型
+    int32   OffsetID        = 6;    // 偏移的MsgID
+    int32   AddOffset       = 7;    // 向后偏移量 （包括OffsetID）
+    int32   Encry           = 8;    // 是否是加密库
+    int32   Limit           = 9;    // 获取消息的条数限制
+    int32   MinDate         = 10;   // 最小日期 暂时不用
+    int32   MaxDate         = 11;   // 最大日期 暂时不用
+    int32   MinID           = 12;   // 最小MsgID
+    int32   MaxID           = 13;   // 最大MsgID 暂时不用
+}
+
+message ReplySearch {
+    repeated pbcomm.UserMsg Messages = 1;
+}
+
+message ReqGetUserMsgByUserIDMsgIDs {
+    int32       UserID      = 1;    // 用户ID
+    int32       WithID      = 2;    // 消息接收者
+    int32       WithType    = 3;    // 对话框类型
+    repeated int32  MsgIDs  = 4;    // 消息ID数组
+	int32       Encry       = 5;    // 是否加密
+}
+
+message ReplyGetUserMsgByUserIDMsgIDs {
+    repeated pbcomm.UserMsg  UserMsgs  = 1;
+}
+
+message ReqGetUserMsgByUserIDMsgIDsHotData {
+    int32       UserID      = 1;    // 用户ID
+    int32       WithID      = 2;    // 消息接收者
+    int32       WithType    = 3;    // 对话框类型
+    repeated int32  MsgIDs  = 4;    // 消息ID数组
+    int32       Encry       = 5;    // 是否加密
+}
+//=================================================== search =======================================================

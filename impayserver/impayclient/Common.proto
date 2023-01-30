@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+//protoc --proto_path=/home/kepler/IdeaProjects/ibi-transaction --java_out=/home/kepler/IdeaProjects/ibi-transaction/src/main/java /home/kepler/IdeaProjects/ibi-transaction/src/main/proto/ReleaseTrans.proto
+//protoc --plugin=protoc-gen-grpc-java=/home/kepler/protobuf/protoc-gen-grpc-java --grpc-java_out=/home/kepler/IdeaProjects/ibi-transaction/src/main/java/im/ibi/transaction/protobufs/transaction --proto_path=/home/kepler/IdeaProjects/ibi-transaction/src/main/proto SendRedPackage.proto
+package impayclient;
+option java_multiple_files = true;
+option java_package = "im.ibi.protobufs.common"; //指定生成的java类所在的包
+option java_outer_classname = "Common";  //指定生成的java类文件名称
+option objc_class_prefix = "ibi";     //生成类前缀
+
+//公共响应
+message CommonResp{
+    int32 code = 1;
+    string message = 2;
+    string data = 3;
+}
+
+message UserIdReq{
+    int32 userId =1;
+}
+
+// 购买、出售 列表返回
+message TransListResp{
+    repeated int32 user_id = 1;
+    CommonResp common_resp = 2;
+}
+
+//我的发布 订单处理方式
+enum HandleType{
+    UP = 0;  //上架
+    DOWN = 1; //下架
+    DEL = 2;  //删除
+}
+
+//交易类型
+enum TransType{
+    BUY = 0;  //购买
+    SELL = 1;  //出售
+}
+
+//发布类型
+enum ReleaseType{
+    AGENT = 0; //代理
+    USER = 1;  //用户
+}
+
+//支付方式
+enum PayStyle{
+    UNKNOWN = 0; //未知
+    ALIPAY = 1;  //支付宝
+    WECHAT = 2;  //微信
+    UNION = 3;  //银行卡
+}
+
+//排序方式
+enum OrderStyle{
+    ASC = 0;
+    DESC = 1;
+}
+
+// 交易订单状态
+enum TransStatus{
+    COMPLETE = 0; //完成
+    CANCEL = 1; //取消
+    PAID = 2; // 已付款
+    UNPAID = 3; // 未付款
+}

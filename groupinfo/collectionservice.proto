@@ -1,0 +1,86 @@
+syntax = "proto3";
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+package groupinfo;
+
+message GroupCollection  {
+	int32 Chat_id     = 1;
+	int32 User_id     = 2;
+	bool Is_super     = 3;
+	bool Is_channel   = 4;
+	int64 Access_hash = 5;
+}
+
+
+message SetCollectionDialogReq {
+    GroupCollection collection = 1;
+    bool isCollection          = 2;
+    pbcomm.Debug Dlog          = 3;
+}
+
+message SetCollectionDialogResp {
+    bytes result = 1;
+    int32 flags  = 2;
+    int32 resultcode     = 3;
+}
+
+message GetCollectionDialogsReq {
+    bool isChannel      = 1;
+    int32 userId        = 2;
+    pbcomm.Debug Dlog   = 3;
+}
+
+message GetCollectionDialogsResp {
+    repeated GroupCollection result = 1;
+    int32 resultcode     = 2;
+}
+
+message GetGroupCollectionsReq {
+    bool isChannel      = 1;
+    int32 userId        = 2;
+    string hash         = 3;
+    pbcomm.Debug Dlog   = 4;
+}
+
+message GetGroupCollectionsResp {
+    repeated GroupCollection result = 1;
+    bool isModified      = 2;
+    string hash          = 3;
+    int32 resultcode     = 4;
+}
+
+message GetDialogCollectionReq {
+    GroupCollection collection = 1;
+    pbcomm.Debug Dlog          = 2;
+}
+
+message GetDialogCollectionResp {
+    bool result = 1;
+    int32 resultcode     = 2;
+}
+
+message UpdateCollectionDialogReq {
+    int32 userId       = 1;
+    int32 chatId       = 2;
+    int32 channelId    = 3;
+    pbcomm.Debug Dlog   = 4;
+}
+
+message UpdateCollectionDialogResp {
+    int64 result     = 1;
+    int32 resultcode = 2;
+}
+
+service GroupCollectionService{
+    //添加删除收藏对话框
+    rpc SetCollectionDialog (SetCollectionDialogReq) returns (SetCollectionDialogResp) {}
+    //老协议直接获取收藏列表
+    rpc GetCollectionDialogs (GetCollectionDialogsReq) returns (GetCollectionDialogsResp) {}
+    //新协议 通过hash判断是否返回收藏列表
+    rpc GetGroupCollections (GetGroupCollectionsReq) returns (GetGroupCollectionsResp) {}
+    //判断对话框是否被收藏
+    rpc GetDialogCollection (GetDialogCollectionReq) returns (GetDialogCollectionResp) {}
+    //判断对话框是否被收藏
+    rpc UpdateCollectionDialog (UpdateCollectionDialogReq) returns (UpdateCollectionDialogResp) {}
+}
+

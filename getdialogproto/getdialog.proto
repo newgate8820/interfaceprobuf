@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package getdialogproto;
+
+service GetDialogService {
+    // GetDialogs 分片获取用户对话框
+    rpc GetDialogs(GetDialogsReq) returns (GetDialogsResp) {}
+
+    // GetPeerDialogs 获取用户指定对话框
+    rpc GetPeerDialogs(GetPeerDialogsReq) returns (GetPeerDialogsResp) {}
+
+    // 获取用户路由表，返回用户对应的机器im、hostname etc
+    rpc GetRouterMessage(GetRouterMessageReq) returns (GetRouterMessageResp) {}
+
+    // GetPinnedDialogs 获取置顶对话框
+    rpc GetPinnedDialogs(GetPinnedDialogsReq) returns (GetPinnedDialogsResp) {}
+}
+
+message GetPinnedDialogsReq {
+    int64 ReqMsgID       = 1;
+    string AppVersion    = 2;
+    int32 MtLayer        = 3;
+    uint64 KeyID         = 4;
+    int32 UserID         = 10;
+}
+
+message GetPinnedDialogsResp {
+    bytes MessagesPeerDialogsBytes = 1;
+}
+
+message GetRouterMessageReq {
+
+}
+
+message GetRouterMessageResp {
+
+}
+
+message GetDialogsReq{
+    int64 ReqMsgID       = 1;
+    string AppVersion    = 2;
+    int32 MtLayer        = 3;
+    int32 Flags          = 4;
+    int32 UserID         = 5;
+    bool ExcludePinned   = 6;
+    int32 OffsetDate     = 7;
+    int32 OffsetID       = 8;
+    InputPeer OffsetPeer = 9;
+    int32 Limit          = 10;
+    int32 Hash           = 11;
+}
+
+message GetDialogsResp {
+    bytes MessagesDialogsBytes = 1;
+}
+
+message GetPeerDialogsReq {
+    int64 ReqMsgID                 = 1;
+    string AppVersion              = 2;
+    int32 MtLayer                  = 3;
+    uint64 KeyID                   = 4;
+    int32 UserID                   = 5;
+    repeated InputDialogPeer peers = 6;
+}
+
+message GetPeerDialogsResp {
+    bytes MessagesPeerDialogsBytes = 1;
+}
+
+message InputDialogPeer {
+    InputPeer Peer = 1;
+}
+
+message InputPeer {
+    int32 PeerID   = 1;
+    int32 PeerType = 2;
+}

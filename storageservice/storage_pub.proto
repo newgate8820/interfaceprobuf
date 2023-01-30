@@ -1,0 +1,55 @@
+/*
+    存储文件相关协议的公共定义
+    作者：Ligl
+    日期：2017-06-20
+    版本：1.0
+    修改日期：
+    修改日志：
+*/
+
+syntax = "proto3";
+
+package storageservice;
+
+// 结果码定义，后续在此添加 ...
+enum ERpcResultCode {
+    RRC_OK                           	 = 0;        // 成功
+
+    RRC_FILE_NOT_EXISITS               	 = 1;        // 文件不存在
+
+    RRC_SYSTEM_EXCEPTION                 = 2;        // 系统异常
+
+    RRC_PARAMETER_EXCEPTION              = 3;        // 参数异常
+
+    RRC_LOGIC_EXCEPTION                  = 4;        // 逻辑异常
+
+    RRC_REPEAT_SLICE                     = 5;        // 重复分片
+
+    RRC_SESSION_NOT_EXISITS            	 = 6;        // 会话不存在
+
+    RRC_DATA_EXCEPTION                   = 7;        // 数据异常
+
+    RRC_NO_ACCESS_RIGHTS                 = 8;        // 没有访问权限
+
+    RRC_DB_EXCEPTION                     = 9;        // DB（redis）异常
+    
+    RRC_UNKNOWN                      	 = 65535;    // 未知异常
+}
+
+// 存放文件的引擎标识定义
+enum EEngineFlag {
+    EF_LEO_FS                            = 0;        // LeoFS
+
+    EF_SEAWEED_FS                  	     = 1;        // SeaweedFS
+    EF_PHOTO                             = 2;
+}
+
+// Fid参数
+message FidPara {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+}
+
+// FileHash参数
+message FileHashPara {
+    string                 file_hash     = 1;        // 文件全量或部分文件块Hash
+}

@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package getserver;
+
+service ServerService {
+    //原help下getconfig方法,主要提供IP
+    rpc GetConfigServer (GetConfigServerReq) returns (SerRes) {
+    };
+    //原help下其他方法,获取其他内容：版本更新,InviteText等
+    rpc GetOtherHelpServer (GetOtherReq) returns (SerRes) {
+    };
+    // 获取group invite prefix配置
+    rpc GroupInvitePrefix (GroupInvitePrefixRequest) returns (GroupInvitePrefixReply);
+    // 获取重复申请好友的间隔
+    rpc GetContactApplyExpire(GetContactApplyExpireRequest) returns (GetContactApplyExpireResponse);
+}
+
+message GetConfigServerReq {
+    bytes  objBin = 1;
+    uint32 crcId = 2;
+    int64  reMessagId = 3;
+    int32  userId = 4; //用户的 ID
+    int64  keyId = 5; //用户的 keyId(端的标识)
+    int32  layer = 6;
+    int32  configTime = 7;
+    bool   isProxy = 8;
+    string proxyIp = 9 ;
+    string clientIp = 10;
+    string phone = 11;
+    uint64 sessionId = 12;
+    uint32 ostype = 13;
+    string appVersion = 14;
+    uint64 messageId =15; //messageId
+    int32  apiId =16;//apIId
+}
+message SerRes {
+    bytes result = 1;
+    int32 errorCode = 2;
+}
+message GetOtherReq {
+    bytes objBin = 1;
+    uint32 crcId = 2;
+    int64 reMessagId = 3;
+    int32 userId = 4; //用户的 ID
+    int64 keyId = 5; //用户的 keyId(端的标识)
+    int32 userDcId = 6;//用户所在DC ID
+    uint64 messageId =7; //messageId
+    string appVersion = 8;
+    int32  platForm = 9;
+    int32  layer = 10;
+    int32  apiId = 11;
+    string deviceModel = 12;
+    string clientIp = 13; // 客户端ip
+    string phone  = 14;//電話號碼
+}
+
+message GroupInvitePrefixRequest{}
+message GroupInvitePrefixReply{
+    string group_invite_prefix = 1;
+    int64 expire_min = 2; // 有效时间,分钟
+}
+
+message GetContactApplyExpireRequest{}
+message GetContactApplyExpireResponse{
+    int64 duration_hours = 1; // 第一次申请后，n小时后可重新申请
+}

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package imshortvideoserver;
+
+////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imshortvideoserver/imshortvideoserver.proto
+service ServerService {
+    // 通用协议
+    rpc ShortVideoBussiness (ShortVideoBussinessReq) returns (ShortVideoBussinessResp) {
+    };
+
+
+}
+
+message ShortVideoBussinessReq {
+    int32 user_id = 1; //用户ID
+    int64 Key_id = 2; //
+    string Client_ip = 3; //客户端IP
+    int32 Bussiness_id = 4;// 業務Id
+    string ReqData = 5; // 請求 的json
+}
+
+message ShortVideoBussinessResp {
+    string ResData = 1; // 返回的 的json
+    repeated int32 userIds = 2; // 需要Im 组装的用户信息的ID 数组
+}

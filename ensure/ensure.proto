@@ -1,0 +1,27 @@
+syntax="proto3";
+
+package ensure;
+
+/*************************
+* author: Dev0026
+* createTime: 19-1-19
+* updateTime: 19-1-19
+* description:
+*************************/
+
+//Consumer Topic
+enum ConsumerTopic{
+	TOPIC_HANDLE_DIALOG = 0;    // topic-dialog超过5000处理
+	TOPIC_DEFAULT = 1;     		// topic-保留
+}
+
+// Consumer Key
+enum ConsumerKey{
+	KEY_HANDLE_DIALOG = 0;      // key-dialog超过5000处理
+	KEY_DEFAULT = 1;       		// Key-保留
+}
+
+message DialogConsumer {
+	int32 UserID  = 1; // 用户ID
+	int32 KeepLen = 2; // 保留长度
+}

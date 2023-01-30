@@ -1,0 +1,246 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+// sudo protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imdigitalwalletserver/imdigitalwalletserver.proto
+
+syntax = "proto3";
+
+package imdigitalwalletserver;
+
+import  "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+enum Code {
+  Success = 0;
+  ErrorSystem = 1;
+  ErrorInvalidRequest = 2; //无效请求
+  ErrorInvalidParameter = 3; //无效参数
+
+  ErrorQueryNotExist = 4; // 查询不存在
+}
+
+message Status {
+  Code Code = 1;
+  string ErrMsg = 2;
+}
+
+// 数字钱包服务
+service DigitalWalletService{
+  // 数字钱包业务通用协议
+  rpc DigitalWalletUniversalBusiness(ReqDigitalWalletUniversalBusiness) returns (ReplyDigitalWalletUniversalBusiness) {};
+
+  // 用户充值地址生成
+  rpc GenerateRechargeAddress(GenerateRechargeAddressReq) returns (GenerateRechargeAddressResp) {};
+
+  // 用户充值
+  rpc UserRecharge(UserRechargeReq) returns (UserRechargeResp) {};
+
+  // 用户兑换
+  rpc UserSwap(UserSwapReq) returns (UserSwapResp) {};
+
+  // 查询可充值代币
+  rpc QueryRechargeableTokens(QueryRechargeableTokensReq) returns (QueryRechargeableTokensResp) {};
+
+  // 查询用户账户信息（余额信息）
+  rpc QueryUserAccountInfo(QueryUserAccountInfoReq) returns (QueryUserAccountInfoResp) {};
+
+  // 查询用户充值明细
+  rpc QueryUserRechargeDetails(QueryUserRechargeDetailsReq) returns (QueryUserRechargeDetailsResp) {};
+
+  // 查询用户兑换明细
+  rpc QueryUserSwapDetails(QueryUserSwapDetailsReq) returns (QueryUserSwapDetailsResp) {};
+
+  // 后台管理接口添加
+  rpc BackgroundManageOpt(BackgroundManageOptReq) returns (BackgroundManageOptResp) {};
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 数字钱包业务通用协议请求
+message ReqDigitalWalletUniversalBusiness {
+  string                             ip = 1;     // 用户IP
+  int64                              userId = 2;     // 交易所用户唯一标识
+  int64                              appUserId = 3;     // 第三方应用用户唯一标识
+  int32                              businessId = 4;     // 业务标识
+  string                             uuid = 5;     // 用户业务请求唯一唯标识
+  string                             phone = 6;     // 用户电话号码
+  bytes                              data = 7;     // JSON数据
+}
+
+// 数字钱包业务通用协议响应
+message ReplyDigitalWalletUniversalBusiness {
+  string                              data = 1;     // JSON数据
+}
+
+// 用户充值地址生成
+message GenerateRechargeAddressReq {
+  int32 UserId = 1;
+  string Chain = 2; //当前币所属主链
+  string Contract = 3; //当前币合约地址
+
+  pbcomm.Debug debug = 11;
+}
+
+message GenerateRechargeAddressResp {
+  Status Status = 1;
+  string Address = 2;
+}
+
+// 用户充值
+message UserRechargeReq {
+  int32 UserId = 1;
+  string Chain = 2; //当前币所属主链
+  string Contract = 3; //当前币合约地址
+  string FromAddress = 4; // from 地址
+  string ToAddress = 5; // to 地址
+  string Value = 6; // 充值金额
+
+  pbcomm.Debug debug = 11;
+}
+
+message UserRechargeResp {
+  Status Status = 1;
+}
+
+// 用户兑换
+message UserSwapReq {
+  int32 UserId = 1;
+  string FromChain = 2; //from 币所属主链
+  string FromContract = 3; //from 币合约地址
+  string ToChain = 4; //to 币所属主链
+  string ToContract = 5; //to 币合约地址
+  string Value = 6; // 兑换金额
+  int32 FromType = 7; // from  币种类型 1:法币 2：数字货币
+  int32 ToType = 8; // to  币种类型 1:法币 2：数字货币
+
+  pbcomm.Debug debug = 11;
+}
+
+message UserSwapResp {
+  Status Status = 1;
+}
+
+// 查询可充值代币
+message QueryRechargeableTokensReq {
+  pbcomm.Debug debug = 1;
+}
+
+// 可用代币列表
+message AbleToken {
+  string Chain = 1; //当前币所属主链
+  string Contract = 2; //当前币合约地址
+  string Name = 3; //币名
+  string PriceUsdt = 4; //对应usdt价值
+  string PriceDct = 5; //对应法币价值
+  string Fee = 6; //链上手续费
+  int32 Type = 7; //币种类型
+}
+
+message QueryRechargeableTokensResp {
+  Status Status = 1;
+  repeated AbleToken TokenList = 2;
+}
+
+// 查询用户账户信息（余额信息）
+message QueryUserAccountInfoReq {
+  int32 UserId = 1;
+  pbcomm.Debug debug = 11;
+}
+
+message TokenBalance {
+  string Chain = 1; //当前币所属主链
+  string Contract = 2; //当前币合约地址
+  string Name = 3; //币名
+  string Balance = 4; //可用余额
+  string Frozen = 5; //冻结余额
+  string BalanceUSDT = 6; //可用余额USDT
+  string BalanceDCT = 7; //可用余额DCT
+}
+
+message AccountInfo {
+  repeated TokenBalance BalanceList = 1; //余额列表
+  string TotalBalanceUSDT = 2; //总USDT余额
+  string TotalBalanceDCT = 3; //总法币余额
+  string TotalAssets = 4; //总资产对应法币
+  int32 Status = 5; //账户状态
+
+}
+
+message QueryUserAccountInfoResp {
+  Status Status = 1;
+  AccountInfo AccountInfo = 2;
+}
+
+
+// 分页参数
+message PaginationParams {
+  uint32 PageNumber = 1; //页码
+  uint32 PageSize = 2; //分页大小
+}
+
+// 日期参数
+message DateParams {
+  uint32 Year = 1; // 年份
+  uint32 Month = 2; // 月份
+  uint32 Day = 3; // 日期
+}
+
+// 查询用户充值明细
+message QueryUserRechargeDetailsReq {
+  int32 UserId = 1;
+  PaginationParams PageParam = 2; // 分页参数
+  DateParams DateParam = 3;
+  uint32 Status = 4; //充值状态
+  pbcomm.Debug debug = 11;
+}
+
+message RechargeDetail {
+  uint64 Timestamp = 1; //充值时间
+  string Value = 2; // 充值金额
+  string Address = 3; // 充值地址
+  string BillId = 4; // 账单ID
+  uint32 Status = 5; //充值状态
+}
+
+message QueryUserRechargeDetailsResp {
+  Status Status = 1;
+  repeated RechargeDetail RecordDetail = 2;
+}
+
+// 查询用户兑换明细
+message QueryUserSwapDetailsReq {
+  int32 UserId = 1;
+  PaginationParams PageParam = 2; // 分页参数
+  DateParams DateParam = 3;
+  pbcomm.Debug debug = 11;
+}
+
+message SwapDetail {
+  uint64 Timestamp = 1; //兑换时间
+  string Number = 2; // 兑换数量
+  string Value = 3; // 兑换金额
+  string ExchangeRate = 4; // 当前汇率
+  string BillId = 5; // 账单ID
+}
+
+message QueryUserSwapDetailsResp {
+  Status Status = 1;
+  repeated SwapDetail RecordDetail = 2;
+}
+
+// 后台管理接口
+enum BusinessCodeEnum {
+  WalletWords = 0; //生成助记词
+  WalletCreate = 1; //创建钱包
+  WalletActive = 2; //激活钱包
+  GetWallets = 3; //系统钱包列表查询
+  ConfigureCollectionAmount = 4; //归集金额配置
+  WalletRecords = 5; //充值记录查询
+  GetChains = 6; //获取链信息
+}
+
+message BackgroundManageOptReq {
+  BusinessCodeEnum BusinessCode = 1;
+  string ReqData = 2; //请求结构 json
+}
+
+message BackgroundManageOptResp {
+  Status Status = 1;
+  string RespData = 2; //返回结构 json
+}

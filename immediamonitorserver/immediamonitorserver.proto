@@ -1,0 +1,63 @@
+/*
+    媒体监督相关接口定义(用于鉴黄组获取文件信息和来源信息)
+    作者：ty
+    日期：2020-04-21
+    版本：1.0
+    修改日期：
+    修改日志：
+    Date                  Desc
+    -----------------------------------------------------
+	protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/immediamonitorserver/immediamonitorserver.proto
+*/
+syntax = "proto3";
+package immediamonitorserver;
+
+// 结果码定义
+enum ERpcResultCode {
+    RRC_OK                           	 = 0;        // 成功
+    RRC_FILE_NOT_EXISITS               	 = 1;        // 文件不存在
+    RRC_SYSTEM_EXCEPTION                 = 2;        // 系统异常
+    RRC_PARAMETER_EXCEPTION              = 3;        // 参数异常
+    RRC_LOGIC_EXCEPTION                  = 4;        // 逻辑异常
+    RRC_DATA_EXCEPTION                   = 5;        // 数据异常
+    RRC_NO_ACCESS_RIGHTS                 = 6;        // 没有访问权限
+    RRC_DB_EXCEPTION                     = 7;        // DB（redis）异常
+    RRC_UNKNOWN                      	 = 65535;    // 未知异常
+}
+
+// 媒体监督相关RPC接口
+service MediaMonitorService {
+    // MediaMonitorInfoSave 媒体监督所需相关信息存储
+    rpc MediaMonitorInfoSave (MediaMonitorInfoSaveReq) returns (MediaMonitorInfoSaveResp) {}
+}
+
+// ----------------------------------------------------
+// 媒体文件信息
+message MediaInfo{
+    uint64  fid        = 1;        // 文件唯一标示Fid(用于阿里云取媒体文件)
+    string  fileName   = 2;        // 上传文件的文件名
+    uint32  fileSize   = 3;        // 文件大小
+}
+
+// 来源信息
+message UserMsg{
+    int32   UserId          = 1;  // 用户ID
+    int32   WithId          = 2;  // 消息交互方
+    int32   WithIdType      = 3;  // 消息交互方类型 1.user 2:chat 3:channel
+    int32   MessageType     = 4;  // 消息类型
+    int32   MsgId           = 5;  // 消息id
+    int32   ToId            = 6;  // 接收方id
+    int32   FromId          = 7;  // 发送方
+}
+
+// 媒体监督所需相关信息存储请求
+message MediaMonitorInfoSaveReq {
+    MediaInfo  file_info = 1; // 媒体文件信息
+    UserMsg    user_msg  = 2; // 来源信息
+ }
+
+ // 媒体监督所需相关信息存储响应
+ message MediaMonitorInfoSaveResp {
+     ERpcResultCode result = 1;    // 结果码
+}
+// ----------------------------------------------------

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package imwebpageserver;
+
+// protoc --gogofast_out=plugins=grpc:. *.proto
+
+// 网页头信息 service
+service WebPageService {
+    // 获取指定url的head信息
+    rpc GetPageHead (WebPageMsg) returns (WebPageReply) {
+    };
+}
+
+// WebPageMsg 获取网页头信息请求
+message WebPageMsg {
+    string url = 1; // url
+}
+
+// WebPageReply 获取网页头信息响应
+message WebPageReply {
+    string Title = 1; // 网站标题
+    string Desc = 2; // 描述信息
+    string KeyWords = 3; // 网站关键字
+    bytes Icon = 4; // 图片字节数组
+}

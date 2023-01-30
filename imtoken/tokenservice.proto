@@ -1,0 +1,39 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+syntax = "proto3";
+
+package tokenservice;
+
+enum TokenErrorCode {
+    Token_OK                           = 0;         //ok
+    Token_EXPIRED                      = 1004;      //token超时失效
+    Token_INVALID                      = 1002;      //token无效
+    Token_KEY_CHANGED                  = 1003;      //token密钥变更
+}
+
+service Tokenservice{
+    //获取token
+    rpc GetToken(ReqGetTokenMsg) returns (GetTokenReply) {};
+    //验证tonken
+    rpc ValidateToken(ReqValidateToken)returns (ValidateTokenReply) {};
+}
+
+message ReqGetTokenMsg{
+    uint64 KeyId    =1;
+    uint64 UserId   =2;
+    uint32 Flag     =3;
+}
+
+message GetTokenReply{
+    bool  ok       =1;
+    string error   =2; 
+    bytes Token    =3;
+}
+
+message ReqValidateToken{
+    string Token   =1;
+}
+
+message ValidateTokenReply{
+    TokenErrorCode  code    =1;
+    string error   =2;    
+}

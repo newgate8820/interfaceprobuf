@@ -1,0 +1,42 @@
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbimhistoryserver/imhistoryserver.proto
+syntax = "proto3";
+package pbimhistoryserver;
+
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+service HistoryServer {
+    //    获取历史
+    rpc GetHistory (GetHistoryReq) returns (GetHistoryResult) {
+    }
+    rpc GetMessages(GetMessagesReq) returns (GetMessagesResult) {
+    }
+}
+
+message GetHistoryReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+    pbcomm.Debug debug = 6;
+}
+
+message GetHistoryResult {
+    bytes result = 1;       //返回二进制
+    int32 error_code = 2;   //返回错误码
+}
+
+message GetMessagesReq {
+    bytes obj_bin = 1; //请求二进制
+    int64 crc_id = 2; //crc协议值
+    int64 message_id = 3; //message_id
+    int64 key_id = 4; //key_id
+    int32 user_id = 5; //user_id
+    pbcomm.Debug debug = 6;
+}
+
+message GetMessagesResult {
+    bytes result = 1;       //返回二进制
+    int32 error_code = 2;   //返回错误码
+}
+

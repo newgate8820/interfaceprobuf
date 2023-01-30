@@ -1,0 +1,46 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/groupservice/usernamesearchserver.proto
+syntax = "proto3";
+
+package groupservice;
+import "gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto";
+
+//username搜索服务
+service UsernameSearchService{
+    // 更新Username信息
+    rpc UpdateUsername(UpdateUsernameReq) returns (UpdateUsernameReply) {};
+    // 完全匹配username
+    rpc GetUsername(GetUsernameReq) returns (GetUsernameReply) {};
+    // 模糊搜索username 和 自己所在的群
+    rpc SearchUsername(SearchUsernameReq) returns (SearchUsernameReply) {};
+}
+
+
+// 更新Username信息
+message UpdateUsernameReq {
+    UserNameBase NewInfo =1;
+    string OldUsername =2;
+}
+message UpdateUsernameReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 完全匹配username
+message GetUsernameReq {
+    string Username   =1;
+}
+message GetUsernameReply {
+    UserNameBase Info =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 模糊搜索username
+message SearchUsernameReq {
+    string SearchStr =1;
+    int32 UserId =2;
+    int32 Limit =3;
+}
+message SearchUsernameReply {
+    repeated UserNameBase Info =1;
+    ActiveErrorCode ErrorCode =2;
+}
+

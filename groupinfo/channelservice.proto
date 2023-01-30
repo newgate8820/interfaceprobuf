@@ -1,0 +1,888 @@
+/*
+    Channel操作相关接口定义
+    作者：hujian
+    日期：2017-12-04
+    版本：1.0
+    修改日期：
+    修改日志：
+    Date           Desc
+    -----------------------------------------------------
+    2017-12-04     新建文件,在原有基础上更改
+	protoc --gogofast_out=plugins=grpc:. *.proto
+	 protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/groupinfo/channelservice.proto
+*/
+
+syntax = "proto3";
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "gitlab.chatserver.im/interfaceprobuf/groupinfo/chatcommon.proto";
+//import "gitlab.chatserver.im/interfaceprobuf/groupinfo/chatservice.proto" ;
+//import "gitlab.chatserver.im/im/iminterfaceprotobufs/infoserver/userserver.proto" ;
+package groupinfo;
+//---基础结构体-----------------------------------------------------------------------
+
+//群成员的基础信息
+message ChannelParticipant {
+    int32   user_id             = 1; //群成员的iD
+    int32   invite_id           = 2; //邀请者的ID
+    bool    can_set_username    = 3; //是否可以更改超级群的username 默认为true
+    bool    can_view_participants = 4; //是否可以查看超级群的成员列表默认为true
+    bool    is_creator  = 5; //是否是群的创建者
+    bool    is_admin    = 6; //是否是超级群的管理员
+    bool    is_ban      = 7; //是否是被禁权的成员
+    int32   join_time   = 8; //进群时间
+    AdminRights     ad_right    = 9; //如果是管理员的话有此权限
+    BannerRights    ban_right   = 10; //bannner用户的权限
+    ChatResultCode  resultcode  = 11; //返回结果码
+    string exported_invite_link = 12; //邀请链接
+    int32  Start_msgid = 13; // add by qingsong at 2019-12-06 for member's start message id.
+    string rank = 14;   // 群成员称号
+}
+//群成员的列表
+message ChannelParticipantArr {
+    int32    TotalCount = 1;
+    repeated ChannelParticipant part = 2;
+}
+//邀请用户
+message InvitedUsers {
+    int32   user_id     = 1; //要进入此超级群/频道的ID
+    bool    is_bot_user = 2; //被邀请者是不是机器人
+}
+//管理员相关权限
+message AdminRights {
+    bool    change_group_info = 1; //如果是管理员的话，是否有修改群信息权限
+    bool    delete_messages = 2; //如果是管理员的话，是否有删除消息的权限
+    bool    ban_users       = 3; //如果是管理员的话，是否有禁止成员的权限的权限
+    bool    pin_messages    = 4; //如果是管理员的话，是否有置顶消息的权限
+    bool    add_new_admin   = 5; //如果是管理员的话，是否有添加新管理员的权限
+    int32   promoted_by     = 6; //如果是管理员的话，被XX升级为管理员
+    bool    post_messages   = 7; //频道是否可以发消息
+    bool    edit_messages   = 8; //编辑消息
+    bool    invite_users    = 9; //邀请用户
+    bool    invite_link     = 10; //邀请链接
+}
+//bannner用户的权限
+message BannerRights {
+    bool    can_read_messages   = 1; //如果是banner的话，是否有读取消息的权限
+    bool    can_send_messge     = 2; //如果是banner的话，是否发送文本消息的权限
+    bool    can_send_media      = 3; //如果是banner的话，是否发送媒体消息的权限
+    bool    can_send_sticker    = 4; //如果是banner的话，是否发送sticker和gif的权限
+    bool    can_embed_links     = 5; //如果是banner的话，是否有此权限
+    int32   kicked_by           = 6; //如果是bannned用户的话，被谁禁止部分权限的
+    int32   until_date          = 7; //如果是banner的话，什么时候解除此禁止权限
+    bool    can_send_gifs       = 8;
+    bool    can_send_games      = 9;
+    bool    can_send_inline     = 10;
+
+    /* @ add by Qingsong at 2019-11-14 for ban member rights. */
+    bool    invite_user         = 11;  // 邀請用戶
+    bool    pin_message         = 12;  // 置頂消息
+    bool    change_group_info   = 13;    // 修群组信息
+    bool    can_send_polls      = 14;   // 发起投票权限
+}
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//创建频道的请求包
+message CreateChannelReq {
+    int32   channel_id  = 1; //超级群的ID
+    int64   access_hash = 2; //哈希值
+    int32   creator_id  = 3; //创建者的ID
+    string  title       = 4; //群名称
+    string  about       = 5; //信息
+    bool    broadcast   = 6; //频道
+    bool    megagroup   = 7; //超级群
+    int32   cluster     = 8; //所在域
+    int32   date        = 9; //创建时间
+    bool    has_geo     = 10; //是否含有地理位置坐标
+    channelLocation location = 11;
+    pbcomm.Debug Dlog   = 12; //日志
+}
+message ChannelupdatesResp {
+    ChannelInfoBase channel = 1; //channel基本信息
+    //UserInfoArray users = 2; //在线用户信息
+    ChannelParticipantArr participants = 2; //在线用户权限
+    ChatResultCode resultcode = 3; //结果码
+}
+//-----------------------------------------------------------------------------
+//获取channel信息
+message GetChannelUpdatesReq {
+    int32 channel_id = 1; //超级群的ID
+    int32 user_id = 2; //超级群的ID
+    pbcomm.Debug Dlog = 3; //日志
+}
+//-----------------------------------------------------------------------------
+//添加(主动加入)超级群、频道的用户的请求
+message AddChannelUserReq {
+    int32 channel_id = 1; //channle的Id
+    int32 invitor_id = 2; //邀请者的用户ID（如果是自己加入invitor_id 为自己的用户ID）
+    int64 access_hash = 3;
+    int32 start_msgid = 4; // add by qingsong at 2019-12-06 for record channel member start message id.
+    repeated InvitedUsers users = 5;
+    pbcomm.Debug Dlog = 6; //日志
+}
+//-----------------------------------------------------------------------------
+//踢人或者主动离开超级群、频道的的请求接口
+message DelChannelUserReq {
+    int32 channel_id    = 1; //channle的Id
+    int32 user_id       = 2; //要进离开/被踢 超级群/频道的成员的用户ID
+    bool is_bot_user    = 3; //被邀请者是不是机器人
+    bool is_kicked      = 4; // 是否是离开超级群\频道
+    int32 Kicked_id     = 5; //如果是超级群被踢的话将，此用户保存到被踢列表中
+    pbcomm.Debug Dlog   = 6; //日志
+}
+//-----------------------------------------------------------------------------
+//更新群about请求
+message UpdateChanAboutReq {
+    int32   channel_id  = 1;
+    int32   user_id     = 2;
+    string  about       = 3; //超级群/频道的简略说明
+    pbcomm.Debug Dlog   = 4; //日志
+}
+//-----------------------------------------------------------------------------
+//更新群名称请求
+message UpdateChanTitleReq {
+    int32   channel_id  = 1;
+    int32   user_id     = 2;
+    string  title       = 3; //超级群/频道的简略说明
+    pbcomm.Debug Dlog   = 4; //日志
+}
+//-----------------------------------------------------------------------------
+//更新群头像请求
+message UpdateChanPhotoReq {
+    int32 channel_id    = 1;
+    int32 user_id       = 2;
+    string photo        = 3; //超级群/频道的简略说明 json的格式
+    pbcomm.Debug Dlog   = 4; //日志
+}
+//-----------------------------------------------------------------------------
+message UpdateChanAdminRightsReq {
+    int32 channel_id    = 1;
+    int32 from_id       = 2; //修改人
+    int32 user_id       = 3; //被修改人
+    bool keep_admin     = 4;
+    AdminRights admin_rights = 5; //权限
+    pbcomm.Debug Dlog   = 6; //日志
+}
+message UpdateChanAdminRightsResp {
+    ChannelupdatesResp updates = 1;
+    bool isAdd = 2; //新增成员，并赋予权限
+    bool ispromote = 3; //权限的增减，true,增加权限，false,降低权限
+    ChatResultCode resultcode = 4; //返回结果码
+}
+//-----------------------------------------------------------------------------
+
+message UpdateChanHiddenprehistoryReq {
+    int32 channel_id = 1;
+    int32 from_id = 2; //修改人
+    int32 user_id = 3; //被修改人
+    bool Hidden_prehistory = 4;
+    pbcomm.Debug Dlog = 5; //日志
+}
+
+message UpdateChanBanRightsReq {
+    int32 channel_id = 1;
+    int32 from_id = 2; //修改人
+    int32 user_id = 3; //被修改人
+    bool isKick = 4; //被踢
+    BannerRights ban_rights = 5; //权限
+    int32 ban_date = 6; //ban的期限
+    pbcomm.Debug Dlog = 7; //日志
+}
+//-----------------------------------------------------------------------------
+//channel最基础的请求
+message DismissChannelReq {
+    int32 channel_id    = 1; //channle的Id
+    int32 user_id       = 2; //请求者的用户Id
+    int64 access_hash   = 3; //哈希值
+    bool  CmdOption     = 4; //是否是管理员命令操作
+    pbcomm.Debug Dlog   = 5; //日志
+}
+message DismissChannelResp {
+    bool b = 1;
+    ChatResultCode resultcode = 2; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//超级群/频道 的按类型的偏移获取
+message ParticipantLimitReq {
+    int32 channel_id = 1; //成员的ID
+    int32 offset = 2; //偏移地址
+    int32 limit = 3; //每次能够取的最大个数
+    int32 part_type = 4; //成员类型 1 代表 channelParticipantsRecent  2、代表 channelParticipantsAdmins 3代表channelParticipantsKicked 4代表channelParticipantsBots 5代表channelParticipantsBanned
+    int32 userid = 5;
+    string q = 6; //根据用户名匹配
+    pbcomm.Debug Dlog = 7; //日志
+}
+//群成员的列表
+message ParticipantLimitResp {
+    int32 TotalCount = 1;
+    repeated ChannelParticipant part = 2;
+    //UserInfoArray users = 3; //在线用户信息
+    ChatResultCode resultcode = 3; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//channel最基础的请求
+message GetChannelOnePartReq {
+    int32 channel_id = 1; //channle的Id
+    int32 user_id = 2; //请求者的用户Id
+    int64 access_hash = 3; //哈希值
+    pbcomm.Debug Dlog = 4; //日志
+}
+//群成员的基础信息
+message GetChannelOnePartResp {
+    ChannelParticipant one_participant = 1;
+    //userInfo user_info = 2 ;
+    ChatResultCode resultcode = 2; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//获取channel userids信息
+message GetChannelUsersIdReq {
+    int32 channel_id = 1; //超级群的ID
+    pbcomm.Debug Dlog = 2; //日志
+}
+message GetChannelUsersIdResp {
+    int32 channel_id = 1;
+    repeated int32 user_id = 2;
+    ChatResultCode resultcode = 3; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//channel最基础的请求
+message GetChannelBaseInfoReq {
+    int32 channel_id = 1; //channle的Id
+    int32 user_id = 2; //请求者的用户Id
+    int64 access_hash = 3; //哈希值
+    pbcomm.Debug Dlog = 4; //日志
+}
+//群基础信息
+message GetChannelBaseInfoResp {
+    ChannelInfoBase baseInfo = 1;
+    ChatResultCode resultcode = 2; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//获取channel信息  不带user信息
+message GetChannelInfoReq {
+    int32 channel_id = 1; //channle的Id
+    int64 access_hash = 2; //哈希值
+    pbcomm.Debug Dlog = 3; //日志
+}
+//群基础信息
+message GetChannelInfoResp {
+    ChannelInfoBase baseInfo = 1; //基础信息  不带user信息
+    ChatResultCode resultcode = 2; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//批量获取
+//channel最基础的请求
+message BatchChannelBaseInfoReq {
+    int32 channel_id = 1; //channle的Id
+    repeated int32 user_id = 2; //请求者的用户Id
+    pbcomm.Debug Dlog = 3; //日志
+}
+message BatchChannelBaseInfoResp {
+    repeated ChannelInfoBase channel = 1; //channel的基础信息
+    ChatResultCode resultcode = 2; //返回结果码
+}
+//-----------------------------------------------------------------------------
+//ChannelLink
+message GetChanByLinkReq {
+    string channel_link = 1;
+    int32 user_id = 2; //请求者的用户Id
+    pbcomm.Debug Dlog = 3; //日志
+}
+//返回为 ChannelInfoBaseResp
+//-----------------------------------------------------------------------------
+//ChannelLinkorusername
+message GetChanInfoByLinkOrUserNameReq {
+    string channel_link = 1;
+    pbcomm.Debug Dlog = 2; //日志
+}
+//返回为 ChannelInfoBaseResp
+//-----------------------------------------------------------------------------
+//GetFullChannelInfo
+message GetFullChannelInfoReq {
+    int32 channel_id = 1; //channle的Id
+    int32 user_id = 2; //请求者的用户Id
+    int64 access_hash = 3; //哈希值
+    pbcomm.Debug Dlog = 5; //日志
+}
+
+message GetFullChannelInfoResp {
+    ChannelInfoBase channelinfo = 1;
+    string  exported_invite_link = 2; //邀请链接
+    int32   participants_count = 3; //成员个数
+    int32   admins_count = 4; //管理员个数
+    int32   kicked_count = 5; //被踢个数
+    int32   banned_count = 6; //被禁止的个数（68层使用）
+    int32   pinned_msg_id = 7; //置顶的消息的ID
+    int32   migrated_from_max_id = 8; //如果是超级群的话从这个普通群升级而来，默认为0
+    int32   migrated_from_chat_id = 9; //如果是超级群的话从这个普通群升级而来，默认为0
+    AdminRights admin_rights = 10; //是否可以设置username
+    BannerRights ban_rights = 11; //是否可以查看群成员列表
+    string  about = 12; //群简要
+    int32   bot_count = 13; //机器人个数，如果大于0，就从机器人服务那边去取
+    repeated int32 bot_id = 14; //机器人id的数组
+    //UserInfoArray users = 15; //用户信息
+    bool Can_set_username = 15;
+    bool Can_view_participants = 16;
+    /// --------------------- TODO
+    double longitude = 17; //地理位置
+    double latitude = 18; //
+    string addr = 19; //地理位置
+    ChatResultCode resultcode = 20; //返回结果码
+
+}
+//-----------------------------------------------------------------------------
+//切换邀请规则
+message ToggleInviteReq {
+    int32 channel_id = 1;
+    int32 user_id = 2;
+    int64 access_hash = 3; //哈希值
+    bool admin_enable = 4;
+    pbcomm.Debug Dlog = 5; //日志
+}
+//返回为ChannelupdatesResp  user可以为空
+//-----------------------------------------------------------------------------
+//生成群群链接
+message CreateChannelLinkReq {
+    int32 channel_id = 1;
+    int32 user_id = 2;
+    pbcomm.Debug Dlog = 3; //日志
+}
+
+//生成群链接
+message CreateChannelLinkResp {
+    string link = 1; //群信息
+    ChatResultCode resultcode = 2; //结果码
+}
+//-----------------------------------------------------------------------------
+//校验邀请链接合法
+message CheckChannelInviteLinkReq {
+    int32 channel_id = 1;
+    int32 user_id = 2;
+    string access_hash = 3;
+    pbcomm.Debug Dlog = 4; //日志
+}
+
+//生成群链接
+message CheckChannelInviteLinkResp {
+    string link = 1; //link
+    int32 gtype = 2; //0:不存在  1：普通群  2：超级群
+    ChannelInfoBase chanInfo = 3;
+    GetChatInfoResp chatinfo = 4;
+    int32 linkCreator = 5;
+    ChatResultCode resultcode = 6; //结果码
+}
+//-----------------------------------------------------------------------------
+//更改username
+message UpdateChannelUserNameReq {
+    int32 channel_id = 1;
+    int32 user_id = 2;
+    string user_name = 3;
+    pbcomm.Debug Dlog = 4; //日志
+}
+message UpdateChannelUserNameResp {
+    ChatResultCode resultcode = 1; //结果码
+}
+//-----------------------------------------------------------------------------
+//更改username
+message UpdateChannelPinnedMsgIdReq {
+    int32 channel_id = 1;
+    int32 user_id = 2;
+    int32 pinned_msg_id = 3;
+    pbcomm.Debug Dlog = 4; //日志
+}
+message UpdateChannelPinnedMsgIdResp {
+    ChatResultCode resultcode = 1; //结果码
+}
+//-----------------------------------------------------------------------------
+//检查userName是否可用
+message CheckUserNameReq {
+    int32 channel_id = 1;
+    int64 access_hash = 2;
+    string user_name = 3; //创建时输入的username
+    pbcomm.Debug Dlog = 4; //日志
+}
+message CheckUserNameResp {
+    ChatResultCode resultcode = 1; //结果码
+}
+//-----------------------------------------------------------------------------
+//检查群是否是加密
+message CheckChannelIsEncryReq {
+    int32 channel_id = 1;
+    pbcomm.Debug Dlog = 2; //日志
+}
+
+//检查群是否是加密
+message CheckChannelIsEncryResp {
+    bool encry = 1; //是否加密
+    ChatResultCode resultcode = 2; //结果码
+}
+//--------------------------------groupinfo 独立后新增---------------------------------------------
+//根据userid查询所有的超级群
+message GetAllChannelInfoByUserIdReq {
+    int32 user_id = 1;
+    pbcomm.Debug Dlog = 2; //日志
+}
+message GetAllChannelInfoByUserIdResp {
+    repeated ChannelInfoBase channels = 1;
+    ChatResultCode resultcode = 2; //结果码
+}
+//全体禁言
+message EveryoneQuietReq {
+    int32 user_id = 1;
+    int32 channel_id = 2;
+    bool quiet = 3;
+    pbcomm.Debug Dlog = 4;
+}
+//禁止私聊
+message EditPrivateChatReq {
+    int32 user_id = 1;
+    int32 channel_id = 2;
+    bool enable = 3;
+    pbcomm.Debug Dlog = 4;
+}
+//通用的更新操作响应
+message UpdateChannelCommonResp {
+    ChatResultCode resultcode = 1; //结果码
+}
+//变更创建者请求
+message SetChannelCreatorReq {
+    int32 channel_id = 1;
+    int32 operator = 2; //操作者id
+    int32 user_id = 3; //变更者id
+    string remark = 4;
+    bool is_add = 5; //不在群是否添加进群
+    pbcomm.Debug Dlog = 6;
+}
+//
+message ResetUserAllCreateGroupsReq {
+    int32 operator = 1;
+    int32 from_userid = 2;
+    int32 to_userid = 3;
+    string remark = 4;
+    pbcomm.Debug Dlog = 5;
+}
+message ResetUserAllCreateGroupsResp {
+    repeated int32 superIds = 1;
+    repeated int32 channelIds = 2;
+    repeated int32 groupIds = 3;
+    ChatResultCode resultcode = 4;
+}
+
+message GetChannelBotIdsReq {
+    int32 channel_id = 1;
+    pbcomm.Debug Dlog = 2;
+}
+
+message GetChannelBotIdsResp {
+    repeated int32 botIds = 1;
+    ChatResultCode resultcode = 2;
+}
+
+message GetChannelActiveUserIdsReq {
+    int32 channel_id = 1;
+    pbcomm.Debug Dlog = 2;
+}
+message GetChannelActiveUserIdsResp {
+    repeated int32 UserIds = 1;
+    ChatResultCode resultcode = 2;
+}
+
+message CheckUserInChannelReq {
+    int32 user_id = 1;
+    int32 channel_id = 2;
+    pbcomm.Debug Dlog = 3;
+}
+message CheckUserInChannelResp {
+    bool state = 1;
+}
+
+//超级群官方认证
+message UpdateChannelVerifyReq {
+    int32 user_id = 1;
+    repeated int32 channel_id = 2;
+    bool verify = 3;
+    pbcomm.Debug debug = 4;
+}
+message UpdateChannelVerifyResp {
+    ChatResultCode resultcode = 1; //结果码
+}
+
+//群地理位置坐标结构
+message channelLocation {
+    double lat = 1;
+    double long = 2;
+    string addr = 3;
+}
+
+//更新群地理位置
+message UpdateChannelGeoReq {
+    bool    isClear     = 1; //是否清楚地理位置
+    channelLocation location = 2; //群地理位置
+    int32   channel_id  = 3; //群ID
+    int32   User_id     = 4;//操作者的ID
+    int64   key_id      = 5;//操作的端标识
+
+}
+
+message UpdateChannelGeoResp {
+    ErrorCode err = 1; //返回结果
+    enum ErrorCode {
+        SucessFul = 0;
+        Failed = 2;
+        DBFailed = 3;
+    }
+}
+
+service ChannelServerService {
+    //修改群的地理位置坐标
+    rpc UpdateChannelGeo (UpdateChannelGeoReq) returns (UpdateChannelGeoResp) {
+    }
+    //创建频道
+    rpc CreateChannel (CreateChannelReq) returns (ChannelupdatesResp) {
+    }
+    //获取channel信息
+    rpc GetChannelUpdatesInfo (GetChannelUpdatesReq) returns (ChannelupdatesResp) {
+    }
+    //添加群成员
+    rpc AddChannelUser (AddChannelUserReq) returns (ChannelupdatesResp) {
+    }
+    //删除群成员
+    rpc DelChannelUser (DelChannelUserReq) returns (ChannelupdatesResp) {
+    }
+    //编辑about
+    rpc EditChannelAbout (UpdateChanAboutReq) returns (ChannelupdatesResp) {
+    }
+    //编辑title
+    rpc EditChannelTitle (UpdateChanTitleReq) returns (ChannelupdatesResp) {
+    }
+    //编辑photo
+    rpc EditChannelPhoto (UpdateChanPhotoReq) returns (ChannelupdatesResp) {
+    }
+    //编辑管理员权限
+    rpc EditChanAdminRights (UpdateChanAdminRightsReq) returns (UpdateChanAdminRightsResp) {
+    }
+    //编辑ban权限
+    rpc EditChanBanRights (UpdateChanBanRightsReq) returns (ChannelupdatesResp) {
+    }
+    //编辑歷史紀錄對新用戶可見或不可見
+    rpc EditChannelHiddenprehistory (UpdateChanHiddenprehistoryReq) returns (ChannelupdatesResp) {
+    }
+    //解散channel
+    rpc DismissChannel (DismissChannelReq) returns (DismissChannelResp) {
+    }
+    //根据偏移获取
+    rpc GetParticipantLimitReq (ParticipantLimitReq) returns (ParticipantLimitResp) {
+    }
+    //获取单个信息
+    rpc GetChanOneParticipantReq (GetChannelOnePartReq) returns (GetChannelOnePartResp) {
+    }
+    //获取所有用户Id
+    rpc GetChanUsersId (GetChannelUsersIdReq) returns (GetChannelUsersIdResp) {
+    }
+    //获取channel基本信息
+    rpc GetChannelBaseInfo (GetChannelBaseInfoReq) returns (GetChannelBaseInfoResp) {
+    }
+    //获取channel信息 不带user信息
+    rpc GetChannelInfo (GetChannelInfoReq) returns (GetChannelInfoResp) {
+    }
+    //批量获取channel基本信息
+    rpc GetBatchChanBaseInfo (BatchChannelBaseInfoReq) returns (BatchChannelBaseInfoResp) {
+    }
+    //根据link获取
+    rpc GetChanInfoByLink (GetChanByLinkReq) returns (GetChannelBaseInfoResp) {
+    }
+    //获取全部信息
+    rpc GetChannelFullInfo (GetFullChannelInfoReq) returns (GetFullChannelInfoResp) {
+    }
+    //切换邀请成员规则
+    rpc ToggleInvite (ToggleInviteReq) returns (ChannelupdatesResp) {
+    }
+    //生成群邀请链接
+    rpc CreateChannelLink (CreateChannelLinkReq) returns (CreateChannelLinkResp) {
+    }
+    //校验邀请链接合法
+    rpc CheckChannelInviteLink (CheckChannelInviteLinkReq) returns (CheckChannelInviteLinkResp) {
+    }
+    //更新channel userName
+    rpc UpdateChannelUserName (UpdateChannelUserNameReq) returns (UpdateChannelUserNameResp) {
+    }
+    //更新channel置顶消息
+    rpc UpdateChannelPinnedMsgId (UpdateChannelPinnedMsgIdReq) returns (UpdateChannelPinnedMsgIdResp) {
+    }
+    //检查userName是否可用
+    rpc CheckUserName (CheckUserNameReq) returns (CheckUserNameResp) {
+    }
+    //检查是否是加密群
+    rpc CheckChannelIsEncry (CheckChannelIsEncryReq) returns (CheckChannelIsEncryResp) {
+    }
+    //--------------------groupinfo 独立后新增接口--------------------------
+    //根据userid获取所有的普通群信息
+    rpc GetAllChannelInfoByUserId (GetAllChannelInfoByUserIdReq) returns (GetAllChannelInfoByUserIdResp) {
+    }
+    //编辑全体禁言状态
+    rpc UpdateEveryoneQuiet (EveryoneQuietReq) returns (UpdateChannelCommonResp) {
+    }
+    //编辑禁止私聊状态
+    rpc UpdatePrivateChat (EditPrivateChatReq) returns (UpdateChannelCommonResp) {
+    }
+    //变更超级群创建者
+    rpc SetChannelCreator (SetChannelCreatorReq) returns (UpdateChannelCommonResp) {
+    }
+    //重置用户所有创建群的创建者
+    rpc ResetUserAllCreateGroups (ResetUserAllCreateGroupsReq) returns (ResetUserAllCreateGroupsResp) {
+    }
+    //获取机器人ID
+    rpc GetChannelBotIds (GetChannelBotIdsReq) returns (GetChannelBotIdsResp) {
+    }
+    //获取活跃用户ID
+    rpc GetChannelActiveUserIds (GetChannelActiveUserIdsReq) returns (GetChannelActiveUserIdsResp) {
+    }
+    //判断超级群成员是否存在
+    rpc CheckUserInChannel (CheckUserInChannelReq) returns (CheckUserInChannelResp) {
+    }
+    //超级群官方认证
+    rpc UpdateChannelVerify (UpdateChannelVerifyReq) returns (UpdateChannelVerifyResp) {
+    }
+
+    /* @ bgn add for update channel's banned rights by qingsong at 2019-10-28 */
+    rpc UpdateChannelBannedRights (UpdateChannelBannedRightsReq) returns (UpdateChannelBannedRightsRsp) {
+    }
+
+    /* @ bgn add by qingsong at 2019-11-04 for get channel base info , channel member info */
+    rpc GetChnlAndMembInfo (GetChnlAndMembInfoReq) returns (GetChnlAndMembInfoRsp) {
+    }
+
+    /* @ bgn add by qingsong at 2019-11-05 for set channel slow mode. */
+    rpc SetChnlSlowMode(SetChnlSlowModeReq) returns (SetChnlSlowModeRsp) {
+    }
+
+    /* @ add by qingsong at 2019-11-12 for set channel Geo */
+    rpc SetChnlGeo(SetChnlGeoReq) returns (SetChnlGeoRsp) {
+    }
+
+    /* @ add by qingsong at 2019-11-21 for channel toggle signatures */
+    rpc ToggleSignatures(ToggleSignaturesReq) returns (ToggleSignaturesRsp) {}
+
+    /* @ add by qingsong at 2019-12-23 for channel set setParticipantBanMode */
+    rpc GroupUpdateBanMode(GroupUpdateBanModeReq) returns (GroupUpdateBanModeRsp) {}
+
+    /* @ add by qingsong at 2019-12-27 for get user own channels. */
+    rpc GroupGetUserOwnChannels(GroupGetUserOwnChannelsReq) returns (GroupGetUserOwnChannelsRsp) {}
+
+    /* @ bgn add by zcl at 2020-4-18 for update chat_channel restricted  */
+    rpc UpdateChannelRestricted (UpdateChannelRestrictedReq) returns (UpdateChannelRestrictedRsp) {}
+    /* @ end add by zcl at 2020-4-18 for update chat_channel restricted */
+
+    /* @ bgn add by zcl at 2020-4-23 for delete channel_kicked_left where channel_id,user_id  */
+    rpc DelChannelKickedLeft (DelChannelKickedLeftReq) returns (DelChannelKickedLeftRsp) {}
+    /* @ end add by zcl at 2020-4-23 for delete channel_kicked_left where channel_id,user_id  */
+
+    //根据link获取私有群，公有基本信息
+    rpc GetChanInfoByLinkOrUserName (GetChanInfoByLinkOrUserNameReq) returns (GetChannelBaseInfoResp) {}
+
+    /* @ bgn add by zcl at 2020-5-8 for update chat_channel RDP_game_mode where channel_id  */
+    //rpc UpdateChannelRDPGameMode (UpdateChannelRDPGameModeReq) returns (UpdateChannelRDPGameModeRsp) {}
+    /* @ end add by zcl at 2020-5-8 for update chat_channel RDP_game_mode where channel_id  */
+
+    /* @ add by qingsong 2020-06-03 for get hot groups. */
+    rpc GMsGetHotGroupIDs (GetHotGroupIDsReq) returns (GetHotGroupIDsRsp) {}
+
+    /* @ add by qingsong 2020-07-06 for get hot group level. */
+    rpc GMsGetHotGroupLv (GetHotGroupLvReq) returns (GetHotGroupLvRsp) {}
+
+    /* @ add by qingsong at 2020.10.20 for set discussion group. */
+    rpc GMsSetDiscussionGroup(GMsSetDiscussionGroupReq) returns (GMsSetDiscussionGroupRsp) {}
+}
+
+/* @ bgn add for update channel's banned rights by qingsong at 2019-10-28 */
+
+message BoolResult {
+    bool  Result = 1;
+}
+
+// message for UpdateChannelBannedRights
+// request
+message UpdateChannelBannedRightsReq {
+    int32   Channel_id  = 1;
+    int32   Banned_flag = 2;
+    int64   Access_hash = 3;
+}
+// response
+message UpdateChannelBannedRightsRsp {
+    int32  Error_code = 1;
+    string Error_info = 2;
+}
+/* @ end add for update channel's banned rights by qingsong at 2019-10-28 */
+
+/* @ bgn add by qingsong at 2019-11-04 for get channel base info , channel member info. */
+message GetChnlAndMembInfoReq {
+    int32   Chnl_id = 1;    // channel id
+    int32   Memb_id = 2;    // channel member's user id.
+}
+
+message GetChnlAndMembInfoRsp {
+    ChannelInfoBase     ChnlInfo = 1;
+    ChannelParticipant  MembInfo = 2;
+}
+
+/* @ end add by qingsong at 2019-11-04 for get channel base info , channel member info. */
+
+
+/* @ bgn add by qingsong at 2019-11-05 for set channel slow mode. */
+
+message SetChnlSlowModeReq {
+    int32 Chnl_id = 1;  // channel id
+    int64 Hash_id = 2;  // access_hash
+    int32 Seconds = 3;  // interval time (s)
+}
+
+message SetChnlSlowModeRsp {
+    int32  Res_code = 1;    // result code
+    string Res_info = 2;    // result information.
+}
+
+/* @ end add by qingsong at 2019-11-05 for set channel slow mode. */
+
+
+/* @ bgn add by qingsong at 2019-11-12 for set channel  geo. */
+message SetChnlGeoReq {
+    int32   Chnl_id = 1;
+    double  Geo_lng = 2;
+    double  Geo_lat = 3;
+    string  GeoAddr = 4;
+}
+message SetChnlGeoRsp {
+    int32   ResCode = 1;
+    string  ResInfo = 2;
+}
+
+/* @ end add by qingsong at 2019-11-12 for set channel geo. */
+
+
+/* @ add by qingsong at 2019-11-21 for channel toggle signatures */
+message ToggleSignaturesReq {
+    int32   Chnl_id = 1;
+    int64   Hash_id = 2;
+    bool    Is_sign = 3;
+}
+message ToggleSignaturesRsp {
+     int32  Res_code = 1;
+     string Res_info = 2;
+}
+
+
+/* @ add by qingsong at 2019-12-23 for channel set setParticipantBanMode */
+message GroupUpdateBanModeReq {
+    int32    Chnl_id  = 1;  // channel id
+    int64    Hash_id  = 2;  // access hash
+    int32    From_id  = 3;  // from user id.
+    bool     Ban_mode = 4;  // 禁止加好友
+}
+message GroupUpdateBanModeRsp {
+    int32  Res_code = 1;
+    string Res_info = 2;
+}
+
+/* @ add by qingsong at 2019-12-23 for get user own channels. */
+message GroupGetUserOwnChannelsReq {
+    int32   User_id = 1;    // user id.
+}
+message ChannelBrief {
+    int32   Channel_id = 1;
+    int64   Access_hash = 2;
+    bool    Broadcast_or_megagroup = 3;
+    string  Title =4;
+}
+message GroupGetUserOwnChannelsRsp {
+    repeated ChannelBrief    Chnls = 1;
+}
+
+/* @ bgn add by zcl at 2020-4-18 for update chat_channel restricted  */
+// request
+message UpdateChannelRestrictedReq {
+    int32   Channel_id  = 1;
+    bool    restricted = 2;
+    int64   Access_hash = 3;
+    string  restriction_reason = 4;
+}
+// response
+message UpdateChannelRestrictedRsp {
+    int32  Error_code = 1;
+    string Error_info = 2;
+}
+/* @ end add by zcl at 2020-4-18 for update chat_channel restricted */
+
+/* @ bgn add by zcl at 2020-4-23 for delete channel_kicked_left where channel_id,user_id  */
+// request
+message DelChannelKickedLeftReq {
+    int32   Channel_id = 1;
+    int32   User_id = 2;
+    int32   From_id = 3;
+}
+// response
+message DelChannelKickedLeftRsp {
+    ChatResultCode  Error_code = 1;
+    string          Error_info = 2;
+}
+/* @ end add by zcl at 2020-4-23 for delete channel_kicked_left where channel_id,user_id  */
+
+/* @ bgn add by zcl at 2020-5-8 for update chat_channel rdp_game_mode   */
+/*Rdp_game_mode->> 0:off,1:creator,2:admin,3:all  */
+// request
+//message UpdateChannelRDPGameModeReq {
+ //   int32   Channel_id  = 1;
+ //   int32   Rdp_game_mode = 2;
+//}
+// response
+//message UpdateChannelRDPGameModeRsp {
+ //   int32  Error_code = 1;
+ //   string Error_info = 2;
+//}
+/* @ end add by zcl at 2020-5-8 for update chat_channel rdp_game_mode  */
+
+
+/* @ add by qingsong 2020-06-03 for get hot groups. */
+// rpc GMsGetHotGroups (GetHotGroupsReq) returns (GetHotGroupsRsp) {}
+message GetHotGroupIDsReq {
+    int32        Level = 1;    // user vip level.
+    int32        Limit = 2;    // reply limit.
+    uint32       Hash  = 3;    // hash version code
+    pbcomm.Debug Debug = 4;
+
+}
+message HotGroup {
+    int32   GroupId = 1;
+    string  GroupType = 2;
+}
+message GetHotGroupIDsRsp {
+    int32               Errno = 1;
+    repeated HotGroup   HotArr = 2;
+    uint32              Hash = 3;    // hash version code
+    pbcomm.Debug   Debug = 4;
+}
+
+/* @ add by qingsong 2020-07-06 for get hot group level. */
+// rpc GMsGetHotGroupLv (GetHotGroupLvReq) returns (GetHotGroupLvRsp) {}
+message GetHotGroupLvReq {
+    int32          Group = 1; // group id
+    pbcomm.Debug   Debug = 2;
+}
+
+message GetHotGroupLvRsp {
+    int32          Errno = 1;
+    int32          Level = 2;  // when level is 0, the group not hot group.
+    pbcomm.Debug   Debug = 3;
+}
+
+
+/* @ add by qingsong at 2020.10.20 for set discussion group. */
+// rpc GMsSetDiscussionGroup(GMsSetDiscussionGroupReq) returns (GMsSetDiscussionGroupRsp) {}
+message GMsSetDiscussionGroupReq {
+    int32 Broadcast = 1;
+    int32 Megagroup = 2;
+    bool  Operation = 3;
+    pbcomm.Debug Debug = 4;
+}
+message GMsSetDiscussionGroupRsp {
+
+}

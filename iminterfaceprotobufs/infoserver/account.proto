@@ -1,0 +1,546 @@
+syntax = "proto3";
+
+package infoserver;
+
+import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+
+//account service 接口
+service Accounter {
+    //获取用户id和用户hash id
+    rpc AssignUserInfo(UserInfoReq) returns (UserInfoRsp) {}
+    rpc UnAssignUserInfo(UserInfoRsp) returns (BoolResult) {}
+    rpc CheckPhoneRegistered(UserInfoReq) returns (BoolResult) {}
+
+    //group
+    rpc AssignGroupId(GroupIdReq) returns (GroupIdRsp) {}
+    rpc UnAssignGroupId(GroupIdRsp) returns (BoolResult) {}
+
+    //session
+    //    rpc NewKeyIdSession(Session) returns (BoolResult) {}
+    //    rpc QueryUserSessions(Session) returns (SessionArray) {}
+    //    rpc UpdateUserSessions(SessionUpdate) returns (BoolResult) {}
+    //    rpc QueryKeyIdSession(Session) returns (Session) {}
+    //    rpc UpdateSessionQts(SessionUpdate) returns (Session) {}
+    //    rpc QueryUsersSessionStatus(SessionsReq) returns (SessionsRsp) {}
+    //    rpc TerminateSessions(SessionTerminateReq) returns (SessionTerminateRsp) {}
+    // init connetion 调用
+    rpc SessionUpdateInitConnection(SessionUpdateInitConnectionReq) returns (SessionUpdateInitConnectionResult){}
+    // register device 调用
+    rpc SessionUpdateRegisterDevice(SessionUpdateRegisterDeviceReq) returns (SessionUpdateRegisterDeviceResult){}
+    // 登陆时调用
+    rpc SessionUpdateSignIn(SessionUpdateSignInReq) returns (SessionUpdateSignInResult){}
+    // ping 或者ping delay等有活动时调用
+    rpc SessionUpdatePing(SessionUpdatePingReq) returns (SessionUpdatePingResult){}
+    // logout 调用
+    rpc SessionUpdateLogout(SessionUpdateLogoutReq) returns (SessionUpdateLogoutResult){}
+    // 剔除单个
+    rpc SessionTerminateByKeyid(SessionTerminateByKeyidReq) returns (SessionTerminateByKeyidResult){}
+    // 剔除多个
+    rpc SessionTerminateExceptKeyid(SessionTerminateExceptKeyidReq) returns (SessionTerminateExceptKeyidResult){}
+    // 查询单个session
+    rpc SessionQueryByKeyid(SessionQueryByKeyidReq) returns (SessionQueryByKeyidResult){}
+    // 查询所有
+    rpc SessionQueryByPhone(SessionQueryByPhoneReq) returns (SessionQueryByPhoneResult){}
+    // 更新qts
+    rpc SessionIncQts(SessionIncQtsReq) returns (SessionIncQtsResult){}
+    // 檢查session是否被踢
+    rpc SessionQueryUseridByKeyid(SessionQueryUseridByKeyidReq) returns (SessionQueryUseridByKeyidResult){}
+    // 根据userid查所有session
+    rpc SessionQueryByUserid(SessionQueryByUseridReq) returns (SessionQueryByUseridResult){}
+    // 客户端握手完成时保存auth key
+    rpc SessionUpdateOnHandshakeDone(SessionUpdateOnHandshakeDoneReq) returns (SessionUpdateOnHandshakeDoneResult) {}
+    // 根据keyid获取apiid
+    rpc SessionQueryApiIDbyKeyid(SessionQueryApiIDbyKeyidReq) returns (SessionQueryApiIDbyKeyidResult){}
+    // 客户端连接断开
+    rpc SessionDisconnect(SessionDisconnectReq) returns (SessionDisconnectResult){}
+
+
+    //authorization
+    rpc SaveAuthorizationInfo(Authorization) returns (BoolResult) {}
+    rpc QueryAuthorizationInfo(Authorization) returns (Authorization) {}
+
+    //password
+    rpc UpdatePassword(PasswordReq) returns (BoolResult) {}
+    rpc GetPassword(PasswordReq) returns (PasswordRsp) {}
+    rpc DeletePassword(PasswordReq) returns (BoolResult) {}
+
+    // 检查userid和access hash是否匹配
+    rpc CheckUserIdAndAccessHash(CheckUserIdAndAccessHashReq) returns (CheckUserIdAndAccessHashResult){}
+
+    // get unique number by key id
+    rpc GetUniqueNumberByKeyId (GetUniqueNumberByKeyIdReq) returns (GetUniqueNumberByKeyIdResult){}
+
+    rpc PtUpdatePassword(PtPasswordReq) returns (BoolResult) {}
+}
+
+message GetUniqueNumberByKeyIdReq{
+    int64 key_id = 1;
+}
+
+message GetUniqueNumberByKeyIdResult{
+    string unique_number = 1;
+}
+
+message SessionDisconnectReq{
+    uint64 key_id = 1; // 端标识
+    string phone_number = 2; // 电话号码
+    bool disconnect = 3; // true断开连接，false新连接
+    string client_ip = 4; // 新连接ip
+    string country = 5; // ip地区
+}
+message SessionDisconnectResult{
+
+}
+
+message SessionQueryApiIDbyKeyidReq{
+    uint64 key_id = 1; // 客户端id
+}
+message SessionQueryApiIDbyKeyidResult{
+    int32 api_id = 1; // 客户端类型标识
+    bool internal_error = 2; //是否发生了错误
+}
+
+message SessionUpdateOnHandshakeDoneReq{
+   uint64 key_id = 1;
+   bytes auth_key = 2;
+}
+message SessionUpdateOnHandshakeDoneResult{
+    bool success = 1; // 是否保存成功，保存失败infoserver查看失败信息
+    FailCode code = 2;
+
+    enum FailCode{
+        Internal = 0;
+        DuplicateKeyid = 1;
+    }
+}
+
+message SessionQueryByUseridReq{
+
+}
+
+message SessionQueryByUseridResult{
+
+}
+
+message SessionQueryUseridByKeyidReq{
+    uint64 key_id = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message SessionQueryUseridByKeyidResult{
+    bool internal_error = 1;
+    int32 user_id = 2;
+}
+
+message SessionInformation {
+    int32 api_id = 1;
+    string device_model = 2;
+    string system_version = 3;
+    string app_version = 4;
+    string lang_code = 5;
+    string ip = 6;
+    string country = 7;
+    int32 layer = 8;
+    bytes auth_key = 9;
+    int32 qts = 10;
+    int32 push_token_type = 11;
+    string push_token = 12;
+    int32 call_token_type = 13;
+    string call_token = 14;
+    int64 ping_time = 15;
+    string phone_number = 16;
+    int32 user_id = 17;
+    int64 access_hash = 18;
+    int32 seq = 19;
+    uint64 key_id = 20;
+    string app_name = 21;
+    bool disconnect = 22; // 客户端是否已断开连接
+}
+
+message SessionQueryByKeyidReq{
+    uint64 key_id = 1;
+    pbcomm.Debug debug = 2;
+}
+message SessionQueryByKeyidResult{
+    ResultCode code = 1;
+    SessionInformation  info = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionQueryByPhoneReq{
+    string phone_number = 1;
+    pbcomm.Debug debug = 2;
+}
+message SessionQueryByPhoneResult{
+    ResultCode code = 1;
+    repeated SessionInformation infos = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionIncQtsReq{
+    uint64 key_id = 1;
+    pbcomm.Debug debug = 2;
+}
+message SessionIncQtsResult{
+    ResultCode code = 1;
+    int32 qts = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionUpdateInitConnectionReq{
+    int32 api_id = 1;
+    string device_model = 2;
+    string system_version = 3;
+    string app_version = 4;
+    string lang_code = 5;
+    string ip = 6;
+    string country = 7;
+    int32 layer = 8;
+    uint64 key_id = 9; // must set
+    pbcomm.Debug debug = 10;
+    string app_name = 11;
+}
+message SessionUpdateInitConnectionResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionUpdateRegisterDeviceReq{
+    int32 push_token_type = 1;
+    string push_token = 2;
+    uint64 key_id = 3;
+    pbcomm.Debug debug = 4;
+    int32 call_token_type = 5;
+    string call_token = 6;
+}
+message SessionUpdateRegisterDeviceResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionUpdateSignInReq{
+    string phone_number = 1;
+    uint64 key_id = 2;
+    pbcomm.Debug debug = 3;
+    int32 user_id = 4;
+    int64 access_hash = 5;
+}
+message SessionUpdateSignInResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionUpdatePingReq{
+    uint64 key_id = 1;
+    int64 ping_time = 2;
+    pbcomm.Debug debug = 3;
+    string phone_number = 4;
+    bool update_time = 5;
+}
+message SessionUpdatePingResult{
+    ResultCode code = 1;
+    int32 user_id = 2;
+    string phone = 3;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+        AuthkeyUnregistered = 2; // session被踢
+    }
+}
+
+message SessionUpdateLogoutReq{
+    uint64 key_id = 1;
+    pbcomm.Debug debug = 2;
+    string phone_number = 3;
+}
+message SessionUpdateLogoutResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionTerminateByKeyidReq{
+    uint64 key_id = 1; // 要剔除的keyid
+    pbcomm.Debug debug = 2;
+    string phone_number = 3;
+    int32 user_id = 4;
+    uint64 current_key_id = 5; //踢人端的keyid
+}
+message SessionTerminateByKeyidResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message SessionTerminateExceptKeyidReq{
+    uint64 key_id = 1; // 要保留的keyid
+    pbcomm.Debug debug = 2;
+    string phone_number = 3;
+    int32 user_id = 4;
+}
+message SessionTerminateExceptKeyidResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+
+message CheckUserIdAndAccessHashReq{
+    int32 user_id = 1;
+    int64 access_hash = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message CheckUserIdAndAccessHashResult{
+    bool match = 1;       // 为true时userid和access hash匹配
+    bool internal_error = 2; // 当为true时，match的值不可用
+}
+
+message PasswordReq {
+    int32   user_id = 1;
+    int64   key_id = 2;
+    int32   flags = 3;
+    bytes   curr_pwd_hash = 4;
+    bytes   new_pwd_hash = 5;
+    bytes   salt = 6;
+    string  hint = 7;
+    string  email = 8;
+    int32   req_type = 9;
+    pbcomm.Debug debug = 10;
+}
+
+message PtPasswordReq {
+    int32   user_id = 1;
+    int64   key_id = 2;
+    int32   flags = 3;
+    bytes   curr_pwd_hash = 4;
+    bytes   new_pwd_hash = 5;
+    bytes   salt = 6;
+    string  hint = 7;
+    string  email = 8;
+    int32   req_type = 9;
+    pbcomm.Debug debug = 10;
+    bool    code_check_only = 11;
+    string  phone_code = 12;
+    string  phone_code_hash = 13;
+}
+
+message PasswordRsp {
+    bytes   pwd_hash = 1;
+    string  email = 2;
+    string  hint = 3;
+    bytes   salt = 4;
+    bool internal_error = 5;
+    bool email_unconfirmed = 6;
+}
+
+message BoolResult {
+    bool ret = 1;
+    bool internal_error = 2;
+
+    ErrorCode e_code = 6;
+
+    enum ErrorCode {
+        Internal = 0;
+        InvalidPassword = 1;
+        EmailUnconfirmed = 2;
+        CheckFlood = 3;
+        PhoneCodeExpired = 4;
+        CodeInvalid = 5;
+    }
+}
+message IntResult {
+    int32 ret = 1;
+}
+
+message UserInfoReq {
+    string first_name = 1;
+    string last_name = 2;
+    string phone = 3;
+    int32  user_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message UserInfoRsp {
+    int32 user_id = 1;
+    int64 access_hash = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message GroupIdReq {
+    int32 user_id = 1;
+    int32 type = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message GroupIdRsp {
+    int32 group_id = 1;
+    int64 access_hash = 2;
+    int32 user_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message IdAssiginReq {
+    int32 user_id = 1;
+    int32 type = 2;
+}
+
+message IdAssiginRsp {
+    int64 id = 1;
+    int64 access_hash = 2;
+    int32 user_id = 3;
+}
+
+message Session {
+    int32   user_id = 1;
+    int64   key_id = 2;
+    int64   session_id = 3;
+    bytes   auth_key = 4;
+    int64   access_hash = 5;
+    int32   status = 6;
+    int32   layer = 7;
+    int32   seq = 8;
+    int32   qts = 9;
+    int64   logout_time = 10;
+    int32   current_status = 11;
+    string  ip = 12;
+    string  device_model = 13;
+    int32   device_tp = 14;
+    string  system_ver = 15;
+    string  app_ver = 16;
+    string  lang_code = 17;
+    int32   api_id = 18;
+    string  app_name = 19;
+    string  phone = 20;
+    string  login_country = 21;
+    string  login_region = 22;
+    string  push_token = 23;
+    int32   push_token_tp = 24;
+    string  call_token = 25;
+    int32   call_token_tp = 26;
+    int64   create_time = 27;
+    int64   last_time = 28;
+    pbcomm.Debug debug = 29;
+}
+
+message SessionArray {
+    repeated Session sessions = 1;
+}
+
+message SessionUpdate {
+    Session session = 1;
+    //    int32   type = 2;
+    UpdateType type = 2;
+    pbcomm.Debug debug = 3;
+
+    enum UpdateType{
+        Type0NoUse = 0; // 无用，占位
+        Type1Logout = 1;
+        Type2InitConnection = 2;
+        Type3PushToken = 3;
+        Type4CurrentStatus = 4;
+        Type5SignIn = 5;
+        Type6Ping = 6;
+    }
+}
+
+message SessionsReq {
+    repeated int32 uids = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message SessionsStatus {
+    int32 user_id = 1;
+    int64 key_id = 2;
+    int32 current_status = 3;
+}
+
+
+message SessionsRsp {
+    repeated SessionsStatus ss = 1;
+}
+
+message SessionTerminateReq {
+    Session session = 1;
+    enum Type {
+        SELF = 0;
+        OTHERS = 1;
+    }
+    Type type = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message SessionTerminateRsp {
+    bool ret = 1;
+    string desc = 2;
+    repeated int64 keys = 3;
+}
+
+message Authorization {
+    int32 user_id = 1;
+    int64 key_id = 2;
+    int32 auth_id = 3;
+    bytes data = 4;
+    int32 dc_id = 5;
+    pbcomm.Debug debug = 6;
+}
+
+message CheckCodeReq {
+    int32   send_type = 1;  //发送类型， 0：短信 1：email 2：App
+    int32   business_type = 2;
+    string  email = 3;
+    string  phone = 4;
+    int32   user_id = 5;
+    string  code = 6;
+    int32   code_len = 7;
+    string  code_hash = 8;
+    bool    resend_flag = 9;
+    int64   key_id = 10;
+}
+
+message CheckCodeRsp {
+    bool    right = 1;  //发送类型， 0：短信 1：email 2：App
+    string  code = 2;
+    string  code_hash = 3;
+    string  desc = 4;
+}
+
+message SetResult {
+    bool ret = 1;
+    string str = 2;
+    int32 num = 3;
+}

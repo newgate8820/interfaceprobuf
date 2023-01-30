@@ -1,0 +1,79 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/groupservice/kickedleftinfoserver.proto
+syntax = "proto3";
+
+package groupservice;
+import "gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto";
+
+//超级群被踢用户信息服务
+service KickedLeftService{
+    // 分页获取被踢用户
+    rpc GetChannelKickedByLimit(GetChannelKickedByLimitReq) returns (GetChannelKickedByLimitReply) {};
+    // 获取单个被踢用户
+    rpc GetChannelKeckedLeft(GetChannelKeckedLeftReq) returns (GetChannelKeckedLeftReply) {};
+    // 设置被踢用户信息到缓存 以存在的直接替换
+    rpc AddLeftParticipant(AddLeftParticipantReq) returns (AddLeftParticipantReply) {};
+    // 删除缓存中的被踢用户信息
+    rpc DelLeftParticipant(DelLeftParticipantReq) returns (DelLeftParticipantReply) {};
+    // 删除缓存中的群Id对应的所有被踢用户信息
+    rpc DelAllLeftChatParticipant(DelAllLeftChatParticipantReq) returns (DelAllLeftChatParticipantReply) {};
+    // 搜索群成员
+    rpc SearchKickedParticipant(SearchKickedParticipantReq) returns (SearchKickedParticipantReply) {};
+}
+
+
+// 搜索被踢群成员
+message SearchKickedParticipantReq {
+    int32 ChannelId =1;
+    string SearchStr =2;
+    int32 Limit=3;
+}
+message SearchKickedParticipantReply {
+    repeated ChannelParticipants Users =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 分页获取被踢用户
+message GetChannelKickedByLimitReq {
+    int32 ChannelId =1;
+    int32 Offset =2;
+    int32 Limit =3;
+}
+message GetChannelKickedByLimitReply {
+    repeated ChannelKickedLeft Users =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 获取单个被踢用户
+message GetChannelKeckedLeftReq {
+    int32 ChannelId =1;
+    int32 UserId =2;
+}
+message GetChannelKeckedLeftReply {
+    ChannelKickedLeft UserInfo =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 设置被踢用户信息到缓存 以存在的直接替换
+message AddLeftParticipantReq {
+    ChannelKickedLeft UserInfo =1;
+}
+message AddLeftParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 删除缓存中的被踢用户信息
+message DelLeftParticipantReq {
+    int32 ChannelId =1;
+    int32 UserId =2;
+}
+message DelLeftParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 删除缓存中的群Id对应的所有被踢用户信息
+message DelAllLeftChatParticipantReq {
+    int32 ChannelId =1;
+}
+message DelAllLeftChatParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}

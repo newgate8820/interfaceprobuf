@@ -1,0 +1,82 @@
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/imcheckmsgrepeat/checkmsgrepeat.proto
+// protoc --gogofast-micro_out=plugins=grpc+grpcli:. -I=/home/Jason/go/imgopath/src -I=/home/Jason/go/gopath/src -I=./ ./*.proto
+
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+package imcheckmsgrepeat;
+
+//CheckMsgRepeat
+service CheckMsgRepeat {
+
+    //CheckIsRepeated 检测是否重复message
+    rpc CheckIsRepeated (CheckIsRepeatedRequest) returns (CheckIsRepeatedReply) {}
+
+    //StoreShortMessage 存储short_message
+    rpc StoreShortMessage (StoreShortMessageRequest) returns (StoreShortMessageReply) {}
+
+    //DeleteShortMessage 删除short_message
+    rpc DeleteShortMessage (DeleteShortMessageRequest) returns (DeleteShortMessageReply) {}
+
+    //DeleteShortMessageByDate 根据时间删除消息
+    rpc DeleteShortMessageByDate (DeleteShortMessageByDateRequest) returns (DeleteShortMessageByDateReply) {}
+}
+
+//CheckIsRepeatedRequest
+message CheckIsRepeatedRequest{
+    int64 KeyID       = 1[(gogoproto.moretags)='ck:"? == 0"']; //
+    int64 RandomID    = 2[(gogoproto.moretags)='ck:"? == 0"']; //
+    int32 RequestTime = 3[(gogoproto.moretags)='ck:"? == 0"']; //请求时间(如果填0,则服务端会默认使用当前时间)
+}
+
+//CheckIsRepeatedReply
+message CheckIsRepeatedReply{
+    bool  Ok               = 1; // 如果ok-表示未重复; 否则重复,及返回对应first_request_time或message_obj
+    int32 FirstRequestTime = 2; // 第一次请求时间
+    bytes MessageObj       = 3; // 消息二进制
+}
+
+//StoreShortMessageRequest
+message StoreShortMessageRequest{
+    int64 KeyID      = 1[(gogoproto.moretags)='ck:"? == 0"'];
+    int64 RandomID   = 2[(gogoproto.moretags)='ck:"? == 0"'];
+    bytes MessageObj = 3[(gogoproto.moretags)='ck:"len(?) == 0"'];
+}
+
+//StoreShortMessageReply
+message StoreShortMessageReply{
+
+}
+
+//DeleteShortMessageRequest
+message DeleteShortMessageRequest{
+    int64 KeyID    = 1[(gogoproto.moretags)='ck:"? == 0"'];
+    int64 RandomID = 2[(gogoproto.moretags)='ck:"? == 0"'];
+}
+
+//DeleteShortMessageReply
+message DeleteShortMessageReply{
+
+}
+
+//DeleteShortMessageByDateRequest
+message DeleteShortMessageByDateRequest{
+    int64 KeyID    = 1[(gogoproto.moretags)='ck:"? == 0"'];
+    int64 RandomID = 2[(gogoproto.moretags)='ck:"? == 0"'];
+    int32 AckTime  = 3[(gogoproto.moretags)='ck:"? == 0"'];
+}
+
+//DeleteShortMessageByDateReply
+message DeleteShortMessageByDateReply{
+
+}
+
+
+//StoredMessage 保存的消息数据
+message StoredMessage{
+    int32 RequestTime = 1; // 请求时间
+    int64 RandomID    = 2; // 消息唯一标识
+    bytes MessageObj  = 3; // 消息二进制数据
+}

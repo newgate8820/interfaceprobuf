@@ -1,0 +1,3774 @@
+//协议文件用途:  操作和获取用户基础信息和用户的联系人信息、黑名单列表信息
+//作者：
+//日期: 2017/6/22
+//版本：0.0.1
+//修改日期：
+//修改日志：
+
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbimuinfoserver/imuinfoserver.proto
+syntax = "proto3";
+package pbimuinfoserver;
+
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+enum ReErrCode {
+    Success = 0; //成功
+    DBError = 1; //数据库错误
+    InternalError = 2; //内部其他错误
+    NotExist = 3; //用户不存在
+    UserNameOccupied = 4; //用户名已占用
+    Register = 5; //已经注册
+    Unregister = 6; //用户注册
+    NotModify = 7; //联系人没有变化
+    Blocked = 8; //是黑名单
+    UnBlocked = 9; //不是黑明单
+    Valid = 10; //隐私选项等可用的返回
+    UnValid = 11; //隐私选项校验失败的情况
+    Failed = 12; //失败
+    HashNotSuccess = 13; //用户哈希值不合法
+    UsernameNotEmpty = 14; // user already has username
+    VipOnly = 15;
+    IllegalUserId = 16; //不合法的userid
+    CanNotBeSelf = 17; //目标不能是自己
+    ContactHasAdded = 18; //联系人已添加
+    AppliedNotExist = 19; //联系人申请不存在
+    Params = 20; //参数错误
+    Unknown = 21;
+    RedisError = 22; //redis错误
+    GroupNotExist = 23; //分组不存在
+    AppliedNotModify = 24;
+    UserNotDefaultGroup = 25;
+    UserNotExist = 26;
+    UserAddContactToManyByDay = 27; // 单日添加联系人次数过多
+    InviteCodeIsBind = 28; //邀请码已绑定
+    CertificateIsBind = 29; // 证件已绑定其它账号一个证件只能与一个账号绑定
+    NoCertification  = 30; //未进行过实名认证
+    NOT_ALLOWED_MODIFY = 31; //已设置过不允许修改
+}
+
+// 密码注册错误码
+enum PasswordRegistryErrorCode {
+    // 成功
+    SUCCESS = 0;
+    // 用户名已存在
+    USERNAME_EXIST = 1;
+    // 用户不存在
+    USERNAME_NOT_EXIST = 2;
+    // 用户名无效
+    USERNAME_INVALID = 3;
+    // 用户名错误
+    USERNAME_ERROR = 4;
+    // 密码错误
+    PASSWORD_ERROR = 5;
+    // 密码无效
+    PASSWORD_INVALID = 6;
+    // 内部错误
+    INTERNAL_ERROR = 7;
+    // 密码错误次数过多
+    PASSWORD_ERROR_MANY = 8;
+}
+
+//根据用户id获取用户ID
+message GetUserInfoByIdReq {
+    int32 self_id = 1; //自己的用户ＩＤ
+    int32 user_id = 2; //需要获取的用户ID
+    pbcomm.Debug debug = 3;
+}
+
+message GetUserInfoByIdArrReq {
+    int32 self_id = 1; //自己的用户ＩＤ
+    repeated int32 user_ids = 2; //需要获取的用户ID
+    pbcomm.Debug debug = 3;
+}
+
+//用户信息数组
+message UserInfoArray {
+    repeated userInfo userin = 1;
+}
+
+//查询出来的用户基础信息（self 、contact、 mutual_contact 需要在逻辑中判断 ）
+message userInfo {
+    int32 user_id = 1; //用户的id
+    int64 access_hash = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string username = 5;
+    string phone = 6; //用户的电话号码
+    int32 status = 7; //是否在线的标识	0 代表不在线 1代表在线
+    int32 last_logout = 8; //最后在线时间
+    int32 cluster_region = 9; // 用户所在的dc
+    string font_rgb = 10; //用户的特色字体颜色（扩展使用） {0,0,0}
+    string country_code = 11; //用户的国家码
+    string photo = 12; //用户头像为json格式
+    int32 bot_info_version = 13; //机器人version
+    string bot_inline_placeholder = 14; //机器人相关
+    string restriction_reason = 15;
+    string lang_code = 16; //国家语言代码
+    string local_phone = 17;
+    bool deleted = 18;
+    bool bot = 19;
+    bool bot_chat_history = 20;
+    bool bot_nochats = 21;
+    bool verified = 22;
+    bool restricted = 23;
+    bool min = 24;
+    bool bot_inline_geo = 25;
+    bool self = 26; //是否是自己
+    bool contact = 27; //是否是自己联系人
+    bool mutal_contact = 28; //是否是双向联系人
+    bool star_mark = 29; // 是否星标联系人
+    bool show_contact_phone = 30; //是否显示联系人手机
+    int32 group_id = 31; // 组
+    int32 created = 32; // 创建时间
+    int32 user_type = 33; //用户类别
+    int32 user_lable = 34; //标记
+    int32 user_level = 35; // 用户等级
+    string about = 36;
+    int32 birthday = 37; //年龄
+    int32 sex = 38; //性别
+    int32 flags = 39; // 用户已经设置信息标记 0x40 : 已设置登录密码， 0x80 : 已设置手势验证
+    string addr = 40;
+    string extend =41; // extend
+}
+
+//根据用户id获取用户销毁时间
+message GetUserExpireByIdReq {
+    int32 user_id = 1; //需要获取的用户ID
+    pbcomm.Debug debug = 2;
+}
+
+//获取用户账号销毁时间返回
+message GetUserExpireByIdResult {
+    int32 expire = 1; //账号销毁时间
+    ReErrCode Errorcode = 2; //返回错误码
+
+}
+
+//根据用户电话号码来获取用户信息
+message GetUserByphone {
+    string phone = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//获取用户基本信息的返回结果
+message GetUserInfoResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+message GetUserInfoByIdArrResult {
+    repeated userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//根据用户userName来获取用户基本信息
+message GetUserByUsername {
+    int32 self_id = 1;
+    string username = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//更新用户头像请求
+message updatePhotoInfoReq {
+    int32 user_id = 1; //用户ID
+    string photo = 2; //用户头像的json格式
+    int64 key_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message GetPhotoInfoReq {
+    int32 user_id = 1; //用户ID
+    pbcomm.Debug debug = 4;
+}
+
+//更新用户头像的返回
+message UpdateUserPhotoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+message GetUserPhotoResult {
+    string Photo = 1; //json photo
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新用户信息
+message UpdateUserProfileReq {
+    int32 user_id = 1; //用户ID
+    int32 flags = 2; // flags 第0 位 为更新firstName 第一位 last_name 第二位为 about
+    string first_name = 3;
+    string last_name = 4;
+    string about = 5;
+    pbcomm.Debug debug = 6;
+}
+
+//更新用户信息
+message UpdateUserFullReq {
+    int32 user_id = 1; //用户ID
+    int64 key_id = 2;
+    int32 flags = 3; // flags 第0 位 为
+    int32 Sex = 4; //性别 0未知异常　１　男　２　女
+    int32 Age = 5; //年龄
+    string Address = 6; //地址
+    string Extened = 7; //扩展字段　json {address,age,sex,source,userAlbumsReq}
+}
+
+//更新用户详情返回
+message UpdateUserFullResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户昵称等的返回结果
+message UpdateUserProfileResult {
+    userInfo Uinfo = 1; //用户基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//用户在线状态的更新
+message StatusReq {
+    int32 self_id = 1; //自己的用户ID
+    int64 key_id = 2; //用户的key_ID(自己端的keyID )
+    bool status = 3; //是否在线 true代表在线，false代表离线
+    int32 offline = 4; //离线时间
+    double longitude = 5; //地理坐标的经度
+    double latitude = 6; //地理坐标的纬度
+    pbcomm.Debug debug = 7;
+}
+
+//用户在线状态的结果
+message StatusResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//用户销毁时间的设置
+message UpdateExpireReq {
+    int32 self_id = 1; //自己的用户ID
+    int32 expire = 2; // 销毁时间单位是天
+    pbcomm.Debug debug = 3;
+}
+
+//设置账号销毁时间的返回结果
+message UpdateExpireResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//用户dc的迁移
+message UserClusterChange {
+    int32 self_id = 1; //自己的用户ID
+    int32 clusterId = 2; // 目标DcID
+    string from_ip = 4; //迁移来自哪个IP
+    int32 from_id = 5; //来自哪个用户
+    pbcomm.Debug debug = 6;
+}
+
+//用户域的迁移结果
+message UserClusterChangeResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户的username的请求
+message UpdateuserNameReq {
+    int32 user_id = 1; //用户的ID
+    string userName = 2; //需要更新的用户名
+    pbcomm.Debug debug = 3;
+    int64 key_id = 4;
+}
+
+//更新用户的username的返回结果
+message UpdateuserNameResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新用户的leve
+message UpdateUserLevelReq {
+    int32 user_id = 1; //用户的ID
+    int64 key_id = 2;
+    int32 levl = 3; //需要更新的权限
+}
+
+// 的返回结果
+message UpdateUserLevelResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+//更新用户的扩展字段
+message UpdateUserExtionReq {
+    int32 user_id = 1; //用户的ID
+    int64 key_id = 2;
+    string extionsion = 3; //需要更新的扩展字段
+}
+
+//删除账号的返回结果
+message UpdateUserExtionResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//检查电话号码是否已经注册
+message CheckPhoneRegisterReq {
+    string phone = 1; //需要检查的电话号码(传没处理过的电话号码)
+    pbcomm.Debug debug = 2;
+}
+
+//检查电话号码是否已经注册的返回结果
+message CheckPhoneRegisterResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除账号的请求
+message DeleteAccountByIdReq {
+    int32 user_id = 1; //被删除账号的用户id
+    int32 del_id = 2; //删除者的Id
+    pbcomm.Debug debug = 3;
+}
+
+//删除账号的返回结果
+message DelAccountResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//机器人基础信息更改
+message BotUpdateInfo {
+    int32 user_id = 1;
+    int32 bot_info_version = 2;
+    bool bot_chat_history = 3;
+    bool bot_no_chat = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//机器人更改信息的返回结果
+message BotUpdateInfoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除单个联系人的请求
+message DelContactReq {
+    //联系人的基本信息
+    int32 user_id = 1; //用户自己的id
+    int32 contact_id = 2; //联系人的id
+    int64 access_hash = 3;
+    int64 key_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//删除联系人的返回结果
+message DelContactResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+message AcceptContactReq {
+    int32 user_id = 1;
+    int32 apply_id = 2;
+    string first_name = 3;
+    string last_name = 4;
+    pbcomm.Debug debug = 5;
+    int32 group_id = 6;
+}
+message AcceptContactResult {
+    int32 from_id = 1;
+    ReErrCode Errorcode = 2;
+}
+
+//需要删除联系人的信息
+message ContactIdHash {
+    int32 contact_id = 1; //联系人的ID
+    int64 access_hash = 2; //联系人的用户哈希值
+}
+
+//批量删除用户的联系人
+message DelContactArrReq {
+    int32 user_id = 1; //用户自己的id
+    repeated ContactIdHash contactidArr = 2; //联系人的id数组
+    int64 key_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+// 重置user联系人信息
+message CmdResetUserContactsReq {
+    int32 amdin_id = 1; // 使用命令的人的id
+    string phone_number = 2; // 要重置联系人的电话号码
+}
+message CmdResetUserContactsResult {
+    repeated int32 current_contact_ids = 1; // 操作成功后当前的联系人id列表
+}
+
+//批量删除用户的联系人的返回
+message DelContactArrResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取用户联系人列表的请求
+message ContatsGetContactsReq {
+    int32 userId = 1; //用户的Id
+    int64 keyId = 2; // 用户的keyId
+    string contacthash = 3; //用户联系人的哈希值
+    pbcomm.Debug debug = 4;
+}
+
+//联系人的基本信息
+message contactInfo {
+    int32 user_id = 1; //用户自己的id
+    int32 contact_id = 2; //联系人的id
+    string first_name = 3; //联系人备注
+    string last_name = 4; //联系人备注
+    bool is_self_contacted = 5; //此联系人是否是自己的联系人
+    bool self_is_contacted = 6; //自己是不是此联系人的联系人
+    bool star_mark = 7; //  是否为星标联系人
+    bool has_phone = 8; // 是否通过电话号码添加
+    int32 group_id = 9;
+    string about = 10;
+}
+
+//用户联系人列表获取的返回
+message ContatsGetContactsResult {
+    repeated contactInfo contactArr = 1; //联系人的的信息们
+    repeated userInfo userInfoArr = 2; //联系人们的用户信息们
+    ReErrCode Errorcode = 3; //返回错误码
+
+}
+
+message ContactsGetContactsV1Req {
+    int32 userId = 1; //用户的Id
+    int64 keyId = 2; // 用户的keyId
+    int32 hash = 3; //用户联系人的哈希值
+    pbcomm.Debug debug = 4;
+}
+
+message ContactsGetContactsV1Result {
+    repeated contactInfo contactArr = 1; //联系人的的信息们
+    repeated userInfo userInfoArr = 2; //联系人们的用户信息们
+    repeated groupOrder groupOrderArr = 3; //
+    int32 savedCount = 4;
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+message ContactsGetContactsIdReq {
+    int32 userId = 1; //用户的Id
+    int64 keyId = 2; // 用户的keyId
+    pbcomm.Debug debug = 3;
+}
+
+message ContactsGetContactsIdResult {
+    repeated int32 contactsId = 1; //联系人的的信息们
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//电话本联系人信息
+message PhoneBookContact {
+    int64 client_id = 1;
+    string phone = 2; //电话号码
+    string first_name = 3;
+    string last_name = 4;
+}
+
+//导入\添加联系人的请求包
+message ContactsImportPhoneContactsReq {
+    int64 key_id = 1; //端标识
+    int32 user_id = 2; //用户的ID
+    repeated PhoneBookContact phoneContactArr = 3; //联系人的电话号码的列表
+    pbcomm.Debug debug = 4;
+}
+
+//导入联系人详细信息
+message ImportContact {
+    int32 user_id = 1;
+    int64 client_id = 2;
+}
+message PopularContact {
+    int64 client_id = 1;
+    int32 importers = 2;
+}
+
+//导入联系人的返回结果
+message ContactsImportPhoneContactsResult {
+    repeated ImportContact imContactDetail = 1; //导入联系人的信息
+    repeated userInfo userInfoArr = 2; //联系人们的用户信息们
+    repeated PopularContact PopuContact = 3;
+    ReErrCode Errorcode = 4; //返回错误码
+}
+
+//关联用户ｉＤ结构
+message AddRelationIdInfo {
+    int32 user_id = 1; //用户自己的id
+    int32 relation_id = 2; //联系人的id
+    pbcomm.Debug debug = 3;
+}
+
+//解除用户关联的
+message DelRelationIdInfo {
+    int32 user_id = 1; //用户自己的id
+    int32 relation_id = 2; //联系人的id
+    pbcomm.Debug debug = 3;
+}
+
+//关联用户用户关系的返回
+message AddRelationIdInfoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//解除用户用户关系的返回
+message DelRelationIdInfoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//拉黑用户的请求
+message BlockeduserReq {
+    int32 user_id = 1; //用户自己的id
+    int32 blocked_id = 2; //联系人的id
+    int64 Access_hash = 3; //联系人id对应的哈希值
+    int64 key_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//拉黑用户的返回
+message BlockeduserResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//将用户从黑明单中移除的请求
+message ContactUnblockedReq {
+    int32 user_id = 1; //用户自己的id
+    int32 blocked_id = 2; //联系人的id
+    int64 Access_hash = 3; //联系人id对应的哈希值
+    int64 key_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//获取黑明单列表
+message ContactsGetBlockedReq {
+    int32 user_id = 1; //用户自己的id
+    pbcomm.Debug debug = 5;
+}
+
+//黑名单用户的信息
+message blockeduser {
+    int32 user_id = 1; //黑明单的用户
+    int32 date = 2;
+}
+
+//获取黑明单列表的返回
+message ContactsGetBlockedResult {
+    repeated int32 blockeduser = 1; //黑明单的ID
+    repeated userInfo InfoArr = 2; //黑名单的用户的基础信息们
+    ReErrCode Errorcode = 3; //返回错误码
+}
+
+//系统白名单的基础信息
+message SystemWhiteUser {
+    int32 user_id = 1; //用户自己的id
+    int32 level = 2; //白名单的权限级别
+    int32 proby = 3; //将用户白名单修改的用户
+    bool is_white = 4; // true if user is white
+}
+
+//存储系统白名单的请求
+message StoreSysWhiteUserReq {
+    int32 user_id = 1; //用户自己的id
+    int32 level = 2; //白名单的权限级别
+    int32 proby = 3; //将用户白名单修改的用户
+    pbcomm.Debug debug = 4;
+}
+
+//存储系统白名单的返回结果
+message StoreSysWhiteUserResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户系统白名单的请求
+message UpdateSystemWhiteUserLevelReq {
+    int32 user_id = 1; //用户自己的id
+    int32 level = 2; //白名单的权限级别
+    int32 proby = 3; //将用户白名单修改的用户
+    pbcomm.Debug debug = 4;
+}
+
+//更新用户系统白名单的返回结果
+message UpdateSystemWhiteUserLevelResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取系统白名单权限
+message GetSysWhiteUserReq {
+    int32 userId = 1; // 需要获取指定白名单人的权限
+    pbcomm.Debug debug = 2;
+}
+
+//获取系统白名单权限结果
+message GetSysWhiteUserResult {
+    SystemWhiteUser sysWhiteInfo = 1; //系统白名单信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取系统所有白名单请求
+message GetSysWhiteUserArrReq {
+    pbcomm.Debug debug = 1;
+}
+
+//获取系统所有白名单返回
+message GetSysWhiteUserArrResult {
+    repeated SystemWhiteUser sysWhiteInfoArr = 1; //系统白名单信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//删除系统白名单用户的请求
+message DelSysWhiteUserReq {
+    int32 userId = 1; //需要删除的系统白名单的用户的ID
+    int32 ProUser = 2; //删除用户白名单的人
+    pbcomm.Debug debug = 3;
+}
+
+//删除系统白名单用户的返回结果
+message DelSysWhiteUserResult {
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//user的ＤＣ的信息
+message UserDc {
+    int32 user_id = 1; //userId
+    int32 dc_id = 2; //用户的DCId
+    pbcomm.Debug debug = 3;
+}
+
+//拉取所有用户的DC的请求
+message GetAllDcReq {
+    pbcomm.Debug debug = 1;
+}
+
+//设置隐私选项的接口的请求
+message SetPrivacyReq {
+    int32 user_id = 1;
+    int32 privacy_type = 2; //隐私选项的类型 1 代表 在线时间的设置  2 代表群组邀请的设置  3、代表phonecall的设置
+    int32 range = 3; // 1 代表每个人 2 代表 我的联系人  3、代表没有人
+    repeated int32 always_disallow = 4; //永不分享的列表
+    repeated int32 always_allow = 5; //总是分享的列表
+    string ip = 6;
+    int64 keyId = 7;
+    int64 session_id = 8;
+    string phone = 9;
+    pbcomm.Debug debug = 10;
+}
+
+//设置隐私选项的接口的返回
+message SetPrivacyResult {
+    repeated userInfo UinfoArr = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取隐私选项的接口
+message GetPrivacyReq {
+    int32 user_id = 1; //需要请求的用户的Id
+    int32 privacy_type = 2; //隐私选项的类型 1 代表 在线时间的设置  2 代表群组邀请的设置  3、代表phonecall的设置
+    int64 keyId = 3;
+    int64 session_id = 4; //
+    string ip = 5;
+    string phone = 6;
+    pbcomm.Debug debug = 7;
+}
+
+//检查相应的隐私设置是否被允许的请求接口
+message CheckPrivacyReq {
+    int32 self_id = 1; //检查自己是否是在 userId 相应权限允许列表中
+    int32 user_id = 2;
+    int32 privacy_type = 3; //隐私选项的类型 1 代表 在线时间的设置  2 代表群组邀请的设置  3、代表phonecall的设置 6 电话号码是否可以被搜索
+    pbcomm.Debug debug = 4;
+}
+
+//检查相应的隐私设置是否被允许的请求返回
+message CheckPrivacyResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//隐私选项获取的结果
+message GetPrivacyResult {
+    int32 range = 1; // 1 代表每个人 2 代表 我的联系人  3、代表没有人 4、代表不允许我的所有联系人
+    repeated int32 always_disallow = 2; //永不分享的列表
+    repeated int32 always_allow = 3; //总是分享的列表
+    repeated userInfo userInfos = 4; //永不分享的列表和总是分享列表的 用户信息们
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+//存储sticker 集合概要的请求参数
+message StoreShopStickerSetReq {
+    int64 access_hash = 1;
+    bool free = 2;
+    bool official = 3;
+    bool masks = 4;
+    string title = 5;
+    string short_name = 6;
+    int32 count = 7;
+    int64 hash = 8;
+    string emoticon = 9;
+    repeated int32 documents = 10;
+    pbcomm.Debug debug = 11;
+    int32 user_id = 12; //sticker作者id - 2018.10.18 新增
+}
+//存储sticker 集合概要的返回
+message StoreShopStickerSetResult {
+    int32 id = 1; //Sticker生成的id
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//存储sticker 集合概要 Documents请求
+message StoreShopStickerSetDocumentsReq {
+    int32 id = 1;
+    repeated int32 documents = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//存储sticker 集合概要 Documents返回结果
+message StoreShopStickerSetDocumentsResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除sticker商城的请求
+message DeleteStickerSetReq {
+    int32 stickerId = 1;
+    pbcomm.Debug debug = 2;
+    int32 user_id = 3; //sticker作者id - 2018.10.18 新增
+}
+
+//删除sticker商城的返回
+message DeleteStickerSetResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//sticker set 的基础信息
+message StickerSetInfo {
+    int32 id = 1;
+    int64 access_hash = 2;
+    bool free = 3;
+    bool official = 4;
+    bool masks = 5;
+    string title = 6;
+    string short_name = 7;
+    int32 count = 8;
+    int64 hash = 9;
+    string emoticon = 10;
+    repeated int32 documents = 11;
+}
+
+//获取指定的sticker集合的请求
+message GetStickerSetInfoReq {
+    int32 id = 1; //sticker的id
+    string short_name = 2;
+    bool is_id = 3; //是否是根据Id来查 true 根据Id查询 false根据short_name 查询
+    pbcomm.Debug debug = 4;
+}
+
+////获取指定的sticker集合的返回
+message GetStickerSetInfoResult {
+    StickerSetInfo stickerSetInfo = 1; //sticker的基础信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//sticker集合里面具体内容
+//存储单个sticker内容请求
+message StickerPackDocumentBase {
+    int64 attributes_stiker_set_id = 1;
+    uint64 document_id = 2;
+    int64 access_hash = 3;
+    string mime_type = 4;
+    int32 size = 5;
+    string thumb = 6;
+    int32 dc_id = 7;
+    int32 date = 8;
+    int32 attributes_image_size_w = 9;
+    int32 attributes_image_size_h = 10;
+    string attributes_stiker_alt = 11;
+    int64 attributes_stiker_set_access_hash = 12;
+    string attributes_file_name = 13;
+}
+message StickerPackDocumentInfo {
+    int32 id = 1;
+    StickerPackDocumentBase infoBase = 2;
+}
+
+//存储sticker文档的请求
+message StoreStickerPackDcReq {
+    StickerPackDocumentBase stickpackbase = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//存储sticker文档的返回
+message StoreStickerPackDcResult {
+    int32 id = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//批量导入sticker的请求
+message StoreStickerPackDcArrReq {
+    repeated StickerPackDocumentBase StPDB = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//批量导入sticker的返回
+message StoreStickerPackDcArrResult {
+    repeated int32 idArr = 1; //导入后的id的列表
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取一个sticker下面的所有贴图信息的请求
+message GetStickerSetPackDcInfosReq {
+    int32 id = 1; //stickerSet 的id
+    pbcomm.Debug debug = 2;
+}
+
+//获取一个sticker下面的所有贴图信息的返回
+message GetStickerSetPackDcInfosResult {
+    repeated StickerPackDocumentInfo StPDcInfo = 1;
+}
+
+// 添加喜欢的sticker 请求
+message AddOrDeleteFaveSticerReq {
+    int32 UserId = 1; // 用户ID
+    int64 StickerId = 2; // sticker 的 id
+    bool Unfave = 3; // 是否取消 true: 取消喜欢 false: 添加为喜欢
+    pbcomm.Debug debug = 4;
+}
+
+// 添加喜欢的sticker 返回
+message AddOrDeleteFaveSticerResult {
+    ReErrCode ErrorCode = 1; // 返回错误码
+}
+
+// 获取已经添加的的喜爱单个贴图 请求
+message GetFavedStickersReq {
+    int32 UserId = 1;
+    int32 Hash = 2;
+    pbcomm.Debug debug = 3;
+}
+
+// 获取已经添加的的喜爱单个贴图 返回
+message GetFavedStickersResult {
+    int32 Hash = 1;
+    repeated StickerPack packs = 2;
+    repeated StickerPackDocumentBase stickers = 3;
+    ReErrCode ErrorCode = 4; // 返回错误码
+}
+message StickerPack {
+    string Emoticon = 1;
+    int64 DocumentId = 2;
+}
+
+//用户安装sticker集合的请求
+message StoreUserStickerSetReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    bool installed = 3;
+    bool disabled = 4;
+    int32 order = 5;
+    bool archived = 6;
+    pbcomm.Debug debug = 7;
+}
+
+//用户安装sticker集合的返回
+message StoreUserStickerSetResult {
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新用户stickerdisable请求
+message UpdateUserStickerSetDisabledReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    bool disabled = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//更新用户stickerdisable结果
+message UpdateUserStickerSetDisabledResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户的Sticker的顺序
+message UpdateUserStickerSetOrderReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    int32 order = 3;
+    pbcomm.Debug debug = 4;
+}
+
+//更新用户的Sticker的顺序返回
+message UpdateUserStickerSetOrderResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户的Sticker install和archived
+message UpdateUserStickerSetInstallArReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    bool archived = 3;
+    bool installed = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//更新用户的Sticker install和archived的返回
+message UpdateUserStickerSetInstallArResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除sticker的请求
+message DeleteuserStickerReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//删除sticker的返回
+message DeleteuserStickerResult {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    ReErrCode Errorcode = 3; //返回错误码
+}
+
+//用户Sticker的信息
+message UserStickerInfo {
+    int32 stickerset_id = 1;
+    bool installed = 2;
+    bool disabled = 3;
+    int32 order = 4;
+    int64 access_hash = 5;
+    bool free = 6;
+    bool official = 7;
+    bool archived = 8;
+    bool masks = 9;
+    string title = 10;
+    string short_name = 11;
+    int32 count = 12;
+    int64 hash = 13;
+    string emotico = 14;
+    repeated int32 documents = 15;
+}
+
+//获取的sticker信息的列表
+message UserStickerInfoArr {
+    repeated UserStickerInfo stickerInfo = 1;
+}
+
+//获取的sticker集合的所有信息
+message StickerSetInfoArr {
+    repeated StickerSetInfo stickerInfo = 1;
+}
+
+//获取用户的所有的贴图请求
+message GetuserAllStickersReq {
+    int32 user_id = 1;
+    pbcomm.Debug debug = 2;
+
+}
+
+//获取用户的所有的贴图的返回
+message GetuserAllStickersResult {
+    repeated UserStickerInfo stickerInfoArr = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取所有sticker集合信息
+message GetAllStickerSetsReq {
+    pbcomm.Debug debug = 1;
+
+}
+
+//获取所有sticker集合信息的返回
+message GetAllStickerSetsResult {
+    repeated StickerSetInfo stickerInfoArr = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//删除单个sticker
+message DeleteStickerPackDocumentReq {
+    int32 id = 1;
+    int64 stickerset_id = 2;
+}
+
+//删除单个sticker返回
+message DeleteStickerPackDocumentResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取作者sticker
+message GetAuthorStickerSetReq {
+    int32 user_id = 1;
+    int64 set_id = 2;
+}
+
+//获取作者sticker返回
+message GetAuthorStickerSetResult {
+    ReErrCode ErrorCode = 1; //返回错误码
+    AuthorStickerSet set = 2;
+}
+
+//获取作者所有sticker
+message GetAuthorAllStickerSetReq {
+    int32 user_id = 1;
+}
+
+//获取作者所有sticker返回
+message GetAuthorAllStickerSetResult {
+    ReErrCode ErrorCode = 1; //返回错误码
+    repeated AuthorStickerSet sets = 2;
+}
+
+//结构体AuthorStickerSet
+message AuthorStickerSet {
+    int32 user_id = 1;
+    int64 stickerset_id = 2;
+    string short_name = 3;
+    bool archived = 4;
+    bool installed = 5;
+    bool disabled = 6;
+    int32 ordered = 7;
+    int32 created = 8;
+    int32 updated = 9;
+}
+
+//统计sticker数量
+message CountAuthorAllStickerSetReq {
+    int32 user_id = 1;
+}
+
+//统计拥有sticker数量返回
+message CountAuthorAllStickerSetResult {
+    ReErrCode ErrorCode = 1; //返回错误码
+    int64 count = 2;
+}
+
+//用户gif的动态图集合
+message userGifInfoArr {
+    repeated userSaveGifInfo gif_arr = 1;
+}
+
+//保存用户动态图的请求
+message userSaveGifInfo {
+    int32 user_id = 1;
+    string gif_id = 2;
+    uint64 fid = 3;
+    int64 git_hash = 4;
+}
+
+//保存gif动态图的请求
+message SaveUserGifReq {
+    int32 user_id = 1;
+    string gif_id = 2;
+    uint64 fid = 3;
+    int64 git_hash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//保存gif动态图的请求返回
+message SaveUserGifResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除动态图的请求
+message DelUserGifReq {
+    int32 user_id = 1;
+    uint64 fid = 3;
+    int64 git_hash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//删除动态图的返回
+message DelUserGifResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取用户的gifs
+message GetUserGifsReq {
+    int32 userId = 1;
+    int32 hash = 2; //校验hash
+    pbcomm.Debug debug = 3;
+}
+
+//获取用户的gifs返回
+message GetUserGifsResult {
+    int32 userId = 1;
+    int32 hash = 2; //校验hash
+    repeated userSaveGifInfo gif_arr = 3;
+    ReErrCode Errorcode = 4; //返回错误码
+}
+
+//检测用户是否是黑名单的请求
+message CheckUserIsBlockedReq {
+    int32 self_id = 1; //自己的id
+    int32 user_id = 2; //需要判断是否是自己黑名单的ID
+    pbcomm.Debug debug = 3;
+}
+
+//检测用户黑名单的返回
+message CheckUserIsBlockedResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//注册用户请求的基础信息
+message registerUserInfo {
+    int32 user_id = 1; //国家码
+    int64 access_hash = 2; //给用户生成的哈希值
+    string phone = 3; //用户的电话号码
+    string country_code = 4; //国家码
+    string local_phone = 5; //去掉国家码的电话号码
+    string first_name = 6;
+    string last_name = 7;
+    bool is_bot = 8; //是否是机器人
+    int32 bot_info_version = 9;
+    bool bot_chat_history = 10;
+    bool bot_no_chats = 11;
+    int32 sex = 12;
+    int32 birthday = 13;
+    string photo = 14;
+}
+
+//更新用户信息返回
+message UpdateUserInfoResult {
+    userInfo uinfo = 1; //用户的具体信息
+    int32 ErrorCode = 2; // 失败的错误码
+    bool Result = 3; //成功或者失败
+}
+
+//检测用户哈希值是否合法请求参数
+message CheckUserAccessHashValidReq {
+    int32 UserId = 1; //需要校验的用户的ID
+    int64 AccessHash = 2; //需要校验的用户的哈希值
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+//检测用户哈希值是否合法返回结构
+message CheckUserAccessHashValidResult {
+    bool isValid = 1; //是否可用
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//注册指定用户的请求
+message RegisterUserInfoReq {
+    int32 user_id = 1;
+    int64 access_hash = 2;
+    string PhoneNumber = 3; //电话号码
+    string FirstName = 4;
+    string LastName = 5;
+    bool is_bot = 6;
+    int32 bot_info_version = 7;
+    bool bot_chat_history = 8;
+    bool bot_no_chats = 9;
+    string CountryCode = 10;
+    string LocalPhone = 11;
+    int32 dc = 12;
+    int32 GroupNow = 13;
+    pbcomm.Debug debug = 14;
+    int32 Sex = 15;
+    int32 birthday = 16;
+}
+
+//注册指定用户的请求
+message RegisterUserInfoResult {
+    userInfo uinfo = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+// 获取音效设置
+message GetNotifySettingsReq {
+    int32 from_id = 1;
+    int32 req_type = 2; // 1表示获取用户的  2.表示获取群的
+    pbcomm.Debug debug = 3;
+}
+
+// 音效设置返回
+message GetNotifySettingsResult {
+    bool Show_previews = 1; // 是否展示预览
+    bool Silent = 2; // 是否静音
+    int32 Mute_until = 3; // 静音时长
+    string Sound = 4; // 声音类型
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+// 更新音效设置
+message UpdateNotifySettingsReq {
+    int32 from_id = 1;
+    int32 req_type = 2; // 1表示获取用户的  2.表示获取群的
+    bool Show_previews = 3;
+    bool Silent = 4;
+    int32 Mute_until = 5;
+    string Sound = 6;
+    pbcomm.Debug debug = 7;
+}
+
+// 更新音效
+message UpdateNotifySettingsResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取自己所有联系人的在线状态请求
+message GetContactsStatusReq {
+    int32 self_id = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//联系人的在线状态
+message UserStaus {
+    int32 user_id = 1; //用户的Id
+    int32 status = 2; //用户的在线状态
+    int32 offline_time = 3; //用户的最后的在线时间
+}
+
+//获取自己所有联系人的在线状态返回
+message GetContactsStatusResult {
+    repeated UserStaus contactStatusArr = 1; //联系人的在线状态
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新机器人头像请求
+message UpdateBotPicRequest {
+    int32 bot_id = 1;
+    bytes photo = 2; //(mtproto.TL_photo_layer105)
+    pbcomm.Debug debug = 3;
+}
+message UpdateBotPicResult {
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取所有代理的IP和端口请求
+message GetAllProxyConfigReq {
+    pbcomm.Debug debug = 1;
+}
+
+//代理的配置的地址结构
+message ProxyAddr {
+    string ip = 1; //代理的IP地址
+    string innerIp = 2; //代理的内网ip地址
+    int32 port = 3; //代理的端口号
+
+}
+//获取所有代理的IP和端口返回结构
+message GetAllProxyConfigResult {
+    repeated ProxyAddr addrs = 1; //代理转发的IP地址们
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//检查用户名是否经被占用请求
+message CheckUserNameOccupiedReq {
+    int32 userid = 1;
+    string user_name = 2; //需要被监测的用户名称
+    pbcomm.Debug debug = 3;
+}
+
+//检查用户名是否经被占用返回结果
+message CheckUserNameOccupiedResult {
+    bool occpuy = 1; //是否被占用
+}
+
+//获取用户最新的GPS的请求
+message GetUserGpsReq {
+    int32 userid = 1; //需要获取用户GPs的用户的ID
+    pbcomm.Debug debug = 2;
+}
+
+//获取用户的GPS的请求
+message GetUserGpsResult {
+    double latitude = 1;
+    double longitude = 2;
+    string device_module = 3;
+    int32 timestamp = 4; //最新的时间
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+//检测是否是自己是否是对方的联系人
+message CheckSelfIsContactReq {
+    int32 selfId = 1; //自己的Id
+    int32 userId = 2; //检测方的id
+    pbcomm.Debug debug = 3;
+}
+
+//检测是否是自己是否是对方的联系人的返回结果
+message CheckSelfIsContactResult {
+    bool SelfIsContact = 1; //自己是否是对方的联系人
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+// user switch type
+enum Switch {
+    Unused = 0;
+    UsernameSearch = 1;
+    UnreadIncludeMuted = 2;
+    DisableMultiSignIn = 3;
+}
+
+// update switch setting
+message UpdateSwitchReq {
+    int32 user_id = 1;
+    Switch switch = 2;
+    bool on_off = 3;
+
+}
+message UpdateSwitchResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// get switch setting
+message GetSwitchStatusReq {
+    int32 user_id = 1;
+    Switch switch = 2;
+}
+message GetSwitchStatusResult {
+    bool on_off = 1;
+    ResultCode code = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//获取viplog 用户电话号码的列表请求
+message GetViplogPhoneListReq {
+}
+
+//获取viplog 用户电话号码的列表返回
+message GetViplogPhoneListResp {
+    repeated string phones = 1; //电话号码列表
+}
+
+//更新用户已经开通支付帐号请求
+message UpdateUserHasPayReq {
+    int32 user_id = 1; //用户的Id
+    int64 key_id = 2; //用户的端标识
+    bool Has_create = 3; //用户是否已经创建
+}
+
+//更新用户已经开通支付帐号返回
+message UpdateUserHasPayResp {
+    bool sucess = 1; //是否成功
+}
+
+//检查用户是否已经创建帐号
+message CheckUserHasPayReq {
+    int32 user_id = 1; //用户的Id
+}
+
+//检查用户是否已经创建帐号的返回
+message CheckUserHasPayResp {
+    bool has = 1; //是否有支付帐号
+}
+
+//更新用户年龄，性别，区域等等  flags:# sex:flags.0?int age:flags.1?int address:flags.2?string extend:flags.3?DataJSON
+message UpdateUserDetailReq {
+    int32 user_id = 1; //用户ID
+    int32 flags = 2; //位标识
+    int32 sex = 3; //用户性别
+    int32 age = 4; //用户年龄
+    string address = 5; //用户区域
+    string extend = 6; // 用户其它详情扩展字段
+}
+
+
+message UpdateUserDetailResult {
+    bool sucessful = 1; //是否成功
+}
+
+//更新用户年龄，性别，区域等等  flags:# birthday:int extend: flags.0?DataJson
+message UpdateUserDetailBirthdayReq {
+    int32 user_id = 1; //用户ID
+    int32 flags = 2; //位标识
+    int32 birthday = 3; //出生年月日
+    string extend = 4; // 用户其它详情扩展字段
+}
+
+message UpdateUserDetailBirthdayResult {
+    bool successful = 1; //是否成功
+}
+
+//flags:# first_name:string flags.0?photo:InputFile sex:int birthday:int extend:flags.1?DataJson = UserFull;
+message SetUserDetailReq {
+    int32 user_id = 1; //用户ID
+    int32 flags = 2; //位标识
+    string first_name = 3; //用户昵称
+    string photo = 4;
+    int32 sex = 5; // 用户性别
+    int32 birthday = 6; // 用户性别
+    string extend = 7; // 用户其它详情扩展字段
+}
+
+message SetUserDetailResult {
+    bool successful = 1; //是否成功
+}
+
+message DeleteReceiveAppliesReq {
+    int32 selfId = 1;
+    repeated int32 userIdArr = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message DeleteReceiveAppliesResult {
+    ReErrCode Errorcode = 1; //返回错误码
+
+}
+message UpdateUserTypeLableReq {
+    int32 userId = 1;
+    int32 userType = 2;
+    int32 userLable = 3;
+    pbcomm.Debug debug = 4;
+}
+message UpdateUserTypeLableResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+message CheckSearchUserCountLimitedReq {
+    int32 userId = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message CheckSearchUserCountLimitedResult {
+    bool isLimited = 1;
+    int32 timeLeft = 2;
+}
+
+message CheckIsMutualContactReq {
+    int32 userId = 1;
+    int32 contactId = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message CheckIsMutualContactResult {
+    bool isMutualContact = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+message ChangeGroupNameReq {
+    int32 group_id = 1;
+    string title = 2;
+    int32 user_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message ChangeGroupNameResult {
+    ReErrCode Errorcode = 1;
+}
+
+message GetContactsV1Req {
+    int32 userId = 1; //用户的Id
+    int64 keyId = 2; // 用户的keyId
+    int32 hash = 3; //用户联系人的哈希值
+    pbcomm.Debug debug = 4;
+}
+
+message GetContactsV1Result {
+    repeated contactInfo contactArr = 1; //联系人的的信息们
+    repeated userInfo userInfoArr = 2; //联系人们的用户信息们
+    repeated groupOrder groupOrderArr = 3; //
+    int32 savedCount = 4;
+    int32 hash = 5;
+    ReErrCode Errorcode = 6; //返回错误码
+}
+
+//*************************************API ******************************************************
+//user service 接口
+service UserServerService {
+    // 邀请码绑定
+    rpc InviteCodeBind(InviteCodeBindReq) returns (InviteCodeBindRsp) {
+    }
+
+    // 我的团队
+    rpc MyTeam(MyTeamReq) returns (MyTeamRsp) {
+    }
+
+    // 实名认证材料提交
+    rpc RealNameCertification(RealNameCertificationReq) returns (RealNameCertificationRsp) {
+    }
+
+    // 实名认证结果反馈
+    rpc GetCertificationResult(GetCertificationResultReq) returns (GetCertificationResultRsp) {
+    }
+
+    // 实名认证后台审核
+    rpc VerifyCertification(VerifyCertificationReq) returns (VerifyCertificationRsp) {
+    }
+
+    // 实名认证后台审核
+    rpc UpdateUserDetailV1(UpdateUserDetailV1Req) returns (UpdateUserDetailV1Rsp) {
+    }
+
+    // 添加电话部好友
+    rpc AddPhoneBookContacts(AddPhoneBookContactsReq) returns (AddPhoneBookContactsReply) {
+    }
+
+    rpc SignUpV1 (SignUpV1Req) returns (SignUpV1Reply) {
+    }
+
+    //更新用户类别，标记
+    rpc UpdateUserTypeLable (UpdateUserTypeLableReq) returns (UpdateUserTypeLableResult) {
+    }
+
+    //更新用户年龄，性别，地理位置等等
+    rpc UpdateUserDetail (UpdateUserDetailReq) returns (UpdateUserDetailResult) {
+    }
+
+    rpc UpdateUserDetailBirthday (UpdateUserDetailBirthdayReq) returns (UpdateUserDetailBirthdayResult) {
+    }
+
+    rpc SetUserDetail (SetUserDetailReq) returns (SetUserDetailResult) {
+    }
+
+    //检查用户是否已经创建帐号
+    rpc CheckUserHasPay (CheckUserHasPayReq) returns (CheckUserHasPayResp) {
+    }
+
+    //更新用户已经开通支付帐号
+    rpc UpdateUserHasPay (UpdateUserHasPayReq) returns (UpdateUserHasPayResp) {
+    }
+    //获取viplog 电话号码列表(仅供ip调用获取viplog 的电话号码们)
+    rpc GetViplogPhoneList (GetViplogPhoneListReq) returns (GetViplogPhoneListResp) {
+    }
+    //********************************用户信息
+    //注册指定用户的接口()
+    rpc RegisterUserInfo (RegisterUserInfoReq) returns (RegisterUserInfoResult) {
+    }
+    //获取用户信息
+    rpc GetUserInfoById (GetUserInfoByIdReq) returns (GetUserInfoResult) {
+    }
+    //批量根据用户ID来获取用户信息selfId 代表自己的Id userId 代表需要获取的用户的Id
+    rpc GetUserInfoByIdArr (GetUserInfoByIdArrReq) returns (GetUserInfoByIdArrResult) {
+    }
+    //获取账号的销毁时间
+    rpc GetUserExpierById (GetUserExpireByIdReq) returns (GetUserExpireByIdResult) {
+    }
+    //通过用户电话号码获取用户基本信息
+    rpc GetUserInfoByPhone (GetUserByphone) returns (GetUserInfoResult) {
+    }
+    //通过username获取用户基本信息
+    rpc GetUserInfoByUsername (GetUserByUsername) returns (GetUserInfoResult) {
+    }
+    //更新用户头像
+    rpc UpdateUserPhoto (updatePhotoInfoReq) returns (UpdateUserPhotoResult) {
+    }
+    //获取用户头像
+    rpc GetUserPhoto (GetPhotoInfoReq) returns (GetUserPhotoResult) {
+    }
+    //更新用户用户status
+    rpc UpdateUserStatus (StatusReq) returns (StatusResult) {
+    }
+    //更新用户用户status v2
+    rpc UpdateUserStatusV2 (StatusReq) returns (StatusResult) {
+    }
+    //设置用户账号销毁时间
+    rpc UpdateUserExpire (UpdateExpireReq) returns (UpdateExpireResult) {
+    }
+    //用户DC的迁移
+    rpc UpdateUserCluster (UserClusterChange) returns (UserClusterChangeResult) {
+    }
+    //更新用户的username
+    rpc UpdateUserName (UpdateuserNameReq) returns (UpdateuserNameResult) {
+    }
+    //更新用户的扩展字段
+    rpc UpdateUserLevel (UpdateUserLevelReq) returns (UpdateUserLevelResult) {
+    }
+    //更新用户的扩展字段
+    rpc UpdateUserExtion (UpdateUserExtionReq) returns (UpdateUserExtionResult) {
+    }
+    //校验用户名称是否被占用
+    rpc CheckUserNameOccupied (CheckUserNameOccupiedReq) returns (CheckUserNameOccupiedResult) {
+    }
+
+    //检查电话号码是否已经注册
+    rpc CheckPhoneRegister (CheckPhoneRegisterReq) returns (CheckPhoneRegisterResult) {
+    }
+    //账号(标记删除)
+    rpc DeleteUserInfoById (DeleteAccountByIdReq) returns (DelAccountResult) {
+    }
+    //更新机器人相关信息
+    rpc UpdateBotInfo (BotUpdateInfo) returns (BotUpdateInfoResult) {
+    }
+    //更新机器人头像
+    rpc UpdateBotPic (UpdateBotPicRequest) returns (UpdateBotPicResult) {
+    }
+    //检测用户哈希是否合法
+    rpc CheckUserAccessHashValid (CheckUserAccessHashValidReq) returns (CheckUserAccessHashValidResult) {
+    }
+
+    //根据id获取正在进行的电话update信息
+    rpc QueryUpdatesByUserid (QueryUpdatesByUseridReq) returns (QueryUpdatesByUseridResult) {
+
+    }
+
+    //获取用户信息
+    rpc GetFullUser (GetFullUserReq) returns (GetFullUserResult) {
+    }
+
+    //添加手机号码更换历史记录
+    rpc HistoryChangePhoneAdd (HistoryChangePhoneAddReq) returns (HistoryChangePhoneAddResult) {
+
+    }
+    //更换手机
+    rpc AccountChangePhone (ChangePhoneReq) returns (ChangePhoneResult) {
+    }
+    // 仅企业版使用该接口
+    // CMD #phoneSet 根据 username 设置用户 phone No.
+    // rpc SetPhoneNoByUsername (SetPhoneNoByUsernameReq) returns (SetPhoneNoByUsernameRsp) {
+    // }
+
+    //更新firstName,lastName和about
+    rpc UpdateUserProfile (UpdateUserProfileReq) returns (UpdateUserProfileResult) {
+
+    }
+
+    //联系人搜索用户
+    rpc SearchUserByPhone (SearchUserByPhoneReq) returns (SearchUserByPhoneResult) {
+    }
+
+    rpc ContactsGetCommonContacts (ContactsGetCommonContactsReq) returns (ContactsGetCommonContactsResult) {
+    }
+
+    rpc SearchUserByNickname (SearchUserByNicknameReq) returns (SearchUserByNicknameResult) {
+    }
+
+    //CMD命令,删除用户名称
+    rpc DeleteUserUsername (DeleteUserUsernameReq) returns (DeleteUserUsernameResult) {
+    }
+
+    //补充 更新机器人相关信息
+    rpc UpdateBotInfoSupp (UpdateBotInfoSuppReq) returns (UpdateBotInfoSuppResult) {
+    }
+
+    //根据用户Id来获取用户信息selfId 代表自己的Id userId 代表需要获取的用户的Id
+    rpc CheckIsMuteContact (CheckIsMuteContactReq) returns (CheckIsMuteContactResult) {
+    }
+    //********************************用户信息
+
+    //********************************联系人的相关接口
+    //删除单个联系人的接口
+    rpc ContactsDelContact (DelContactReq) returns (DelContactResult) {
+    }
+    //接受添加联系人的接口
+    rpc AcceptContact (AcceptContactReq) returns (AcceptContactResult) {
+    }
+    //批量删除用户联系人的接口
+    rpc ContactsDelContactsArr (DelContactArrReq) returns (DelContactArrResult) {
+    }
+    // 重置用户联系人信息，删除所有联系人
+    rpc CmdResetUserContacts (CmdResetUserContactsReq) returns (CmdResetUserContactsResult) {
+    }
+    //获取用户联系人列表
+    rpc ContactsGetContacts (ContatsGetContactsReq) returns (ContatsGetContactsResult) {
+    }
+    //获取用户联系人列表V1
+    rpc ContactsGetContactsV1 (ContactsGetContactsV1Req) returns (ContactsGetContactsV1Result) {
+    }
+    //获取联系人列表
+    rpc GetContactsV1 (GetContactsV1Req) returns (GetContactsV1Result) {
+    }
+    //获取用户联系人userid列表
+    rpc ContactsGetContactsId (ContactsGetContactsIdReq) returns (ContactsGetContactsIdResult) {
+    }
+
+    //批量导入联系人的操作(具体业务逻辑在用户服务来实现)
+    rpc ImportContacts (ContactsImportPhoneContactsReq) returns (ContactsImportPhoneContactsResult) {
+    }
+    //获取自己所有联系人的在线状态
+    rpc GetContactsStatus (GetContactsStatusReq) returns (GetContactsStatusResult) {
+    }
+    //检测自己是否是对方的联系人
+    rpc CheckSelfIsContact (CheckSelfIsContactReq) returns (CheckSelfIsContactResult) {
+    }
+    //检测是否双向好友
+    rpc CheckIsMutualContact (CheckIsMutualContactReq) returns (CheckIsMutualContactResult) {
+    }
+
+    //************用户关联表 用户在线状态的更新*******************
+    //创建dialog的增加用户关系（单聊）
+    rpc DialogUserRelation (AddRelationIdInfo) returns (AddRelationIdInfoResult) {
+    }
+    //删除dialog的剔除用户关系
+    rpc DelDialogUserRelation (DelRelationIdInfo) returns (DelRelationIdInfoResult) {
+    }
+    //上传保存联系人
+    rpc UploadContacts (UploadContactsReq) returns (UploadContactsResult) {
+    }
+
+    //联系人申请
+    rpc ApplyContact (ApplyContactReq) returns (ApplyContactResult) {
+    }
+
+    rpc ContactsGreetApply (ContactsGreetApplyReq) returns (ContactsGreetApplyResult) {
+    }
+
+    //确认添加申请
+    rpc VerifyContact (VerifyContactReq) returns (VerifyContactResult) {
+    }
+
+    //获取被添加用户申请列表
+    rpc GetAppliedContacts (GetAppliedContactsReq) returns (GetAppliedContactsResult) {
+    }
+
+    //删除申请列表
+    rpc DeleteAppliedHistoryContact (DeleteAppliedHistoryContactReq) returns (DeleteAppliedHistoryContactResult) {
+    }
+
+    //删除一些申请
+    rpc DeleteAppliedSomeContact (DeleteAppliedSomeContactReq) returns (DeleteAppliedSomeContactResult) {
+    }
+
+    rpc DeleteReceiveApplies (DeleteReceiveAppliesReq) returns (DeleteReceiveAppliesResult) {
+    }
+
+    //设置申请为已读
+    rpc ReadAppliedHistory (ReadAppliedHistoryReq) returns (ReadAppliedHistoryResult) {
+    }
+
+    rpc GetContactsApplyDifference (GetContactsApplyDifferenceReq) returns (GetContactsApplyDifferenceResult) {
+    }
+
+    rpc GetContactsApplyDifferenceV2 (GetContactsApplyDifferenceV2Req) returns (GetContactsApplyDifferenceV2Result) {
+    }
+
+    //检查搜索用户数量是否到达上线
+    rpc CheckSearchUserCountLimited (CheckSearchUserCountLimitedReq) returns (CheckSearchUserCountLimitedResult) {
+    }
+
+    //**********联系人分组***************
+    rpc CreateGroup (CreateGroupReq) returns (CreateGroupResult) {
+    }
+
+    rpc SetUserGroup (SetUserGroupReq) returns (SetUserGroupResult) {
+    }
+
+    rpc ChangeGroupName (ChangeGroupNameReq) returns (ChangeGroupNameResult) {
+    }
+
+
+    rpc ChangeGroupOrder (ChangeGroupOrderReq) returns (ChangeGroupOrderResult) {
+    }
+
+    rpc DeleteGroup (DeleteGroupReq) returns (DeleteGroupResult) {
+    }
+
+    rpc DeleteGroups (DeleteGroupsReq) returns (DeleteGroupsResult) {
+    }
+
+    //********************************联系人的相关接口
+
+    //**********用户黑名单的管理 ***************
+    //拉黑用户
+    rpc BlockedUser (BlockeduserReq) returns (BlockeduserResult) {
+    }
+    //移除拉黑的用户
+    rpc ContactUnBlockedUser (ContactUnblockedReq) returns (BlockeduserResult) {
+    }
+    //获取用户的黑明单列表
+    rpc ContactsGetBlocked (ContactsGetBlockedReq) returns (ContactsGetBlockedResult) {
+    }
+    //检测用户是否是黑名单
+    rpc CheckUserIsBlocked (CheckUserIsBlockedReq) returns (CheckUserIsBlockedResult) {
+    }
+    //**********用户黑名单的管理 ***************
+
+    //***********系统白名单的相关操作和管理*******************
+    //存储白名单
+    rpc StoreSystemWhiteUser (StoreSysWhiteUserReq) returns (StoreSysWhiteUserResult) {
+    }
+    //更新用户白名单的级别
+    rpc UpdateSystemWhiteUserLevel (UpdateSystemWhiteUserLevelReq) returns (UpdateSystemWhiteUserLevelResult) {
+    }
+    //获取指定的白名单人信息
+    rpc GetSysWhiteUser (GetSysWhiteUserReq) returns (GetSysWhiteUserResult) {
+    }
+    //获取白名单列表 )
+    rpc GetSysWhiteUserArr (GetSysWhiteUserArrReq) returns (GetSysWhiteUserArrResult) {
+    }
+    //移除指定的白名单人
+    rpc DelSysWhiteUser (DelSysWhiteUserReq) returns (DelSysWhiteUserResult) {
+    }
+    //拉取所有用户的DC
+    rpc GetAllUserDc (GetAllDcReq) returns (stream UserDc) {
+    }
+    //***********系统白名单的相关操作和管理*******************
+
+    //************************* 有关隐私选项设置的接口们 ****************************************
+    //设置隐私选项的接口
+    rpc SetUserPrivacy (SetPrivacyReq) returns (SetPrivacyResult) {
+    }
+    //获取隐私选项的接口
+    rpc GetUserPrivacy (GetPrivacyReq) returns (GetPrivacyResult) {
+    }
+    //检测用户的隐私选项
+    rpc CheckUserPrivacy (CheckPrivacyReq) returns (CheckPrivacyResult) {
+    }
+    //************************* 有关隐私选项设置的接口们 ****************************************
+
+    //    //************************* 有关sticker的设置和获取 ****************************************
+    //    //存储sticker集合的概要
+    //    rpc StoreStickerSet (StoreShopStickerSetReq) returns (StoreShopStickerSetResult) {
+    //    }
+    //
+    //    //存储sickerSet 的documents
+    //    rpc StoreStickerSetDocument (StoreShopStickerSetDocumentsReq) returns (StoreShopStickerSetDocumentsResult) {
+    //    }
+    //    //删除指定的sticker集合
+    //    rpc DeleteShopStickerSet (DeleteStickerSetReq) returns (DeleteStickerSetResult) {
+    //    }
+    //    //获取指定的sticker集合
+    //    rpc GetStickerSetInfo (GetStickerSetInfoReq) returns (StickerSetInfo) {
+    //    }
+    //
+    //    //存储stickerSet下面的单个贴图
+    //    rpc StoreStickerPackDc (StoreStickerPackDcReq) returns (StoreStickerPackDcResult) {
+    //    }
+    //    //批量导入sticker
+    //    rpc StoreStickerPackDcArr (StoreStickerPackDcArrReq) returns (StoreStickerPackDcArrResult) {
+    //    }
+    //    //获取一个sticker下面的所有贴图信息
+    //    rpc GetStickerSetPackDcInfos (GetStickerSetPackDcInfosReq) returns (GetStickerSetPackDcInfosResult) {
+    //    }
+    //
+    //    // 添加或者取消喜欢的sticker unfave = true: 取消喜欢 unfave = false: 添加为喜欢
+    //    rpc AddOrDeleteFaveSticer (AddOrDeleteFaveSticerReq) returns (AddOrDeleteFaveSticerResult) {
+    //    }
+    //
+    //    // 获取已经添加的的喜爱单个贴图集合
+    //    rpc GetFavedStickers (GetFavedStickersReq) returns (GetFavedStickersResult) {
+    //    }
+    //
+    //    //***************用户安装sticker的操作*******
+    //    rpc StoreUserStickerSet (StoreUserStickerSetReq) returns (StoreUserStickerSetResult) {
+    //    }
+    //    //更新sticker的用户禁用状态
+    //    rpc UpdateUserStickerDisable (UpdateUserStickerSetDisabledReq) returns (UpdateUserStickerSetDisabledResult) {
+    //    }
+    //    //更新sticker的order
+    //    rpc UpdateUserStickerOrder (UpdateUserStickerSetOrderReq) returns (UpdateUserStickerSetOrderResult) {
+    //    }
+    //    //更新sticker的installed和archived
+    //    rpc UpdateUserStickerInstallArchived (UpdateUserStickerSetInstallArReq) returns (UpdateUserStickerSetInstallArResult) {
+    //    }
+    //    //删除用户指定的Sticker
+    //    rpc DeleteUserSticker (DeleteuserStickerReq) returns (DeleteuserStickerResult) {
+    //    }
+    //    //获取用户sticker集合信息
+    //    rpc GetuserAllStickers (GetuserAllStickersReq) returns (GetuserAllStickersResult) {
+    //    }
+    //    //获取所有sticker集合信息
+    //    rpc GetAllStickerSets (GetAllStickerSetsReq) returns (GetAllStickerSetsResult) {
+    //    }
+    //    //删除指定sticker包的单个sticker
+    //    rpc DeleteStickerPackDocument (DeleteStickerPackDocumentReq) returns (DeleteStickerPackDocumentResult) {
+    //    }
+    //    //根据setId查询作者的sticker
+    //    rpc GetAuthorStickerSet (GetAuthorStickerSetReq) returns (GetAuthorStickerSetResult) {
+    //    }
+    //    //查询作者所有的sticker
+    //    rpc GetAuthorAllStickerSet (GetAuthorAllStickerSetReq) returns (GetAuthorAllStickerSetResult) {
+    //    }
+    //    //计算作者拥有sticker数量
+    //    rpc CountAuthorAllStickerSet (CountAuthorAllStickerSetReq) returns (CountAuthorAllStickerSetResult) {
+    //    }
+    //    //************************* 有关sticker的设置和获取 ****************************************
+    //
+    //    //********************用户动态图的接口们 *********
+    //    //保存gif动态图
+    //    rpc SaveUserGif (SaveUserGifReq) returns (SaveUserGifResult) {
+    //    }
+    //    //删除动态图
+    //    rpc DelUserGif (DelUserGifReq) returns (DelUserGifResult) {
+    //    }
+    //    //获取用户的gifs
+    //    rpc GetUserGifs (GetUserGifsReq) returns (GetUserGifsResult) {
+    //    }
+    //    //********************用户动态图的接口们 *********
+
+    //********************推送音效等设置 *****************
+    // 获取音效设置
+    rpc GetNotifySettings (GetNotifySettingsReq) returns (GetNotifySettingsResult) {
+    }
+    // 更新音效设置
+    rpc UpdateNotifySettings (UpdateNotifySettingsReq) returns (UpdateNotifySettingsResult) {
+    }
+    //********************推送音效等设置 *****************
+
+    //********************代理配置的获取 *****************
+    //    //获取所有的代理的配置们
+    //    rpc GetAllProxyConfig (GetAllProxyConfigReq) returns (GetAllProxyConfigResult) {
+    //    }
+
+    //********* 用户相关的GPS *********
+    rpc GetUserGps (GetUserGpsReq) returns (GetUserGpsResult) {
+    }
+
+    //********* switches ****************
+    //用户开关设置-用户名被搜索,未读计数,允许多段登陆
+    rpc UpdateSwitch (UpdateSwitchReq) returns (UpdateSwitchResult) {
+    }
+    //获取开关的状态
+    rpc GetSwitchStatus (GetSwitchStatusReq) returns (GetSwitchStatusResult) {
+    }
+    //获取Switch版本
+    rpc GetSwitchVersion (GetSwitchVersionReq) returns (GetSwitchVersionResult) {
+    }
+    //********* switches ****************
+
+    //********************获取用户扩信息 *****************
+    //获取用户扩信息
+    rpc GetUserExpansion (GetUserExpansionReq) returns (GetUserExpansionResult) {
+    }
+    //用户扩展信息表-设置
+    rpc UserExpansionSet (UserExpansionSetReq) returns (UserExpansionSetResult) {
+
+    }
+    //获取用户扩展信息
+    rpc UserExpansionFind (UserExpansionFindReq) returns (UserExpansionFindResult) {
+
+    }
+    //********************获取用户扩信息 *****************
+    rpc GetUserInfoExtend (GetUserInfoExtendReq) returns (GetUserInfoExtendResult) {
+    }
+
+    //********************特权名单列表 *****************
+    //检查自己是否在特权名单列表中
+    rpc CheckUserSpaicl (CheckUserSpaiclReq) returns (CheckUserSpaiclResult) {
+
+    }
+    //增加特权名单
+    rpc InsertUSerSpaicl (InsertUSerSpaiclReq) returns (InsertUSerSpaiclResult) {
+
+    }
+    //删除特权名单
+    rpc DelUSerSpaicl (DelUSerSpaiclReq) returns (DelUSerSpaiclResult) {
+
+    }
+    //获取所有的特权名单
+    rpc GetAllUSerSpaicl (GetAllUSerSpaiclReq) returns (GetAllUSerSpaiclResult) {
+
+    }
+    //********************特权名单列表中 *****************
+
+    //********************特权名单列表中 *****************
+    //UserIpAddOrUpdate(uid int32, addr string, isSignUp bool) error
+    rpc UserIpAddOrUpdate (UserIpAddOrUpdateReq) returns (UserIpAddOrUpdateResult) {
+    }
+    //GetUserIpByAddr(addr string, signUpOnly bool) (users []int32, err error)
+    rpc GetUserIpByAddr (GetUserIpByAddrReq) returns (GetUserIpByAddrResult) {
+    }
+    //GetUserIpByUserId(uid int32, signUpOnly bool) (addrs []*UserIpAddr, err error)
+    rpc GetUserIpByUserId (GetUserIpByUserIdReq) returns (GetUserIpByUserIdResult) {
+    }
+    //********************特权名单列表中 *****************
+
+    //获取自己有关联的联系人关系列表
+    rpc GetRelationUsers (GetRelationUsersReq) returns (GetRelationUsersResult) {
+
+    }
+
+    //****************** 退订*************************
+    //设置退订
+    rpc SetUserUnsubscribe (SetUserUnsubscribeReq) returns (SetUserUnsubscribeResult) {
+    }
+    //获取退订
+    rpc GetUserUnsubscribe (GetUserUnsubscribeReq) returns (GetUserUnsubscribeResult) {
+    }
+    //****************** 退订*************************
+
+    //    //****************** only for  simple chat 未实现任何逻辑,也无调用*************************
+    //    //更新用户性别--未实现任何逻辑,也无调用
+    //    rpc UpdateUserGrender (UpdateUserGrenderReq) returns (UpdateUserGrenderResult) {
+    //    }
+    //    //更新用户邮件--未实现任何逻辑,也无调用
+    //    rpc UpdateUserEmail (UpdateUserEmailReq) returns (UpdateUserEmailResult) {
+    //    }
+    //    //更新用户位置--未实现任何逻辑,也无调用
+    //    rpc UpdateUserLocation (UpdateUserLocationReq) returns (UpdateUserLocationResult) {
+    //    }
+    //    //****************** only for  simple chat *************************
+
+    //****************** RecvLocker *************************
+    rpc RecvLockerAddUserId (RecvLockerAddUserIdReq) returns (RecvLockerAddUserIdResult) {
+    }
+    rpc RecvLockerDelUserId (RecvLockerDelUserIdReq) returns (RecvLockerDelUserIdResult) {
+    }
+    rpc RecvLockerGetUserIds (RecvLockerGetUserIdsReq) returns (RecvLockerGetUserIdsResult) {
+    }
+    //****************** only for  simple chat *************************
+
+    rpc CheckDigitalWalletSwitch (CheckDigitalWalletSwitchReq) returns (CheckDigitalWalletSwitchResult) {
+
+    }
+    rpc AddLoginDay (AddLoginDayReq) returns (AddLoginDayResult) {
+
+    }
+
+    //批量查询电话本号码是系统号码
+    //    rpc GetPhoneBookInfos (GetPhoneBookInfosReq) returns (GetPhoneBookInfosResult) {
+    //    }
+
+    //****************** 客服相关接口 *************************
+
+    //获取客服列表
+    rpc GetCustomerList (GetCustomerListReq) returns (GetCustomerListReply) {
+    }
+    // 指定ID是否是客服
+    rpc IsCustomerByUserId (IsCustomerByUserIdReq) returns (IsCustomerByUserIdReply) {
+    }
+    // 获取指定客服的用户列表请求
+    rpc GetCustomerOrientUsers (GetCustomerOrientUsersReq) returns (GetCustomerOrientUsersReply) {
+    }
+
+    // 检测用户Id是否是特权消息账号请求
+    rpc CheckSpecialUser (CheckSpecialUserReq) returns (CheckSpecialUserReply) {
+    }
+
+    // 获取强制加入群组ids
+    rpc GetForceGroupList (GetForceGroupListReq) returns (GetForceGroupListReply) {
+    }
+    // 获取非强制加入群组ids
+    rpc GetNotForceGroupList (GetNotForceGroupListReq) returns (GetNotForceGroupListReply) {
+    }
+
+    //批量查询电话本号码是系统号码
+    rpc GetPhoneBookInfos (GetPhoneBookInfosReq) returns (GetPhoneBookInfosResult) {
+    }
+
+    // ********** 密码登录注册开始 *****************
+    // 密码注册
+    rpc PassWordRegistry (PassWordRegistryReq) returns (PassWordRegistryReply) {
+    }
+    // 通过username注册
+    rpc RegistryUserByUsername (RegistryUserByUsernameReq) returns (RegistryUserByUsernameReply) {
+    }
+    // 密码登录
+    rpc PassWordLogin (PassWordLoginReq) returns (PassWordLoginReply) {
+    }
+    // 找回密码
+    rpc ChangePassWord (ChangePassWordReq) returns (ChangePassWordReply) {
+    }
+
+    rpc CheckIsSelfContact (CheckIsSelfContactReq) returns (CheckIsSelfContactResult) {
+    }
+
+    // ********* 授权登录 *********************
+    //    // 获取授权token
+    //    rpc GetAuthToken (GetAuthTokenReq) returns (GetAuthTokenReply) {
+    //    }
+    //    // 绑定token
+    //    rpc BindUserToken (BindUserTokenReq) returns (BindUserTokenReply) {
+    //    }
+    //    // 验证token
+    //    rpc VerifyAuthToken (VerifyAuthTokenReq) returns (VerifyAuthTokenReply) {
+    //    }
+    //    // 通过授权token获取用户信息
+    //    rpc GetUserByAuthToken (GetUserByAuthTokenReq) returns (GetUserByAuthTokenReply) {
+    //    }
+
+    //=-----------------有關 cdn VIP等級相關
+
+    rpc ChkCdnVip (ChkCdnVipReq) returns (ChkCdnVipRsp) {
+    }
+    rpc AddCdnVip (AddCdnVipReq) returns (AddCdnVipRsp) {
+    }
+    // @ added by qingsong at 2021.03.03 for buy CDN VIP.
+    rpc BuyCdnVip (BuyCdnVipReq) returns (BuyCdnVipRsp) {
+    }
+
+    // @ added by qingsong at 2021.03.03 for set CDN VIP auto renew.
+    rpc SetCdnVipAutoPay (SetCdnVipAutoPayReq) returns (SetCdnVipAutoPayRsp) {
+    }
+
+    // @ added by qingsong at 2021.03.03 for get user cdn-vip info.
+    rpc GetUserCdnVipInfo (GetUserCdnVipInfoReq) returns (GetUserCdnVipInfoRsp) {
+    }
+
+    // @ added by qingsong at 2021.03.03 for get user cdn-vip pay list.
+    rpc GetUserCdnPayList (GetUserCdnPayListReq) returns (GetUserCdnPayListRsp) {
+    }
+
+    //=-------------------- 虛擬號碼相關
+    //生成虛擬號碼池
+    rpc GenVitulaPhoneNumbers (GenVitulaPhoneNumbersReq) returns (GenVitulaPhoneNumbersResp) {
+    }
+
+    //獲取n個虛擬號碼
+    rpc GetVitulPhoneNumbers (GetVitulPhoneNumbersReq) returns (GetVitulPhoneNumbersResp) {
+    }
+
+    //獲取指定需要啦羣的用戶們
+    rpc GetAllVitualUsersByFlags (GetAllVitualUsersByFlagsReq) returns (GetAllVitualUsersByFlagsResp) {
+    }
+
+    //檢測是否是虛擬號碼
+    rpc CheckIsVitulaPhone (CheckIsVitulaPhoneReq) returns (CheckIsVitulaPhoneResp) {
+    }
+
+    rpc SignUpVitual (SignUpVitualReq) returns (SignUpVitualResp) {
+    }
+
+    //檢測是否是虛擬號碼
+    rpc CheckIsVitulaPhoneArr (CheckIsVitulaPhoneArrReq) returns (CheckIsVitulaPhoneArrResp) {
+    }
+
+    //檢測是否是虛擬號碼
+    rpc CheckIsPhoneVitulaPhone (CheckIsPhoneVitulaPhoneReq) returns (CheckIsPhoneVitulaPhoneResp) {
+    }
+
+    // 检查用户是否能加群
+    rpc JoinGroupCheck (JoinGroupCheckReq) returns (JoinGroupCheckRsp) {
+    }
+
+    //檢測是否有添加聯系人權限（號碼tag是否相同）
+    rpc VitualCheckCanAddContact (VitualCheckCanAddContactReq) returns (VitualCheckCanAddContactResp) {
+    }
+
+    //獲取發送短信驗證碼的頻道
+    rpc GetVitualSendCodeChannel (GetVitualSendCodeChannelReq) returns (GetVitualSendCodeChannelResp) {
+    }
+
+    //新增
+    rpc BindVitualSendCodeChannel (BindVitualSendCodeChannelReq) returns (BindVitualSendCodeChannelResp) {
+    }
+
+    // 虚拟帐号绑定手机号
+    rpc VirtualBindRealPhone (VirtualBindRealPhoneReq) returns (VirtualBindRealPhoneRsp) {
+    }
+    // 虚拟帐号加真实帐号用户好友
+    rpc VirtualAddContactByPhone (VirtualAddContactByPhoneReq) returns (VirtualAddContactByPhoneRsp) {
+    }
+    // 获取虚拟帐号绑定信息
+    rpc GetVirtualBindByPhone (GetVirtualBindByPhoneReq) returns (GetVirtualBindByPhoneRsp) {
+    }
+
+    //授予管理員權限
+    rpc AddUserAdmin (AddUserAdminReq) returns (AddUserAdminResp) {
+    }
+
+    rpc GetuserAdminInfo (GetuserAdminInfoReq) returns (GetuserAdminInfoResp) {
+    }
+    // @ added by qingsong at 2021.03.17 for virtual pretty number
+    // 查询靓号
+    rpc SearchPrettyNumber(SearchPrettyNumberReq) returns (SearchPrettyNumberRsp) {}
+    // 激活靓号
+    rpc ActivePrettyNumber(ActivePrettyNumberReq) returns (ActivePrettyNumberRsp) {}
+//
+//    // @ added by qingsong at 2021.07.22 for set gesture code.
+//    rpc SetGestureCode(SetGestureCodeReq) returns (SetGestureCodeRsp) {}
+//    // @ added by qingsong at 2021.07.22 for check gesture code.
+//    rpc ChkGestureCode(ChkGestureCodeReq) returns (ChkGestureCodeRsp) {}
+
+    // @ brief : 获取用户角色信息
+    rpc GetUserRoleInfoByIds(GetUserRoleInfoByIdsReq) returns (GetUserRoleInfoByIdsRsp) {}
+
+
+    // @ brief : inner user operation.
+    rpc InnerUserOp(InnerUserOpReq) returns (InnerUserOpRsp) {}
+
+    // @ brief : bind real phone.
+    rpc BindRealPhone(BindRealPhoneReq) returns (BindRealPhoneRsp) {}
+
+
+    /// @ added by qingsong at 2021.12.13 for get user relation.
+    rpc GetUserRelationWithIds(GetUserRelationWithIdsReq) returns (GetUserRelationWithIdsRsp) {}
+
+    rpc UpdateUserVerified(UpdateUserVerifiedReq) returns (UpdateUserVerifiedResult) {}
+}
+
+// @ added by qingsong at 2021.03.17 for virtual pretty number
+// rpc SearchPrettyNumber(SearchPrettyNumberReq) returns (SearchPrettyNumberRsp) {}
+message SearchPrettyNumberReq {
+    string CountryCode = 1;
+    string MatchNumber = 2;
+}
+message SearchPrettyNumberRsp {
+    string  Message = 1;
+    repeated string PrettyNumbers = 2;
+}
+
+// rpc ActivePrettyNumber(ActivePrettyNumberReq) returns (ActivePrettyNumberRsp) {}
+message ActivePrettyNumberReq {
+    string CountryCode = 1; // 国家码
+    string ActivePhone = 2; // 电话号码， 不带国家码
+    string AssginFlags = 3; //
+    int32  Operator = 4;
+}
+message ActivePrettyNumberRsp {
+    bool    Success = 1;
+    string  Message = 2;
+}
+
+
+// 获取虚拟帐号绑定信息
+// rpc GetVirtualBindByPhone(GetVirtualBindByPhoneReq) returns (GetVirtualBindByPhoneRsp) {}
+message GetVirtualBindByPhoneReq {
+    string VirtualPhone = 1;
+}
+
+message GetVirtualBindByPhoneRsp {
+    bool    IsVirtualAcct = 1;  // is virtual account.
+    string  BindRealPhone = 2;  // bind real phone
+    int32   BindContactId = 3;  // bind contact id
+    string  Assing_flags = 4; // flags
+}
+
+
+message GetuserAdminInfoReq {
+    int32 userId = 1;
+}
+
+message GetuserAdminInfoResp {
+    bool isAdmin = 1; //是不是管理員
+    int32 Level = 2; //管理員級別
+}
+
+message AddUserAdminReq {
+    int32 userId = 1; //用戶ID
+    int32 operator = 2; //操作者的userId
+    int32 Level = 3; //權限級別
+}
+
+message AddUserAdminResp {
+    bool SUcessful = 1;
+    string ErrStr = 2;
+}
+
+message BindVitualSendCodeChannelReq {
+    string assigFlag = 1; //分配標識
+    int32 sendId = 2; //羣短信驗證碼發送者ID
+    int32 ChannelId = 3; //羣Id
+    int64 Access_hash = 4; // 羣hash
+}
+
+message BindVitualSendCodeChannelResp {
+    int32 ErrorCode = 1; //錯誤嗎
+    string ErrStr = 2;
+}
+
+
+message GetVitualSendCodeChannelReq {
+    string phoneNumber = 1;
+}
+
+
+message GetVitualSendCodeChannelResp {
+    bool isNeedSendChannel = 1; //是否需要向羣裏發送
+    int32 sendId = 2; //羣短信驗證碼發送者ID
+    int32 ChannelId = 3; //羣Id
+    int64 Access_hash = 4; // 羣hash
+}
+
+
+message VitualCheckCanAddContactReq {
+    int32 user_id = 1;
+    int32 contact_id = 2;
+}
+
+message VitualCheckCanAddContactResp {
+    bool canAdd = 1; //是否能夠添加
+}
+
+
+message CheckIsPhoneVitulaPhoneReq {
+    string phone = 1; //虛擬號碼
+}
+
+message CheckIsPhoneVitulaPhoneResp {
+    bool isVirtal = 1;
+}
+
+
+message CheckIsVitulaPhoneArrReq {
+    repeated int32 userId = 1;
+}
+
+message CheckIsVitulaPhoneArrResp {
+    bool IsVitual = 1;
+}
+
+message SignUpVitualReq {
+    string PhoneNumber = 1; //电话号码
+    string PhoneCodeHash = 2;
+    string PhoneCode = 3; //验证码
+    string FirstName = 4;
+    int32 sex = 5;
+    bool is_bot = 6;
+    int32 bot_info_version = 7;
+    bool bot_chat_history = 8;
+    bool bot_no_chats = 9;
+    string country_code = 10; // 国家码
+    string local_phone = 11; // 不带国家码的号码
+    int32 birthday = 12;
+    string photo = 13;
+    int32 proxyCode = 14; // 邀请人userId
+}
+
+message SignUpVitualResp {
+    ResultCode code = 1;
+    userInfo userInfo = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 服务器内部错误
+        PhoneNumberInvalid = 2; // 无效的电话号码
+        PhoneNumberOccupied = 3; // 电话号码已注册
+        CaptchaExpired = 4; // 验证码失效
+        CaptchaInvalid = 5; // 验证码无效
+        FloodWait = 6;
+        SignUpRobotBlocked = 7; // 机器人注册接口暂时关闭
+    }
+}
+
+// rpc VirtualBindRealPhone(VirtualBindRealPhoneReq) returns (VirtualBindRealPhoneRsp) {}
+message VirtualBindRealPhoneReq {
+    string VPhone = 1; // virtual phone.
+    string RPhone = 2; // real phone.
+}
+message VirtualBindRealPhoneRsp {
+    bool    Success = 1;
+    string  Message = 2;
+}
+
+// rpc VirtualAddContactByPhone(VirtualAddContactByPhoneReq) returns (VirtualAddContactByPhoneRsp) {}
+message VirtualAddContactByPhoneReq {
+    string VPhone = 1; // virtual phone.
+    string RPhone = 2; // real phone.
+}
+message VirtualAddContactByPhoneRsp {
+    bool Success = 1;
+    string Message = 2;
+}
+
+message JoinGroupCheckReq {
+    int32 InviterId = 1; // inviter user id.
+    repeated int32 MemberIds = 2;
+}
+message JoinGroupCheckRsp {
+    repeated int32 CanJoinIds = 1;
+}
+
+message CheckIsVitulaPhoneReq {
+    int32 userId = 1;
+}
+
+message CheckIsVitulaPhoneResp {
+    bool isVitulal = 1;
+}
+
+
+message VirtulPhoneInfo {
+    int32 user_id = 1;
+    string phoneNumber = 2; //電話號碼
+}
+
+message GetAllVitualUsersByFlagsReq {
+    string assgin_flags = 1;
+}
+
+message GetAllVitualUsersByFlagsResp {
+    bool sucess = 1;
+    repeated VirtulPhoneInfo infos = 2; //需要拉人的羣組信息
+
+}
+
+message GetVitulPhoneNumbersReq {
+    int32 number = 1; //需要獲取的號碼的個數
+    int32 admin_id = 2; //需要獲取的管理員
+    string assgin_flags = 3; //團體標識別
+    int64 util_date = 4; //失效時間
+    string countryCode = 5; //需要分配的國家代碼
+
+}
+
+message GetVitulPhoneNumbersResp {
+    int32 errCode = 1; //錯誤嗎 0 成功 其它失敗
+    string errStr = 2; //錯誤i信息
+    repeated string phonenumbers = 3;
+}
+
+
+message GenVitulaPhoneNumbersReq {
+    string CountryCode = 1; //國家嗎代號
+}
+
+message GenVitulaPhoneNumbersResp {
+    int32 errCode = 1;
+    string errStr = 2; //錯誤i信息
+}
+
+// 用户 vip 信息
+message UserCdnVipInfo {
+    int32 state = 1; // vip 状态，0:未开通或已过期，1:支付中待确认， 2:已开通未过期
+    int32 level = 2; // vip 等级
+    int32 BgnTime = 3; // 开始时间
+    int32 EndTime = 4; // 结束时间
+    bool AutoPay = 5; // 自动续费
+}
+// 用户 vip 支付信息
+message UserCdnPayInfo {
+    int64 PayId = 1; // 支付订单号
+    //    int32   UserId = 2; // 用户ID
+    //    int32   Month = 3;
+    //    int32   Price = 4;  // 支付单价
+    //    int32   state = 5;
+    int32 PayAmt = 2; // 支付金额
+    int32 BgnTime = 3;
+    int32 EndTime = 4;
+}
+
+// @ added by qingsong at 2021.03.03 for buy CDN VIP.
+// rpc BuyCdnVip(BuyCdnVipReq) returns (BuyCdnVipRsp) {}
+message BuyCdnVipReq {
+    int32 UserId = 1; // 用户 ID
+    int32 VipLvl = 2; // vip等级
+    int32 Months = 3; // 购买月数
+    string Passwd = 4; // 支付密码
+    pbcomm.Debug Debugs = 6;
+}
+
+message BuyCdnVipRsp {
+    int32 RetCode = 1; // 返回代码
+    string Message = 2; // 返回信息
+    UserCdnVipInfo VipInfo = 3; // vip 信息
+}
+
+// @ added by qingsong at 2021.03.03 for set CDN VIP auto renew.
+// rpc SetCdnVipAutoPay(SetCdnVipAutoPayReq) returns (SetCdnVipAutoPayRsp) {}
+message SetCdnVipAutoPayReq {
+    int32 UserId = 1;
+    bool IsOpen = 2; // 是否开启
+}
+message SetCdnVipAutoPayRsp {
+    bool Success = 1;
+    string Message = 2;
+    UserCdnVipInfo VipInfo = 3;
+}
+
+// @ added by qingsong at 2021.03.03 for get user cdn-vip pay list.
+// rpc GetUserCdnPayList(GetUserCdnPayListReq) returns (GetUserCdnPayListRsp) {}
+message GetUserCdnPayListReq {
+    int32 UserId = 1;
+}
+
+message GetUserCdnPayListRsp {
+    int32 RetCode = 1;
+    string Message = 2;
+    UserCdnVipInfo VipInfo = 3;
+    repeated UserCdnPayInfo PayList = 4;
+}
+
+// @ added by qingsong at 2021.03.03 for get user cdn-vip info.
+// rpc GetUserCdnVipInfo(GetUserCdnVipInfoReq) returns (GetUserCdnVipInfoRsp) {}
+message GetUserCdnVipInfoReq {
+    int32 UserId = 1;
+}
+message GetUserCdnVipInfoRsp {
+    int32 RetCode = 1;
+    string Message = 2;
+    UserCdnVipInfo VipInfo = 3;
+}
+// 检查用户是否是 vip
+message ChkCdnVipReq {
+    int32 UserId = 1;
+}
+message ChkCdnVipRsp {
+    bool IsVip = 1;
+}
+message AddCdnVipReq {
+    int32 UserId = 1;
+    int32 VipLvl = 2;
+    int32 Months = 3;
+}
+message AddCdnVipRsp {
+    bool Sucess = 1;
+    string Message = 2;
+}
+
+//检测是否是对方是否是自己的联系人
+message CheckIsSelfContactReq {
+    int32 selfId = 1; //自己的Id
+    int32 userId = 2; //检测方的id
+    pbcomm.Debug debug = 3;
+}
+
+//检测是否是自己是否是对方的联系人的返回结果
+message CheckIsSelfContactResult {
+    bool IsSelfContact = 1; //对方是否是自己的联系人
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+message GetPhoneBookInfosReq {
+    int64 key_id = 1; //端标识
+    int32 user_id = 2; //用户的ID
+    repeated PhoneBookContact phoneContactArr = 3; //联系人的电话号码的列表
+}
+
+message GetPhoneBookInfosResult {
+    ResultCode reCode = 1;
+    repeated userInfo Uinfo = 2; ///用户的基本信息
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        Failed = 2;
+    }
+}
+
+
+message AddLoginDayReq {
+    int32 user_id = 1;
+}
+
+message AddLoginDayResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool result = 2; //
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message CheckDigitalWalletSwitchReq {
+    int32 user_id = 1;
+}
+message CheckDigitalWalletSwitchResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool result = 2; //
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+
+message RecvLockerAddUserIdReq {
+    uint32 user_id = 1;
+}
+message RecvLockerAddUserIdResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message RecvLockerDelUserIdReq {
+    uint32 user_id = 1;
+}
+message RecvLockerDelUserIdResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+
+message RecvLockerGetUserIdsReq {
+}
+
+message RecvLockerGetUserIdsResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    repeated uint32 user_id = 2; //
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//根据用户Id来获取用户信息selfId 代表自己的Id userId 代表需要获取的用户的Id
+message CheckIsMuteContactReq {
+    int32 self_id = 1;
+    int32 user_id = 2;
+}
+message CheckIsMuteContactResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool result = 2; //
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//设置退订
+message SetUserUnsubscribeReq {
+    int32 userId = 1;
+    int32 val = 2;
+}
+
+message SetUserUnsubscribeResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+//获取退订
+message GetUserUnsubscribeReq {
+    int32 userId = 1;
+
+}
+message GetUserUnsubscribeResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    int32 val = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//检查
+message GetRelationUsersReq {
+    int32 user_id = 1; //用户的ID
+    string phone = 2; //电话
+    pbcomm.Debug debug = 3;
+}
+
+message GetRelationUsersResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    repeated userInfo infos = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message GetUserIpByAddrReq {
+    string addr = 1; //地址
+    bool is_sign_up = 2; //
+}
+
+message GetUserIpByAddrResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    repeated int32 user_id = 2; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message UserIpAddr {
+    int64 Id = 1;
+    int32 UserId = 2;
+    string IpAddr = 3;
+    int32 IpPort = 4;
+    int64 LastOnline = 5;
+    bool IsSignUp = 6;
+}
+
+
+message GetUserIpByUserIdReq {
+    int32 user_id = 1; //用户的ID
+    bool is_sign_up = 2; //
+}
+
+message GetUserIpByUserIdResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    repeated UserIpAddr addrs = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+message UserIpAddOrUpdateReq {
+    int32 user_id = 1; //用户的ID
+    string addr = 2; //地址
+    bool is_sign_up = 3; //
+}
+
+message UserIpAddOrUpdateResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//检查
+message CheckUserSpaiclReq {
+    int32 user_id = 1; //用户的ID
+    int32 type = 2; //类型 1:普通 2:354
+}
+message CheckUserSpaiclResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool Result = 2; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+//增加
+message InsertUSerSpaiclReq {
+    int32 user_id = 1; //用户的ID
+    int32 type = 2; //类型 1:普通 2:354
+}
+message InsertUSerSpaiclResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool Result = 2; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+//删除
+message DelUSerSpaiclReq {
+    int32 user_id = 1; //用户的ID
+    int32 type = 2; //类型 1:普通 2:354
+}
+message DelUSerSpaiclResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool Result = 2; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+//获取所有
+message GetAllUSerSpaiclReq {
+    int32 type = 1; //类型 1:普通 2:354
+}
+message GetAllUSerSpaiclResult {
+    ResultCode ErrorCode = 1; // 失败的错误码
+    repeated int32 true_user_id = 2; //成功或者失败
+    repeated int32 false_user_id = 3; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//更改电话号码的请求参数
+message ChangePhoneReq {
+    int32 userId = 1; //用户的ID
+    int64 keyId = 2; //用户的keyId(端的标识)
+    string Phone_number = 3; //更改的新电话号码
+    string PhoneCodeHash = 4;
+    string PhoneCode = 5; //验证码
+    pbcomm.Debug debug = 6;
+    string country_code = 7; // 国家码
+    string local_phone = 8; // 不带国家码的电话号码
+}
+
+//更改电话号码的返回
+message ChangePhoneResult {
+    //userInfo userInfo = 1; //用户的具体信息
+    ResultCode ErrorCode = 1; // 失败的错误码
+    bool Result = 2; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        PhoneNumberOccupied = 2; // 电话已注册
+        PhoneCodeExpired = 3; // 验证码已过期
+        PhoneCodeInvalid = 4; // 验证码无效
+        FloodWait = 5;
+    }
+}
+
+// 虚拟号信息
+message VirtualPhoneNumberInfo {
+    string virtual_phone = 1; // 虚拟号
+    string real_phone = 2; // 绑定的真实电话号码
+    uint32 activated = 3; // 是否为激活状态
+    int64 bind_time = 4; // 绑定电话号码的时间 unix timestamp
+    int64 activate_time = 5; // 激活时间
+    int32 activate_admin_id = 6; // 激活该虚拟号的管理员id
+    int32 bind_admin_id = 7; // 为该虚拟号码绑定电话的管理员id
+    int32 owner_id = 8; // user id of whom owns the phone
+    string initial_phone_code = 9; // phone code for register if not bind yet
+}
+
+
+message UserExpansionFindReq {
+    int32 userID = 1;
+}
+
+message UserExpansionFindResult {
+    UserExpansion user_expansion = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+
+message UserExpansion {
+    int32 userID = 1;
+    string data = 2;
+    int32 version = 3;
+}
+
+message UserExpansionSetReq {
+    int32 userID = 1;
+    UserExpansion user_expansion = 2;
+}
+
+message UserExpansionSetResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//UserInfoExtend add by xiaoming.
+message UserInfoExtend {
+    int64 user_type = 1;
+    string uselable_fid = 2;
+    int64 uselable_size = 3;
+    int64 uselable_width = 4;
+    int64 uselable_height = 5;
+}
+
+message GetUserInfoExtendReq {
+
+}
+
+message GetUserInfoExtendResult {
+    ReErrCode Errorcode = 1;
+    int64 hash = 2;
+    repeated UserInfoExtend userInfoExtend = 3;
+}
+
+message HistoryChangePhoneAddResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+message HistoryChangePhoneAddReq {
+    int32 userID = 1;
+    string fromNumber = 2;
+    string toNumber = 3;
+    string addr = 4;
+    int32 port = 5;
+}
+
+message QueryUpdatesByUseridReq {
+    int32 user_id = 1;
+    uint64 key_id = 2;
+    int64 timestamp = 3;
+}
+
+message QueryUpdatesByUseridResult {
+    bytes jsonContent = 1;
+}
+
+
+message GetSwitchVersionReq {
+    int32 user_id = 1; //查询用户ID
+}
+
+message GetSwitchVersionResult {
+    int64 version = 1; //提示消息
+}
+
+//获取用户信息、群、超级群信息的请求
+message UGetUsersChatsReq {
+    int32 userid = 1; // 获取方id
+    repeated int32 users = 2; // 获取用户信息的用户id数组
+    repeated int32 chatid = 3; //获取普通群信息的群id数组
+    repeated int32 channelid = 4; // 获取超级群用户信息的超级群id数组
+    int32 protocol_layer = 5; // 协议层数
+    pbcomm.Debug Dlog = 6; //日志
+}
+
+//获取用户信息、群、超级群信息的返回
+message UGetUsersChatsResult {
+    //repeated ChannelInfoBase channels = 1;
+    //repeated GetChatInfoResp chats = 3;
+    repeated bytes channels = 1;
+    UserInfoArray users = 2;
+    repeated bytes chats = 3;
+    repeated int32 no_chats = 4;
+    repeated int32 no_chans = 5;
+    UChatResultCode resultcode = 6; //结果码
+}
+
+enum UChatResultCode {
+    Chat_RPC_OK = 0; //成功
+    Chat_ADDUSER3549_EXP = 4000; //3549隐私选项
+    Chat_User_Priavcay = 4001; //隐私选项 没有权限
+    Chat_To_User_Blocked = 4002; //block你将用户拉入黑名单  隐私选项
+    Chat_User_Blocked = 4003; //block用户将你拉入黑名单  隐私选项
+    Chat_REPEAT_CREAT = 4004; //短时间重复创建群
+    Chat_REPEAT_ADD_USER = 4005; //重复添加群成员
+    Chat_EXCEED_CREATE_MAXNUM = 4006; //超过最大建群数量
+    Chat_EXCEED_TODAY_CREATE_MAXNUM = 4007; //超过当日最大建群数量
+    Chat_EXCEED_ADD_USER_MAXNUM = 4008; //超过群最大添加人数
+    Chat_PROHIBIT_ADD_GROUP = 4009; //禁止加入群组
+    Chat_ADMINLEVEL_EXCEPTION = 4010; //没有邀请权限
+    Chat_ALREADYLEFT_EXCEPTION = 4011; //用户不在群里
+    Chat_GROUP_DISBAND = 4012; //该群已经解散
+    Chat_GROUP_KICKED = 4013; //该群以将你拉黑
+    Chat_HOURS_ADD_USER_MAXNUM = 4114; //超过每小时最多添加群成员数
+    Chat_ONCE_ADD_USER_MAXNUM = 4115; //超过单次最多添加群成员数
+    //
+    Chat_UNKNOWN = 4100; //未知异常
+    Chat_PARAMETER_EXCEPTION = 4101; //参数异常
+    Chat_LOGIC_EXCEPTION = 4102; //逻辑异常
+    Chat_REDIS_EXCEPTION = 4103; //redis异常
+    Chat_DB_EXCEPTION = 4104; //数据库异常
+    Chat_AllocId_EXCEPTION = 4105; //群id分配错误
+    Chat_CallGetUser_EXCEPTION = 4106; //获取user出错  刘鑫磊提供接口
+    Chat_DB_NORECORD = 4107; //无记录
+    Chat_Group_NORECORD = 4108; //无群记录
+}
+
+message UpdateBotInfoSuppReq {
+    int32 UserId = 1;
+    string Placeholder = 2;
+    bool geo = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message UpdateBotInfoSuppResult {
+    ReErrCode Errorcode = 1;
+}
+
+message DeleteUserUsernameReq {
+    int32 admin_id = 1; // 调用者id
+    string username = 2;
+    bool force_delete = 3; // 强制删除
+    pbcomm.Debug debug = 4;
+}
+
+message DeleteUserUsernameResult {
+    Code code = 1;
+    string internal_error_message = 2; // 发生内部错误时的错误信息
+    int32 owner_id = 3; // 用户名拥有者id
+
+    enum Code {
+        Success = 0;
+        PermissionDenied = 1; // 权限不够
+        UsernameNotExist = 2; // 用户名不存在
+        InvalidUsername = 3; // 无效的用户名
+        UserIsBot = 4; // 用户为bot
+        UsernameOccupied = 5; // 用户名使用中，需要设置force_delete强制删除
+        InternalError = 6; // 内部错误，错误信息保存在internal_error_message字段
+    }
+}
+
+
+message UpdateUserLocationReq {
+    int32 UserId = 1;
+    string Country = 2;
+    string City = 3;
+    string Detail = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message UpdateUserLocationResult {
+    bool Success = 1;
+    string Reason = 2;
+}
+
+message UpdateUserGrenderReq {
+    int32 UserId = 1;
+    int32 Grender = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message UpdateUserGrenderResult {
+    bool Success = 1;
+    string Reason = 2;
+}
+
+message UpdateUserEmailReq {
+    int32 UserId = 1;
+    string Email = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message UpdateUserEmailResult {
+    bool Success = 1;
+    string Reason = 2;
+}
+message UploadContactsReq {
+    int64 key_id = 1; //端标识
+    int32 user_id = 2; //用户的ID
+    repeated PhoneBookContact phoneContactArr = 3; //联系人的电话号码的列表
+}
+
+message UploadContactsResult {
+    bool error = 1; //是否上传失败
+    string message = 2; //提示消息
+}
+
+message ApplyContactReq {
+    int32 user_id = 1; //被添加人user_id
+    int32 apply_user_id = 2; //添加发起者user_id
+    string with_message = 3; //附带消息
+    int32 from_type = 4;
+    int32 group_id = 5;
+    string first_name = 6;
+    string last_name = 7;
+    pbcomm.Debug debug = 8; //日志记录相关的
+    int64 access_hash = 9;
+}
+
+message ApplyContactResult {
+    int32 from_apply_id = 1;
+    int32 from_reply_id = 2;
+    int32 to_apply_id = 3;
+    int32 to_reply_id = 4;
+    int32 date = 5;
+    int32 to_unread_count = 6;
+    bool add_contact = 7;
+    ReErrCode Errorcode = 8;
+}
+
+message ContactsGreetApplyReq {
+    int32 user_id = 1;
+    int32 apply_id = 2;
+    string greet = 3;
+    pbcomm.Debug debug = 4; //日志记录相关的
+}
+
+message ContactsGreetApplyResult {
+    int32 from_apply_id = 1;
+    int32 from_reply_id = 2;
+    int32 to_apply_id = 3;
+    int32 to_reply_id = 4;
+    int32 user_id = 5;
+    int32 unread_count = 6;
+    ReErrCode Errorcode = 7;
+}
+
+message GetAppliedContactsReq {
+    int32 user_id = 1; //查询用户ID
+}
+
+message GetAppliedContactsResult {
+    bool error = 1;
+    string message = 2; //提示消息
+    repeated Applied applied_arr = 3; //数据
+}
+
+message Applied {
+    int64 id = 1;
+    int32 user_id = 2; //被添加者用户ID
+    userInfo apply_user = 3; //发起申请用户
+    string with_message = 4; //附加消息
+    int32 status = 5; //状态消息 0-申请;1-同意;2-不同意;3-忽略
+    int32 flag = 6; //标识 0-未读;1-已读
+    int32 gender = 7; //性别
+    string email = 8; //邮箱
+    string Country = 9; //国家
+    string City = 10; //城市
+    string Detail = 11; //详情
+}
+
+message VerifyContactReq {
+    int64 id = 1; //申请好友唯一ID
+    int32 verify_user_id = 3; //确认者user_id
+    int32 status = 4; //状态消息
+}
+
+message VerifyContactResult {
+    bool error = 1;
+    string message = 2; //提示消息
+}
+
+message DeleteAppliedHistoryContactReq {
+    int32 max_id = 1;
+    int32 user_id = 2;
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+message DeleteAppliedHistoryContactResult {
+    ReErrCode Errorcode = 1;
+}
+
+message DeleteAppliedSomeContactReq {
+    repeated int32 id = 1;
+    int32 user_id = 2;
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+message DeleteAppliedSomeContactResult {
+    ReErrCode Errorcode = 1;
+}
+
+message ReadAppliedHistoryReq {
+    int32 user_id = 1;
+    pbcomm.Debug debug = 2; //日志记录相关的
+}
+
+message ReadAppliedHistoryResult {
+    ReErrCode Errorcode = 1;
+}
+
+message GetContactsApplyDifferenceReq {
+    int32 user_id = 1;
+    int32 apply_id = 2;
+    int32 limit = 3;
+    int32 date = 4;
+    pbcomm.Debug debug = 5; //日志记录相关的
+}
+
+message ApplyDifference {
+    int32 apply_id = 1;
+    int32 reply_id = 2;
+    int32 user_id = 3;
+    int32 date = 4;
+    int32 state = 5;
+    string greet = 6;
+    int32 from_type = 7;
+}
+
+message GetContactsApplyDifferenceResult {
+    repeated ApplyDifference applies = 1;
+    int32 max_apply_id = 2;
+    int32 unread_count = 3;
+    ReErrCode Errorcode = 4;
+}
+
+message GetContactsApplyDifferenceV2Req {
+    int32 user_id = 1;
+    int32 apply_id = 2;
+    int32 limit = 3;
+    int32 date = 4;
+    int64 hash = 5;
+    pbcomm.Debug debug = 6; //日志记录相关的
+}
+
+message GetContactsApplyDifferenceV2Result {
+    repeated ApplyDifference applies = 1;
+    int32 max_apply_id = 2;
+    int32 unread_count = 3;
+    int64 hash = 4;
+    ReErrCode Errorcode = 5;
+}
+
+message SearchUserByPhoneReq {
+    int32 self_id = 1;
+    string phone = 2; //手机号-带国家码
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+message SearchUserByPhoneResult {
+    repeated userInfo user_infos = 1; //用户信息
+    int32 gender = 2; //性别
+    string email = 3; //邮箱
+    string country = 4; //国家
+    string City = 5; //城市
+    string Detail = 6; //详情
+    ReErrCode Errorcode = 7; //返回错误码
+}
+
+message CreateGroupReq {
+    int32 self_id = 1;
+    repeated int32 user_id_arr = 2;
+    string title = 3;
+    pbcomm.Debug debug = 4; //日志记录相关的
+}
+
+message CreateGroupResult {
+    int32 group_id = 1;
+    int32 order = 2;
+    int32 date = 3;
+    ReErrCode Errorcode = 4; //返回错误码
+}
+
+message SetUserGroupReq {
+    int32 self_id = 1;
+    repeated userInfo user_infos = 2;
+    int32 group_id = 3;
+    pbcomm.Debug debug = 4; //日志记录相关的
+}
+
+message SetUserGroupResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//getfull user的请求
+message GetFullUserReq {
+    int32 selfId = 1; //自己的用户Id
+    int32 UserId = 2; // 需要获取的用户的ID
+    int64 AccessHash = 3; //需要获取的用户的哈希值
+    pbcomm.Debug debug = 4; //日志记录相关的
+}
+
+//getfull user的请求
+message GetFullUserResult {
+    userInfo uinfo = 1; //用户的基础信息
+    bool isblocked = 2; //此用户是否是自己的黑名单
+    bool phone_calls_private = 3; //userfull需要
+    bool phone_calls_available = 4; //userfull需要
+    string about = 5; //用户的个性签名
+    int32 common_chat = 6; //共同群的个数
+    string extend = 7; //用户的扩展字段们 年龄，性别 {Age:1111, Sex: 1, Address: "china"}
+    ReErrCode Errorcode = 8; //返回错误码
+}
+
+message GetUserExpansionReq {
+    int32 userId = 1;
+}
+
+message GetUserExpansionResult {
+    string data = 1;
+    int32 version = 2;
+}
+
+message ChangeGroupOrderReq {
+    int32 self_id = 1;
+    repeated groupOrder group_order = 2;
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+message groupOrder {
+    int32 group_id = 1;
+    int32 order_id = 2;
+    string title = 3;
+    int32 date = 4;
+    int32 unread_count = 5;
+}
+
+message ChangeGroupOrderResult {
+    ReErrCode Errorcode = 1;
+}
+
+message DeleteGroupReq {
+    int32 user_id = 1;
+    int32 group_id = 2;
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+message DeleteGroupResult {
+    ReErrCode Errorcode = 1;
+}
+
+message DeleteGroupsReq {
+    int32 user_id = 1;
+    repeated int32 group_ids = 2;
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+message DeleteGroupsResult {
+    ReErrCode Errorcode = 1;
+}
+
+// ****************** 客服相关 message 开始 ***********************
+
+// 获取客服列表请求
+message GetCustomerListReq {
+    // 是否是定向客服
+    bool IsOrient = 1;
+}
+// 客服列表结体
+message CustomerList {
+    int32 UserId = 1;
+    string Phone = 2;
+    // 是否定向客服
+    bool IsOrient = 3;
+    // 打招呼文案
+    string description = 4;
+    // 排序字段，数值越小越靠前
+    int32 Sort = 5;
+}
+
+// 获取定向客服列表响应
+message GetCustomerListReply {
+    // 返回的用户id数组
+    repeated CustomerList Customers = 1;
+    // 错误码
+    ReErrCode ErrorCode = 2;
+}
+
+message IsCustomerByUserIdReq {
+    int32 userId = 1;
+}
+message IsCustomerByUserIdReply {
+    ReErrCode error_code = 1;
+    bool yes = 2;
+}
+
+// 获取指定客服的用户列表请求
+message GetCustomerOrientUsersReq {
+    // 用户id
+    int32 UserId = 1;
+}
+
+// 获取指定客服的用户列表响应
+message GetCustomerOrientUsersReply {
+    // 返回的用户id数组
+    repeated int32 UserIds = 1;
+    // 错误码
+    ReErrCode ErrorCode = 2;
+    // 注册时问候语
+    string Description = 3;
+}
+
+// 检测用户Id是否是特权消息账号请求
+message CheckSpecialUserReq {
+    // 用户id
+    int32 UserId = 1;
+}
+// 检测用户Id是否是特权消息账号响应
+message CheckSpecialUserReply {
+    // 用户id
+    bool IsSpecial = 1;
+}
+
+// 获取强制加入群组ids请求
+message GetForceGroupListReq {
+}
+// 获取强制加入群组ids响应
+message GetForceGroupListReply {
+    repeated int32 GroupIds = 1;
+    ReErrCode ErrorCode = 2;
+}
+// 获取非强制加入群组ids请求
+message GetNotForceGroupListReq {
+}
+
+// 获取非强制加入群组ids响应
+message GetNotForceGroupListReply {
+    repeated int32 GroupIds = 1;
+    ReErrCode ErrorCode = 2;
+}
+// ****************** 客服相关 message 结束 ***********************
+
+// ************ 密码注册开始 *******************
+
+// 密码注册请求
+message PassWordRegistryReq {
+    // user id
+    int32 user_id = 1;
+    //给用户生成的哈希值
+    int64 access_hash = 2;
+    // 用户账号
+    string UserName = 3;
+    // 用户密码
+    string PassWord = 4;
+    // 手机号码
+    string PhoneNumber = 5;
+    // 邮箱
+    string email = 6;
+    string first_name = 7;
+    string last_name = 8;
+    // 手机国家码
+    string CountryCode = 9;
+    // 不含国家码的手机号
+    string LocalPhone = 10;
+
+}
+// 密码注册响应
+message PassWordRegistryReply {
+    // 是否成功
+    bool Success = 1;
+    // 错误码
+    PasswordRegistryErrorCode ErrorCode = 2;
+    // 用户信息
+    userInfo User = 3;
+}
+
+// 密码登录请求
+message PassWordLoginReq {
+    // 用户账号
+    string UserName = 1;
+    // 手机号码
+    string PhoneNum = 2;
+    // 用户密码t
+    string Password = 3;
+}
+// 密码登录响应
+message PassWordLoginReply {
+    // 是否成功
+    bool Success = 1;
+    // 错误码
+    PasswordRegistryErrorCode ErrorCode = 2;
+    // 用户信息
+    userInfo User = 3;
+}
+
+// 修改/找回密码请求
+message ChangePassWordReq {
+    int32 UserId = 1;
+    // 新密码
+    string NewPassWord = 2;
+}
+
+// 修改/找回密码响应
+message ChangePassWordReply {
+    // 是否成功
+    bool Success = 1;
+    // 错误码
+    PasswordRegistryErrorCode ErrorCode = 2;
+
+    // 用户信息
+    userInfo User = 3;
+}
+
+// 通过用户名 密码注册用户
+message RegistryUserByUsernameReq {
+    // 用户账号
+    string username = 1;
+    // 用户密码
+    string password = 2;
+    // 手机号码
+    string phone_number = 3;
+    // 邮箱
+    string email = 4;
+    string first_name = 5;
+    string last_name = 6;
+    // 手机国家码
+    string country_code = 7;
+    // 不含国家码的手机号
+    string local_phone = 8;
+}
+
+// 通过用户名 密码注册用户响应
+message RegistryUserByUsernameReply {
+    // 是否成功
+    bool success = 1;
+    // 错误码
+    PasswordRegistryErrorCode error_code = 2;
+    // 用户信息
+    userInfo user = 3;
+}
+
+// ************* 授权登录 ********************
+// 授权登录错误码
+enum OAuthLoginError {
+    // 成功
+    OAUTH_LOGIN_SUCCESS = 0;
+    // 内部错误
+    OAUTH_LOGIN_INTERNAL_ERROR = 1;
+    // user id 错误
+    OAUTH_LOGIN_USER_ID_ERROR = 2;
+    // token 过期
+    OAUTH_LOGIN_TOKEN_EXPIRE = 3;
+}
+
+// 获取授权登录的token 请求
+message GetAuthTokenReq {
+    // key id
+    int64 key_id = 1;
+}
+// 获取授权登录的token 响应
+message GetAuthTokenReply {
+    // 获取到的token
+    string token = 1;
+    int32 until_date = 2;
+    // 错误码
+    OAuthLoginError error_code = 3;
+}
+
+// 绑定token请求
+message BindUserTokenReq {
+    string token = 1;
+    int32 user_id = 2;
+}
+
+// 绑定token响应
+message BindUserTokenReply {
+    // 用户信息
+    int32 user_id = 1;
+    // key id
+    int64 key_id = 2;
+    // 错误码
+    OAuthLoginError error_code = 3;
+}
+
+// 通过授权token 获取用户信息
+message GetUserByAuthTokenReq {
+    // 获取到的token
+    string token = 1;
+}
+
+// 通过授权token 获取用户信息
+message GetUserByAuthTokenReply {
+    // key id
+    int64 key_id = 1;
+    // 用户信息
+    int32 user_id = 2;
+    userInfo user = 3;
+    // 错误码
+    OAuthLoginError error_code = 4;
+}
+
+// 验证token 请求
+message VerifyAuthTokenReq {
+    // 获取到的token
+    string token = 1;
+}
+
+// 验证token 响应
+message VerifyAuthTokenReply {
+    // key id
+    int64 key_id = 1;
+    // 用户id, 等于0说明还没绑定user
+    int32 user_id = 2;
+    // 错误码
+    OAuthLoginError error_code = 3;
+}
+
+// 仅企业版使用该接口
+// @ add by qingsong at 2020-05-21 for
+//message SetPhoneNoByUsernameReq {
+//    // user name
+//    string  Uname = 1;
+//    // phone No.
+//    string  Phone = 2;
+//    pbcomm.Debug Debug = 3;
+//}
+//
+//message SetPhoneNoByUsernameRsp {
+//    ReErrCode Reply_code = 1;
+//    string Reply_info = 2;
+//}
+message SignUpV1Req {
+    string PhoneNumber = 1; //电话号码
+    string PhoneCodeHash = 2;
+    string PhoneCode = 3; //验证码
+    int64 keyId = 5; //用户的keyId(端的标识)
+    string FirstName = 6;
+    int32 sex = 7;
+    bool is_bot = 8;
+    int32 bot_info_version = 9;
+    bool bot_chat_history = 10;
+    bool bot_no_chats = 11;
+    int32 dc_id = 12;
+    pbcomm.Debug debug = 13;
+    string country_code = 14; // 国家码
+    string local_phone = 15; // 不带国家码的号码
+    int32 birthday = 16;
+    string photo = 17;
+    int32 proxyCode = 18; // 邀请人userId
+}
+
+message SignUpV1Reply {
+    ResultCode code = 1;
+    userInfo userInfo = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 服务器内部错误
+        PhoneNumberInvalid = 2; // 无效的电话号码
+        PhoneNumberOccupied = 3; // 电话号码已注册
+        CaptchaExpired = 4; // 验证码失效
+        CaptchaInvalid = 5; // 验证码无效
+        FloodWait = 6;
+        SignUpRobotBlocked = 7; // 机器人注册接口暂时关闭
+    }
+}
+
+message ContactsGetCommonContactsReq {
+    repeated int32 user_ids = 1;
+}
+
+message ContactsGetCommonContactsResult {
+    repeated userInfo user_infos = 1;
+    ReErrCode Errorcode = 2;
+}
+
+message SearchUserByNicknameReq {
+    string nickname = 1;
+    repeated int32 user_ids = 2;
+    int32 offset = 3;
+    int32 limit = 4;
+    int32 self_id = 5;
+}
+
+message SearchUserByNicknameResult {
+    repeated userInfo user_infos = 1;
+    ReErrCode Errorcode = 2;
+}
+
+
+
+//// @ added by qingsong at 2021.07.22 for set gesture code.
+//// rpc SetGestureCode(SetGestureCodeReq) returns (SetGestureCodeRsp) {}
+//message SetGestureCodeReq {
+//    int32 UserId = 1;
+//    string GestureCode = 2;
+//}
+//message SetGestureCodeRsp {
+//    ReErrCode   ErrCode = 1;
+//}
+//
+//// @ added by qingsong at 2021.07.22 for check gesture code.
+//// rpc ChkGestureCode(ChkGestureCodeReq) returns (ChkGestureCodeRsp) {}
+//message ChkGestureCodeReq {
+//    int32 UserId = 1;
+//    string GestureCode = 2;
+//}
+//message ChkGestureCodeRsp {
+//    ReErrCode   ErrCode = 1;
+//}
+
+
+/// @ added by qingsong at 2021.10.18 for get user role information by user ids.
+// rpc GetUserRoleInfoByIds(GetUserRoleInfoByIdsReq) returns (GetUserRoleInfoByIdsRsp) {}
+message GetUserRoleInfoByIdsReq {
+    repeated int32 UserIds = 1;
+}
+message UserRoleInfo {
+    int32 UserId = 1;
+    int32 AccessHash = 2;
+    string UserName = 3;
+    string NickName = 4;
+    string Photo = 5;
+    string About = 6;
+    bool   IsBot = 7;
+    int32   Sex = 8;
+}
+message GetUserRoleInfoByIdsRsp {
+    ReErrCode   ErrCode = 1;
+    repeated UserRoleInfo RoleArr = 2;
+}
+
+
+
+/// @ added by qingsong at 202011122 for inner user operation.
+message InnerUser {
+    int32 UserId = 1;
+    string VPhone = 2;
+    string RPhone = 3;
+    string Remark = 4;
+    string Passwd = 5;
+    int32 Status = 6;
+    int32 EnabledBy = 7;
+    string EnabledAt = 8;
+}
+
+
+
+// inner user operation.
+// rpc InnerUserOp(InnerUserOpReq) returns (InnerUserOpRsp) {}
+message InnerUserOpReq {
+    OperType OpType = 1;  // operation type.
+    int32  FromId = 2;  // operator
+    int32  UserId = 3;  //
+    string VPhone = 4;  //
+    string RPhone = 5;  // full phone number.
+    string Remark = 6;  // 帐号生产备注信息
+    enum OperType {
+        OperTypeBeginAt = 0;
+        EnableInnerUser = 1;
+        RevokeInnerUser = 2;
+        QueryEnableUser = 3;
+        BindRealPhoneNo = 4;
+        NewPrettyNumber = 5;
+    };
+}
+
+message InnerUserOpRsp {
+    int32  ResCode = 1;
+    string Message = 2;
+    repeated InnerUser UserArr = 3;
+}
+// rpc BindRealPhone(BindRealPhoneReq) returns (BindRealPhoneRsp)
+message BindRealPhoneReq {
+    int32 UserId = 1;
+    string RPhone = 2;
+}
+message BindRealPhoneRsp {
+    int32 ResCode = 1;
+    string Message = 2;
+}
+
+
+/// @ added by qingsong at 2021.12.13 for get user relation with ids.
+// rpc GetUserRelationWithIds(GetUserRelationWithIdsReq) returns (GetUserRelationWithIdsRsp) {}
+message GetUserRelationWithIdsReq {
+    int32 FromId = 1;
+    repeated int32 WithIds = 2;
+}
+message Relation {
+    int32 User  = 1;
+    enum RelationType {
+        Stranger = 0;  // 陌生人
+        Contacts = 1;  // 联系人
+        Blacklisted = 2;  // 拉黑或被拉黑
+    }
+    RelationType Type = 2;
+}
+message GetUserRelationWithIdsRsp {
+    int32 ResCode = 1;
+    repeated Relation Relations = 2;
+}
+
+//设置官方标识
+message UpdateUserVerifiedReq {
+    int32 UserId = 1;
+    bool Verified = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message UpdateUserVerifiedResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+message AddPhoneBookContactsReq {
+    int32 UserId = 1;
+    string LocalPhone = 2;
+}
+
+message Contact {
+    int32 UserId = 1;
+    string FirstName = 2;
+    string LastName = 3;
+
+}
+
+message AddPhoneBookContactsReply {
+    repeated Contact Contacts = 1; //联系人列表
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+// 绑定邀请码
+message InviteCodeBindReq {
+    int32 UserId = 1;
+    int32 InviteBy = 2; // 邀请人
+}
+
+message InviteCodeBindRsp {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+// 我的团队
+message MyTeamReq {
+    int32 UserId = 1;
+    int32 Offset = 2;
+    int32 Limit = 3;
+}
+
+message MyTeamRsp {
+    repeated int32 Users = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+// 实名认证材料提交
+message RealNameCertificationReq {
+    int32 UserId = 1;
+    string Name = 2;
+    string IdentityNumber = 3;
+    string FrontImage = 4;
+    string ReverseImage = 5;
+}
+
+message RealNameCertificationRsp {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+// 实名认证结果反馈
+message GetCertificationResultReq {
+    int32 UserId = 1;
+}
+
+message CertificationResult {
+    string name = 1;
+    string identity_number = 2;
+    string front_image = 3;
+    string reverse_image = 4;
+    int32 status = 5;
+    int32 reason_code = 6;
+}
+
+message GetCertificationResultRsp {
+    ReErrCode Errorcode = 1; //返回错误码
+    CertificationResult Result = 2;
+}
+
+// 实名认证后台审核
+message VerifyCertificationReq {
+    int32 UserId = 1;
+    int32 Status = 2;
+    int32 ReasonCode = 3;
+}
+
+message VerifyCertificationRsp {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+message UpdateUserDetailV1Req {
+    int32 user_id = 1; //用户ID
+    int32 sex = 2; //用户性别
+    int32 birthday = 3; //用户年龄
+    string extend = 4; // 用户其它详情扩展字段
+}
+
+message UpdateUserDetailV1Rsp {
+    ReErrCode Errorcode = 1; //返回错误码
+}

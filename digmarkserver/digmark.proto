@@ -1,0 +1,31 @@
+syntax = "proto3";
+// protoc --gogofast_out=plugins=grpc:. *.proto
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/digmarkserver/digmark.proto
+package digmarkserver;
+
+// 行情服务
+service DigMarkService {
+    // 公共接口
+    rpc DigMarkCommon (DigMarkCommonReq) returns (DigMarkCommonResp) {};
+}
+
+// 公共接口请求
+message DigMarkCommonReq {
+    int32 businessID = 1; // 业务Id
+    bytes reqData = 2; // 具体数据
+}
+// 公共接口响应
+message DigMarkCommonResp {
+    string respData = 1;
+    ErrorCode errorCode = 2;
+    string errorMsg = 3;
+}
+
+// 错误代码定义
+enum ErrorCode{
+    ErrorCodeOk = 0; // 成功响应
+    ErrorCodeInternal = 1; // 服务器内部错误
+    ErrorCodeReq = 2; // 请求或请求参数为空
+    ErrorCodeBusinessID = 3; // 没传或者传错误的BusinessID
+    ErrorCodeMysql = 4; // 数据库错误
+}

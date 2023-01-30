@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+/*
+    为管理后台提供调用服务
+*/
+
+package immangerserver;
+
+//错误代码的返回
+enum ErrorCode {
+    Sucessful = 0; //操作成功
+    Failed = 1; //操作失败
+    INTERNALERR = 2; //服务器内部错误
+}
+
+////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/immangerserver/immangerserver.proto
+service ServerService {
+    // 通知系统所有人的功能（公告）
+    rpc NotifyAllImUser (NotifyAllImUserReq) returns (OpResp) {
+    }
+    //禁止人登录功能/禁止用户登录时间
+    rpc BannedUser (BannedUserReq) returns (OpResp) {
+    }
+    //踢人下线功能
+    rpc KickUser (KickUserReq) returns (OpResp) {
+    }
+    //删除账号功能（兼顾踢人下线）
+    rpc DelUser (DelUserReq) returns (OpResp) {
+    }
+    //解散群功能
+    rpc deleteGroup (deleteGroupReq) returns (OpResp) {
+    }
+
+    //将一个用户的创建的所有群转让给指定用户
+    rpc converOwernsGroup (converOwernsGroupReq) returns (OpResp) {
+    }
+
+    //清楚用户历史功能（针对单聊）
+    rpc clearUserPeerHistory (clearUserPeerHistoryReq) returns (OpResp) {
+    }
+
+    //删除两步验证功能
+    rpc delTwoCheck (delTwoCheckReq) returns (OpResp) {
+    }
+}
+
+//删除两部验证
+message delTwoCheckReq {
+    string phone = 1; //要删除两步验证
+}
+
+// 清楚用户聊天消息
+message clearUserPeerHistoryReq {
+    string phone = 1; //被删除历史的用户
+}
+
+//将指定用户创建的群转移到目标用户请求
+message converOwernsGroupReq {
+    string fromPhone = 1; //原来群拥有者
+    string toPhone = 2; //转移到用户的
+}
+
+//解散群请求
+message deleteGroupReq {
+    int32 channel_id = 1; //需要解散的群的ID
+}
+
+//删除帐号请求
+message DelUserReq {
+    string userPhone = 1; //被删除的帐号的电话号码
+}
+
+//返回结构提
+message OpResp {
+    ErrorCode err = 1; //错误码返回
+}
+
+//踢人下线请求
+message KickUserReq {
+    string KickedPhone = 1; // 被踢下线的用户u
+}
+
+//禁止人登录功能/禁止用户登录时间的请求
+message BannedUserReq {
+    string UserPhone = 1;
+    int32 bannedDate = 2; // 如果 bannedDate 为0 代表永久封禁止，， 单位为 天
+}
+
+//通知系统所有人的功能（公告）请求参数
+message NotifyAllImUserReq {
+    string CNNotifyMsg = 1; // 中文公告内容
+    string ENNotifyMsg = 2; // 英文通知内容[暂留]
+}
+
+
+

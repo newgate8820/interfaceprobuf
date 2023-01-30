@@ -1,0 +1,44 @@
+// sudo protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imdigsessionserver/imdigsessionserver.proto
+syntax = "proto3";
+
+package imdigsessionserver;
+
+enum TokenErrorCode {
+  Token_OK = 0;         //ok
+  Token_REQ_PARAME_ERR = 1001;      //请求参数错误
+  Token_CTEATE_TOKEN_FAIL = 1002;      //获取token失败
+  Token_ERR = 1003;      //token错误
+  Token_EXPIRED = 1004;      //token超时失效
+  Token_NOT_EXIST = 1005;      //token不存在
+  Token_INTERNAL_ERR = 1006;      //内部错误
+}
+
+service ImDigSessionService{
+  //获取token
+  rpc GetToken(ReqGetTokenMsg) returns (GetTokenReply) {};
+  rpc GetUserToken(ReqGetUserToken) returns (GetUserTokenReply){};
+}
+
+message ReqGetTokenMsg{
+  string keyId = 1;
+  int64 userId = 2; //
+  string nonce = 3; //上传的随机字符串长度为16字节
+}
+message GetTokenReply{
+  TokenErrorCode code = 1;
+  string error = 2;
+  string token = 3;
+  string nonce = 4; //随机字符串长度为16字节
+  uint64 expirationTime = 5;//过期时间戳（秒级）
+}
+
+message ReqGetUserToken{
+  string token = 1;
+}
+
+message GetUserTokenReply{
+  TokenErrorCode code = 1;
+  int64 userId = 2;
+  string key = 3;
+  uint64 expirationTime = 4;//过期时间戳（秒级）
+}

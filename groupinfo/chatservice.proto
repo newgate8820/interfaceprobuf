@@ -1,0 +1,381 @@
+
+/*
+    普通群接口定义
+    作者：hujian
+    日期：2017-12-05
+    版本：1.0
+    修改日期：
+    修改日志：
+    Date           Desc
+    -----------------------------------------------------
+    2017-12-04     新建文件,在原有基础上更改        
+	protoc --gogofast_out=plugins=grpc:. *.proto
+*/
+syntax = "proto3";
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "gitlab.chatserver.im/interfaceprobuf/groupinfo/chatcommon.proto" ;
+
+package groupinfo;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//创建群的请求数据
+message CreateChatReq {
+    string       title       = 1 ; //群名称
+    int32        creator_id  = 2 ; //群创建者的id
+    pbcomm.Debug Dlog        = 3 ; //日志
+}
+message CreateChatResp {
+    int32 chat_id = 1; //普通群的ID
+    ChatResultCode resultcode = 2;//结果码
+}
+//-----------------------------------------------------------------------------
+//通过群Id获取群成员
+message GetChatUsersIdReq {
+    int32        chat_id = 1 ; //群id
+    pbcomm.Debug Dlog    = 2 ; //日志
+}
+message GetChatUsersIdResp {
+   repeated int32 user_id    = 1 ; //用户id
+   ChatResultCode resultcode = 2 ; //结果码
+}
+//-----------------------------------------------------------------------------
+//通过群Id 用户Id 获取群基本信息
+message GetChatInfoReq {
+    int32        chat_id    = 1 ; //群id
+    int32        user_id    = 2 ; //用户id
+    bool         robot_get  = 3 ; //是否是机器人获取
+    pbcomm.Debug Dlog       = 4 ; //日志
+}
+
+//-----------------------------------------------------------------------------
+//添加群成员
+message AddChatMemberReq {
+    int32            chat_id          = 1 ;
+    int32            invitor_id       = 2 ; //邀请者
+    repeated int32   member_id        = 3 ; //被邀请者id
+    int32            date             = 4 ; //群创建时间
+    pbcomm.Debug     Dlog             = 5 ; //日志
+}
+message AddChatMemberResp {
+    ChatResultCode resultcode = 1;//结果码
+}
+//-----------------------------------------------------------------------------
+//删除群成员
+message DelChatMemberReq {
+    int32           chat_id     = 1;
+    int32           operator_id = 2; //删除操作者
+    repeated int32  member_id   = 3; //被删除者id
+    pbcomm.Debug    Dlog        = 4 ; //日志
+}
+message DelChatMemberResp {
+    ChatResultCode resultcode = 1;//结果码
+}
+//-----------------------------------------------------------------------------
+//编辑群头像
+message EditChatPhotoReq {
+    int32 chat_id = 1;
+    int32 user_id = 2 ;
+    bytes photo = 3;
+    bytes fullphoto = 4;
+    pbcomm.Debug Dlog = 5 ; //日志
+}
+message EditChatPhotoResp {
+    ChatResultCode resultcode = 1;//结果码
+}
+//-----------------------------------------------------------------------------
+//编辑群title
+message EditChatTittleReq {
+    int32 chat_id = 1;
+    int32 user_id = 2 ;
+    string tittle = 3;
+    pbcomm.Debug Dlog = 4 ; //日志
+}
+message EditChatTittleResp {
+    ChatResultCode resultcode = 1;//结果码
+}
+//-----------------------------------------------------------------------------
+//设置管理员
+message AddChatAdminReq {
+    int32 operator_id = 1; //邀请者或者踢人的id
+    int32 member_id = 2;  //被设置
+    int32 chat_id = 3;
+    pbcomm.Debug Dlog = 4 ; //日志
+}
+message AddChatAdminResp {
+    ChatResultCode resultcode = 1;//结果码
+}
+//-----------------------------------------------------------------------------
+//取消管理员
+message DelChatAdminReq {
+    int32 operator_id = 1; //邀请者或者踢人的id
+    int32 member_id = 2;  //被取消
+    int32 chat_id = 3;
+    pbcomm.Debug Dlog = 4 ; //日志
+}
+message DelChatAdminResp {
+    ChatResultCode resultcode = 1;//结果码
+}
+//-----------------------------------------------------------------------------
+//获取群成员角色
+message GetChatUsersRoleReq {
+    int32 chat_id = 1;
+    pbcomm.Debug Dlog = 2 ; //日志
+}
+message ChatUserRole {
+    int32 invitor_id  = 1; // 邀请人id
+    int32 user_id  = 2; // 群成员id
+    int32 invitor_date = 3; // 邀请时间
+    int32 role = 4; // 1: 普通群成员  2: 管理员 3: 群主  
+}
+message GetChatUsersRoleResp {
+    repeated ChatUserRole    users_role = 1 ;
+    int32 version                       = 2 ;
+    ChatResultCode           resultcode = 3;//结果码
+}
+//-----------------------------------------------------------------------------
+//批量获取用群、超级群信息的请求
+message GetChatsChannelsReq {
+    int32 userid             = 1; // 获取方id
+    //repeated int32 users     = 2; // 获取用户信息的用户id数组
+    repeated int32 chatid    = 2; //获取普通群信息的群id数组
+    repeated int32 channelid = 3; // 获取超级群用户信息的超级群id数组
+    int32 protocol_layer     = 4; // 协议层数
+    pbcomm.Debug Dlog        = 5; //日志
+}
+
+//批量获取群、超级群信息的返回
+message GetChatsChannelsResp {
+    //repeated ChannelInfoBase channels = 1;
+    //repeated GetChatInfoResp chats = 2;
+    repeated bytes channels = 1;
+    //UserInfoArray users = 2;
+    repeated bytes chats = 2;
+    repeated int32 no_chats = 3;
+    repeated int32 no_chans = 4;
+    ChatResultCode resultcode = 5;//结果码
+}
+
+//批量获取用群、超级群信息的请求
+message GetChatsChannelsMapReq {
+    repeated int32 userid      = 1; // 获取方id
+    repeated int32 chatid    = 2; //获取普通群信息的群id数组
+    repeated int32 channelid = 3; // 获取超级群用户信息的超级群id数组
+    int32 protocol_layer     = 4; // 协议层数
+    pbcomm.Debug Dlog        = 5; //日志
+}
+message GroupBytes {
+    repeated bytes groups= 1;
+}
+//批量获取群、超级群信息的返回
+message GetChatsChannelsMapResp {
+    map<int32, GroupBytes> groups = 1;
+    repeated int32 no_chats = 2;
+    repeated int32 no_chans = 3;
+    ChatResultCode resultcode = 4;//结果码
+}
+//-----------------------------------------------------------------------------
+//获用户的共同群
+message GetTwoUserChatsReq {
+    int32 userid_one = 1; // 第一个user id
+    int32 userid_two = 2; // 第二个user id
+    int32 max_id     = 3; // 偏移
+    int32 limit      = 4; // 总数限制
+    pbcomm.Debug Dlog = 5 ; //日志
+}
+
+//获取用户信息、群、超级群信息的返回
+message GetTwoUserChatsResp {
+   int32 count                    = 1;  //共同群的总数
+   repeated int32 chat_ids        = 2;  //普通群群信息
+   repeated int32 super_chat_ids  = 3;  //超级群信息
+   ChatResultCode resultcode      = 4;  //结果码
+}
+//-----------------------------------------------------------------------------
+//升级超级群
+message UpGradeChatReq {
+    int32 user_id = 1 ;
+    int32 chat_id = 2 ;
+    int32 migrated_maxId = 3 ;
+    pbcomm.Debug Dlog = 4 ; //日志
+}
+
+//升级超级群返回
+message UpGradeChatResp {
+   int32           superchat_id  = 1;  //共同群的总数
+   string          title         = 2;     //群信息
+   ChatResultCode  resultcode    = 3;  //结果码
+}
+//-----------------------------------------------------------------------------
+//生成群群链接
+message CreateChatLinkReq {
+    int32 chat_id = 1 ;
+    int32 user_id = 2 ;
+    pbcomm.Debug Dlog = 3 ; //日志
+}
+
+//生成群链接
+message CreateChatLinkResp {
+   string          link         = 1;     //群信息
+   ChatResultCode  resultcode    = 2;  //结果码
+}
+//-----------------------------------------------------------------------------
+//切换邀请规则
+message SwitchInviteRuleReq {
+    int32 chat_id       = 1 ;
+    int32 user_id       = 2 ;
+    bool  admin_enable  = 3 ;
+    pbcomm.Debug Dlog   = 4 ; //日志
+}
+
+//生成群链接
+message SwitchInviteRuleResp {
+   bool is_modify = 1 ;
+   ChatResultCode  resultcode    = 2;  //结果码
+}
+//-----------------------------------------------------------------------------
+//检查群是否是加密
+message CheckChatIsEncryReq {
+    int32 chat_id       = 1 ;
+    pbcomm.Debug Dlog   = 2 ; //日志
+}
+
+//检查群是否是加密
+message CheckChatIsEncryResp {
+   bool encry                    = 1 ;  //是否加密
+   ChatResultCode  resultcode    = 2 ;  //结果码
+}
+//-------------groupinfo 独立后新增接口-----------------------
+//普通群信息
+message ChatInfoBase{
+    int32          chat_id            = 1 ;
+    bool           admins_enabled     = 2 ;
+    bool           deactivated        = 3 ; //群是否活跃
+    string         exported_invite    = 4 ;
+    bool           encry              = 5 ; //是否加密群
+    int32          creator            = 6 ; //创建者的id
+    string         title              = 7 ;
+    bytes          photo              = 8 ; //群头像
+    bytes          full_photo          = 9 ; //群头像
+    int32          version            = 10 ; //群version
+    int32          participants_count = 11; //	群成员个数 （邀请人和踢人都要相应变化）
+    int32          date               = 12; //群创建时间
+    string         migrate_to         = 13; //升级为超级群的时候默认"" 格式为json格式
+    ChatResultCode resultcode         = 14;//结果码
+}
+//获取单个用户的所有普通群
+message GetAllChatInfoByUserIdReq{
+   int32 user_id       = 1 ;
+   pbcomm.Debug Dlog   = 2 ; //日志
+}
+message GetAllChatInfoByUserIdResp{
+   repeated ChatInfoBase chat_infos  = 1;
+   ChatResultCode resultcode         = 2;//结果码
+}
+message ChatParticipant {
+   int32 chat_id     =1;
+   int32 user_id     =2;
+   int32 invitor     =3;
+   int32 admin_level =4;
+   int32 leave_flg   =5;//0，正常，1 离开，2被踢
+   int32 jointime    =6;
+}
+//获取群成员信息请求
+message GetChatUserInfoReq {
+   int32 chat_id       = 1 ;
+   int32 user_id       = 2 ;
+   pbcomm.Debug Dlog   = 3 ; //日志
+}
+message GetChatUserInfoResp{
+   ChatParticipant chatuserinfo  =1 ;
+   ChatResultCode  resultcode    = 2;//结果码
+}
+//变更创建者请求
+message SetGroupChatCreatorReq{
+    int32 chat_id      =1 ;
+    int32 operator     =2 ; //操作者id
+    int32 user_id      =3 ; //变更者id
+    string remark      =4 ;
+    bool  is_add       =5 ; //不在群是否添加进群
+    pbcomm.Debug Dlog  =6 ;
+}
+//通用的更新操作响应
+message UpdateChatCommonResp{
+    ChatResultCode  resultcode    = 1;  //结果码
+}
+
+message CheckUserInChatReq{
+    int32 user_id   =1 ;
+    int32 chat_id =2 ;
+    pbcomm.Debug Dlog  =3 ;
+}
+message CheckUserInChatResp{
+    bool state = 1;
+}
+
+//-----------------------------------------------------------------------------
+service ChatServerService{
+    //创建群
+    rpc CreateNewChat (CreateChatReq) returns (CreateChatResp) {
+    }
+    //通过群Id获取群成员
+    rpc GetChatUsersIdById (GetChatUsersIdReq) returns (GetChatUsersIdResp) {
+    }
+    //通过群Id 用户Id 获取群基本信息
+    rpc GetChatInfo (GetChatInfoReq) returns (GetChatInfoResp) {
+    }
+    //通过群Id 用户Id 获取群基本信息,用户可以不在群内
+    rpc GetChatInfo_User (GetChatInfoReq) returns (GetChatInfoResp) {
+    }
+    //添加群成员
+    rpc AddChatUser (AddChatMemberReq) returns (AddChatMemberResp) {
+    }
+    //删除群成员
+    rpc DelChatUser (DelChatMemberReq) returns (DelChatMemberResp) {
+    }
+    //编辑群头像
+    rpc EditChatPhoto (EditChatPhotoReq) returns (EditChatPhotoResp) {
+    }
+    //编辑群title
+    rpc EditChatTittle (EditChatTittleReq) returns (EditChatTittleResp) {
+    }
+    //设置管理员
+    rpc AddChatAdmin (AddChatAdminReq) returns (AddChatAdminResp) {
+    }
+    //取消管理员
+    rpc DelChatAdmin (DelChatAdminReq) returns (DelChatAdminResp) {
+    }
+    //获取群成员角色
+    rpc GetChatUserRole (GetChatUsersRoleReq) returns (GetChatUsersRoleResp) {
+    }
+    //获取共同群
+    rpc GetTwoUserChats (GetTwoUserChatsReq) returns (GetTwoUserChatsResp){
+    }
+    //升级超级群
+    rpc UpGradeChat (UpGradeChatReq) returns (UpGradeChatResp){
+    }
+    //生成群邀请链接
+    rpc CreateChatLink (CreateChatLinkReq) returns (CreateChatLinkResp){
+    }
+    //切换邀请规则  是否是管理员可以邀请  还是所有
+    rpc SwitchInviteRule (SwitchInviteRuleReq) returns (SwitchInviteRuleResp){
+    }
+    //检查是否是加密群
+    rpc CheckChatIsEncry (CheckChatIsEncryReq) returns (CheckChatIsEncryResp){}
+
+   //--------------------groupinfo 独立后新增接口--------------------------
+   rpc GetChatsChannels (GetChatsChannelsReq) returns (GetChatsChannelsResp) {}
+   rpc GetChatsChannelsMap (GetChatsChannelsMapReq) returns (GetChatsChannelsMapResp) {}
+   //根据userid获取所有的普通群信息
+   rpc GetAllChatInfoByUserId(GetAllChatInfoByUserIdReq) returns (GetAllChatInfoByUserIdResp){}
+   //获取群成员信息
+   rpc GetChatUserInfo(GetChatUserInfoReq)returns (GetChatUserInfoResp){}
+   //变更普通群创建者
+   rpc SetGroupChatCreator(SetGroupChatCreatorReq) returns (UpdateChatCommonResp){}
+   //判断普通群成员是否存在
+   rpc CheckUserInChat(CheckUserInChatReq) returns (CheckUserInChatResp){}
+}
+
+
+                        
+	 

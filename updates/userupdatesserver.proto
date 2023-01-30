@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package updates;
+
+// protoc --gogofast_out=plugins=grpc:. ./*.proto
+
+service UserUpdatesServer {
+    // 单聊、普通群离线pts消息
+    rpc StoreUserPtsHandle(ReqStoreUserPtsHandle) returns (ReplyStoreUserPtsHandle) {}
+
+    // 获取单聊、普通群离线pts消息
+    rpc GetUserPtsHandle(ReqGetUserPtsHandle) returns (ReplyGetUserPtsHandle) {}
+
+    // 删除单条pts离线消息
+    rpc DeleteUserPtsHandle(ReqDeleteUserPtsHandle) returns (ReplyDeleteUserPtsHandle) {}
+
+    // 清除用户单聊、普通群所有的离线消息
+    rpc ClearUserPtsHandle(ReqClearUserPtsHandle) returns (ReplyClearUserPtsHandle) {}
+
+    // 清除对话框的离线消息
+    rpc ClearUserDialogPtsHandle(ReqClearUserDialogPtsHandle) returns (ReplysClearUserDialogPtsHandle) {}
+
+    // 根据MsgID删除离线消息
+    rpc DeleteUserPtsHandleByMsgIDs(ReqDeleteUserPtsHandleByMsgIDs) returns (ReplyDeleteUserPtsHandleByMsgIDs) {}
+
+    // 更新离线消息
+    rpc UpdateUserPtsHandle(ReqUpdateUserPtsHandle) returns (ReplyUpdateUserPtsHandle) {}
+
+    // 通过msgID获取离线消息
+    rpc GetUserPtsHandleByMsgIDs(ReqGetUserPtsHandleByMsgIDs) returns(ReplyGetUserPtsHandleByMsgIDs) {}
+
+    // ================== 存储 电话信息 联系人 加密聊天请求 二进制信息 ==================
+    // infoService 调用存储信息
+    rpc StoreOtherInfoMsg(ReqStoreOtherInfoMsg) returns (ReplyStoreOtherInfoMsg) {}
+
+    // 批量 存储 otherInfoMsg
+    rpc BatchStoreOtherInfoMsg(ReqBatchStoreOtherInfoMsg) returns (ReplyBatchStoreOtherInfoMsg) {}
+
+    // 获取infoMsg信息
+    rpc GetOtherInfoMsg(ReqGetOtherInfoMsg) returns (ReplyGetOtherInfoMsg) {}
+
+    // 用与实时交互查数据
+    rpc Monitor(ReqMonitor) returns(ReplyMonitor) {}
+}
+
+message ReqGetUserPtsHandleByMsgIDs {
+    int32 UserID = 1;
+    repeated int32 MsgIDs = 2;
+}
+
+message ReplyGetUserPtsHandleByMsgIDs {
+    repeated PtsHandle PtsHandles = 1;
+}
+
+message ReplyUpdateUserPtsHandle {}
+
+message ReqUpdateUserPtsHandle {
+    PtsHandle PtsHandle = 1;
+}
+
+message ReqDeleteUserPtsHandleByMsgIDs {
+    int32 UserID          = 1;
+    repeated int32 MsgIDs = 2;
+}
+
+message ReplyDeleteUserPtsHandleByMsgIDs {}
+
+message ReqMonitor {
+    string Command       = 1; // 命令
+    string SubCommand    = 2; // 子命令
+    repeated string Args = 3; // 参数
+}
+
+message ReplyMonitor {
+    string Message = 1; // 返回消息
+}
+
+message ReqStoreOtherInfoMsg {
+    OtherInfoMsg OtherInfoMsg = 1;
+}
+
+message ReplyStoreOtherInfoMsg {}
+
+message ReqBatchStoreOtherInfoMsg {
+    repeated OtherInfoMsg OtherInfoMsgs = 1; // otherInfoMsg 消息数组
+}
+
+message ReplyBatchStoreOtherInfoMsg {}
+
+message ReqGetOtherInfoMsg {
+    int32 UserId       = 1; // 用户ID
+    int64 Date         = 2; // 时间戳 纳秒
+}
+
+message ReplyGetOtherInfoMsg {
+    repeated OtherInfoMsg OtherInfoMsgs = 1;
+}
+
+message ReqStoreUserPtsHandle {
+    PtsHandle PtsHandle = 1; // ptsHandle
+}
+
+message ReplyStoreUserPtsHandle {}
+
+message ReqGetUserPtsHandle {
+    int32 UserId = 1; // [must] 用户ID [must]
+    int32 Pts    = 2; // 查询 > pts的limit条数据
+    int32 Limit  = 3; // [must] 查询条数
+}
+
+message ReplyGetUserPtsHandle {
+    repeated bytes Msgs = 1; // 消息二进制集合
+    int32 LastPts       = 2; // 返回二进制中最大的PTS
+}
+
+message ReqDeleteUserPtsHandle{
+    int32 UserId        = 1; // [must] 用户ID
+    repeated int32 Ptss = 2; // [must] 待删除的pts切片
+}
+
+message ReplyDeleteUserPtsHandle{
+
+}
+
+message ReqClearUserPtsHandle {
+    int32 UserId = 1; // [must] 用户ID
+    int32 MaxPts = 2; // 最大的Pts 删除 <= pts 的数据， 如果为0 则全删除
+}
+
+message ReplyClearUserPtsHandle {
+
+}
+
+message ReqClearUserDialogPtsHandle {
+    int32 UserId = 1; // [must] 用户ID
+    int32 WithId = 2; // [must] 消息接收者ID
+    int32 MaxPts = 3; // 最大的Pts 删除 <= pts 的数据， 如果为0 则全删除
+}
+
+message ReplysClearUserDialogPtsHandle {
+
+}
+
+message OtherInfoMsg {
+    int32 UserId = 1; // 用户ID
+    int64 Date   = 2; // 时间戳 time.Now.Unix() 长度10位
+    bytes Msg    = 3; // 消息二进制
+}
+
+message PtsHandle {
+    int32 UserId       = 1; // 用户ID
+    int32 WithID       = 6;
+    int32 MsgID        = 7;
+    int32 Pts          = 2; // Pts
+    int32 Type         = 3; // 二进制类型 0 common 1 action（比如删除消息、更新消息等）
+    bytes Msg          = 4; // pts对应消息二进制
+    int64 Date         = 5; // 創建時間 默认当前时间 在存储消息的时候初始化
+    enum int {
+        COMMON = 0;
+        ACTION = 1;
+    }
+}

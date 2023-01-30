@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package sequencer;
+
+// IncreaseService 自增序列服务接口
+service SequenceService {
+    // IncreaseMsgID 自增
+    rpc IncreaseMsgID(IncreaseMsgIDReq) returns(IncreaseMsgIDReply);
+
+    // GetCurMsgID 获取当前自增序列值
+    rpc GetCurMsgID(GetCurMsgIDReq) returns (GetCurMsgIDReply);
+
+    // 获取用户路由表，返回用户对应的机器im、hostname etc
+    rpc GetRouterMessage(GetRouterMessageReq) returns (GetRouterMessageReply);
+}
+
+message GetRouterMessageReq {
+    int32 UserID  = 1;
+    int32 Version = 2;
+}
+
+message GetRouterMessageReply {
+    int32 ServerID      = 1;
+    string HostName     = 2;
+    string ServerIP     = 3;
+    LBVersion LBVersion = 4;
+}
+
+message GetCurMsgIDReq {
+    int32 UserID  = 1;
+    int32 Version = 2;
+}
+
+message GetCurMsgIDReply {
+    int32 MsgID             = 1;
+    int32 Pts               = 2;
+    LBVersion LBVersion     = 3;
+}
+
+message IncreaseMsgIDReq {
+    int32 UserID      = 1;
+    uint32 MsgIDIncr  = 2;
+    uint32 PtsIncr    = 3;
+    int32 Version     = 4;
+}
+
+message IncreaseMsgIDReply {
+    int32 MsgID             = 1;
+    int32 Pts               = 2;
+    LBVersion LBVersion     = 3;
+}
+
+message LBVersion {
+    int32 ServerID = 1;
+    int32 Version  = 2;
+}
+
+message MetaData {
+    string ServerStatus = 1;
+    int32 ServerID      = 2;
+}

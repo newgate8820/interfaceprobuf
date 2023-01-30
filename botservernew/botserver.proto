@@ -1,0 +1,184 @@
+//protoc --gogofast_out=plugins=grpc:. *.proto
+//protoc --gogofast_out=plugins=grpc:. .\gitlab.potato.im\iminterfaceprotobufs\channelserver\pbchannelserver.proto
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbchannelserver/pbchannelserver.proto
+
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/botserver/botserver.proto
+//protoc --go_out=plugins=grpc:. ./botserver/botserver.proto
+
+syntax = "proto3";
+package pbbotserver;
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "gitlab.chatserver.im/interfaceprobuf/advertisemonitornew/advertisemonitor.proto";
+//import "gitlab.chatserver.im/interfaceprobuf/pbchannelserver/pbchannelserver.proto";
+
+// ChatType 聊天类型
+enum ChatType {
+    ChatTypeZero = 0;       //用户
+    PeerUser = 1;       //用户聊天
+    PeerChat = 2;       //普通群聊天
+    ChannelChat = 3;    //超级群聊天
+}
+
+service BotServer {
+    // 離開群組
+    rpc LeaveChat (ReqData) returns (ReplyData) {
+    }
+    // 獲取群訊息
+    rpc GetChat (ReqData) returns (ReplyData) {
+    }
+    // 獲取群成員數目
+    rpc GetChatMembersCount (ReqGetChatMembersCount) returns (ReplyGetChatMembersCount) {
+    }
+    // 獲取群管理員
+    rpc GetChatAdministrators (ReqData) returns (ReplyData) {
+    }
+    // 修改群名字
+    rpc SetChatTitle (ReqData) returns (ReplyData) {
+    }
+    // 修改群簡介
+    rpc SetChatDescription (ReqData) returns (ReplyData) {
+    }
+    // 置顶群消息
+    rpc UpdatePinnedChannelMessage (ReqData) returns (ReplyData) {
+    }
+//    // 取消置顶群消息
+//    rpc UpinChatMessage (ReqData) returns (ReplyData) {
+//    }
+    // 發送Action
+    rpc SendChatAction (ReqSendChatAction) returns (ReplyData) {
+    }
+    // 發送名片
+    rpc SendContact (ReqData) returns (ReplyData) {
+    }
+    // 刪除消息
+    rpc DeleteMessage (ReqDeleteMessage) returns (ReplyData) {
+    }
+
+    // GetGroups 获取群组消息
+    rpc GetGroups (ReqGetGroups) returns (ReplyGetGroups) {}
+
+    // GetGroups 获取使用者是管理員的群組消息
+    rpc GetAdminGroups (ReqGetAdminGroups) returns (ReplyGetGroups) {}
+
+    // 新增手動禁言名單
+    rpc SetManualBlockList(pbadvertisemonitor.ReqSetManualBlockList) returns (pbadvertisemonitor.ReplyData) {}
+
+    // 刪除手動禁言名單
+    rpc DelManualBlockList(pbadvertisemonitor.ReqDelManualBlockList) returns (pbadvertisemonitor.ReplyData) {}
+
+    // 讓使用者離開群(使用者後續還可以自動加入)
+    //rpc LeaveChannel(ReqData) returns (pbchannelserver.ReplyChannelData) {}
+}
+
+message ReqGetAdminGroups {
+    int32 UserID     = 1;
+    //int32 PeerFilter = 2; // 2：只要普通群 4：只要超级群 8：只要频道 （可相互组合 ex: 2|4|8 暂时不支持单聊)
+    pbcomm.Debug debug = 2;
+}
+
+message ReqGetGroups {
+    int32 UserID     = 1;
+    int32 PeerFilter = 2; // 2：只要普通群 4：只要超级群 8：只要频道 （可相互组合 ex: 2|4|8 暂时不支持单聊)
+}
+
+message Peer {
+    int32 PeerID    = 1;
+    string PeerName = 2;
+}
+
+message ReplyGetGroups {
+    repeated Peer Groups      = 1; // 普通群
+    repeated Peer SuperGroups = 2; // 超级群
+    repeated Peer Channels    = 3; // 频道
+}
+
+message ReqDeleteMessage{
+    ChatType ChatType =1;
+    int32 user_id = 2;
+    int32 chat_id = 3;
+    repeated int32 msg_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message ReqSendChatAction{
+    ChatType ChatType =1;
+    int32 user_id = 2;
+    int32 chat_id = 3;
+    bytes actionData = 4 ;
+    pbcomm.Debug debug = 5;
+}
+
+message ReqData{
+    ChatType ChatType =1;
+    bytes reqData = 2 ;
+    int32 bot_id = 3;
+}
+
+message ReplyData{
+    bytes reply = 1; //回覆結果
+    int32 error = 2;
+}
+
+message ReqGetChatMembersCount{
+    ChatType ChatType =1;
+    int32 user_id = 2;
+    int32 chat_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message ReplyGetChatMembersCount{
+    int32 ChatMembersCount = 1;
+    int32 ErrorCode = 2;
+}
+
+/*
+
+message ReqLeaveChat{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+}
+
+message ReqGetChat{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+}
+
+message ReqGetChatMembersCount{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+}
+message ReqGetChatAdministrators{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+}
+message ReqSetChatTitle{
+    ChatType ChatType =1;
+    int32 chat_id = 2; //群id
+    string title = 3; //名字
+}
+message ReqSetChatDescription{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+    string description = 3;
+}
+message ReqPinChatMessage{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+    int32 message_id = 3;
+    bool disable_notification = 4;
+
+}
+message ReqUpinChatMessage{
+    ChatType ChatType =1;
+    int32 chat_id = 2;
+}
+message ReqSendChatAction{
+    ChatType ChatType =1;
+    string action = 2;
+}
+message ReqSendContact{
+    ChatType ChatType =1;
+    bytes data = 2;
+}*/
+
+

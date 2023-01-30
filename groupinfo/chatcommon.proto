@@ -1,0 +1,104 @@
+syntax = "proto3";
+package groupinfo;
+
+
+// 
+enum ChatResultCode {
+    Chat_RPC_OK                           = 0;         //成功
+    Chat_ADDUSER3549_EXP                  = 4000;       //3549隐私选项
+    Chat_User_Priavcay                    = 4001;       //隐私选项 没有权限
+    Chat_To_User_Blocked                  = 4002;       //block你将用户拉入黑名单  隐私选项
+    Chat_User_Blocked                     = 4003;       //block用户将你拉入黑名单  隐私选项
+    Chat_REPEAT_CREAT                     = 4004;       //短时间重复创建群
+    Chat_REPEAT_ADD_USER                  = 4005;       //重复添加群成员
+	Chat_EXCEED_CREATE_MAXNUM             = 4006;       //超过最大建群数量
+	Chat_EXCEED_TODAY_CREATE_MAXNUM       = 4007;       //超过当日最大建群数量
+    Chat_EXCEED_ADD_USER_MAXNUM           = 4008;       //超过群最大添加人数
+    Chat_PROHIBIT_ADD_GROUP               = 4009;       //禁止加入群组
+    Chat_ADMINLEVEL_EXCEPTION             = 4010;       //没有邀请权限
+    Chat_ALREADYLEFT_EXCEPTION            = 4011;       //用户不在群里
+    Chat_GROUP_DISBAND                    = 4012;       //该群已经解散
+    Chat_GROUP_KICKED                     = 4013;       //该群以将你拉黑
+    Chat_HOURS_ADD_USER_MAXNUM            = 4114;       //超过每小时最多添加群成员数
+    Chat_ONCE_ADD_USER_MAXNUM             = 4115;       //超过单次最多添加群成员数
+    //
+    Chat_UNKNOWN                      	  = 4100;       //未知异常
+    Chat_PARAMETER_EXCEPTION              = 4101;       //参数异常
+    Chat_LOGIC_EXCEPTION                  = 4102;       //逻辑异常
+    Chat_REDIS_EXCEPTION                  = 4103;       //redis异常
+    Chat_DB_EXCEPTION                     = 4104;       //数据库异常
+    Chat_AllocId_EXCEPTION                = 4105;       //群id分配错误
+    Chat_CallGetUser_EXCEPTION            = 4106;       //获取user出错  刘鑫磊提供接口
+    Chat_DB_NORECORD                      = 4107;       //无记录
+    Chat_Group_NORECORD                   = 4108;       //无群记录
+}
+
+//群基础信息
+message ChannelInfoBase {
+    int32   channel_id = 1; //超级群、频道ID
+    int64   access_hash = 2;
+    bool    encry = 3; //是否是加密群
+    bool    broadcast = 4; //是否是频道
+    bool    verified = 5;
+    bool    megagroup = 6; //	是否是超级群的标识
+    bool    restricted = 7; //是否被限制
+    bool    democracy = 8; //是否民主（设置管理员的时候需要用）
+    bool    signatures = 9;
+    bool    min = 10;
+    string  title = 11; //群名称
+    string  username = 12; //超级群的唯一标识名称
+    string  photo = 13; //用户头像 json格式
+    int32   date = 14; //创建时间
+    int32   version = 15; //版本
+    string  restriction_reason = 16; //被限制的原因
+    int32   cluster = 17; //超级群创建的cluster
+   // bool moderator = 18; //是不是主持人
+    bool    is_creator = 18; //是不是创建者
+   // bool editor = 19; //是否是管理员
+    bool    is_admin = 19; //是否是管理员
+    bool    left = 20; //是否是已经离开此超级群
+    bool    kicked = 21; //是否是被踢人
+    int32   migrated_from_chat_id = 22;
+    int32   invite_rule = 23 ;//0:所有人能邀请  1:仅管理员  其他：扩展用
+    int32   Admins_count = 24;
+	int32   Kicked_count = 25;
+	int32   Banned_count = 26;
+    int32   Bot_count   =27;
+    int32   Participants_count  =28;
+    bool    IsInChannel  =29;
+    int32   util_date  =30;
+    string  exported_invite_link = 31; //邀请链接
+    int32   Creator = 32;
+    string  About = 33;
+    bool    EveryoneQuiet = 34;
+    bool    PrivateChat = 35;
+    bool    Hidden_prehistory = 36;
+    //----------------------------- 新增
+    bool    slow_mode = 37;// 群慢速模式 TODO
+    int32   slowmode_seconds = 38;
+    int32   slowmode_next_send_date = 39;
+    bool    has_geo = 40 ;//是否含有地理位置坐标
+    int32   Banned_rights = 41;
+    bool    Ban_add_contact = 42; // add by qingsong at 2019-12-25 for ban channel member add contact.
+    int32   Rdp_game_mode = 43; // add by qingsong at 2020-05-11 for channel game RDP switcher
+    int32   Participants_ver = 44; // add by qingsong at 2020-06-23 for record participants version.
+    int32   Linked_chat_id = 45; // add by qingsong at 2020.10.20 for set discussion group.
+}
+
+//普通群的基础信息
+message GetChatInfoResp {
+    int32          chat_id            = 1 ;
+    bool           admins_enabled     = 2 ;
+    bool           deactivated        = 3 ; //群是否活跃
+    string         exported_invite    = 4 ;
+    bool           encry              = 5 ; //是否加密群
+    int32          creator            = 6 ; //创建者的id
+    string         title              = 7 ;
+    bytes          photo              = 8 ; //群头像 
+    bytes          full_photo          = 9 ; //群头像 
+    int32          version            = 10 ; //群version
+    int32          participants_count = 11; //群成员个数 （邀请人和踢人都要相应变化）
+    int32          date               = 12; //群创建时间
+    string         migrate_to         = 13; //升级为超级群的时候默认"" 格式为json格式
+    ChatResultCode resultcode         = 14;//结果码
+}

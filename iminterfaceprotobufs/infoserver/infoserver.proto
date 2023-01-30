@@ -1,0 +1,979 @@
+//protoc --gogofast_out=plugins=grpc:. *.proto
+//gitlab.potato.im/iminterfaceprotobufs/
+syntax = "proto3";
+import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/userserver.proto";
+import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+
+package infoserver;
+
+//发送短信的类型
+enum CodeType {
+    SendSms = 0; // 发送短信
+    SendAppCode = 1; //发送App的验证码类型
+}
+
+//发送短信验证码的请求
+message sendCodeReq {
+    string PhoneNumber = 1; //客户端传过来的电话号码 未处理过的
+    bool CurrentNumber = 2; //是否是当前的号码
+    int32 ApiId = 3;
+    string ApiHash = 4;
+    string LangCode = 5;
+    int32 userId = 6; //用户的ID
+    int64 keyId = 7; //用户的keyId(端的标识)
+    pbcomm.Debug debug = 8;
+    string country_code = 9; //国家码
+    string local_phone = 10; //不带国家码的电话号码
+}
+//发送短信请求的返回
+message SendCodeResult {
+    bool Result = 1; //成功或者失败
+    ResultCode ErrorCode = 2; // 失败的错误码
+    bool PhoneRegister = 3; //手机是否已经注册，
+    CodeType NextCodeType = 4; //发送短信的验证码类型
+    string PhoneCodeHash = 5; //验证码的哈希值
+    int32 TimeOut = 6; //短信的失效时间
+    bool SendTypeApp = 7; //是否发送的app内验证码
+    string PhoneCodeDesc = 8; // 验证码，统计使用
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; //内部错误，例如rpc调用等
+        PhoneOccupied = 2; //号码已注册
+        VirtualPhoneBlockedTemporarily = 3; // 虚拟号暂时不能登陆，已注册但是未绑定电话号码，并且当前没有其他端在线
+        PhoneNumberInvalid = 4; // 无效的号码,暂时用于判断未激活的虚拟号
+        AccountMarkedDeleted = 5; // 账号已标记删除
+        FloodWait = 6; // flooding request
+        SMSFailed = 7; // send sms error
+        UserRestricted = 8; // user is restricted
+    }
+}
+
+//更改电话号码发送短信的接口
+message sendChangePhoneCodeReq {
+    string PhoneNumber = 1; //客户端传过来的电话号码 未处理过的
+    bool AllowFlashcall = 2;
+    bool Current_number = 3;
+    int32 userId = 4; //用户的ID
+    int64 keyId = 5; //用户的keyId(端的标识)
+    pbcomm.Debug debug = 6;
+    string country_code = 7; //国家码
+    string local_phone = 8; //不带国家码的电话号码
+}
+
+//登录的请求
+message SignInReq {
+    string PhoneNumber = 1; //电话号码
+    string PhoneCodeHash = 2;
+    string PhoneCode = 3; //验证码
+    int64 keyId = 5; //用户的keyId(端的标识)
+    pbcomm.Debug debug = 6;
+    string country_code = 7; //国家码
+    string local_phone = 8; //不带国家码的电话号码
+}
+
+//登录或者注册接口的返回
+message SignInOrReqitsterResult {
+    userInfo userInfo = 1; //用户的具体信息
+    ResultCode ErrorCode = 2; // 失败的错误码
+    bool Result = 3; //成功或者失败
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 服务器内部错误
+        PhoneNumberUnoccupied = 2; // 电话号码未注册
+        CaptchaInvalid = 3; // 验证码无效
+        PasswordNeeded = 4; // 需要输入密码
+        CaptchaExpired = 5; // 验证码过期
+        FloodWait = 6; // 攻击
+    }
+}
+
+//用户注册的请求结构
+message SignUpReq {
+    string PhoneNumber = 1; //电话号码
+    string PhoneCodeHash = 2;
+    string PhoneCode = 3; //验证码
+    int64 keyId = 5; //用户的keyId(端的标识)
+    string FirstName = 6;
+    string LastName = 7;
+    bool is_bot = 8;
+    int32 bot_info_version = 9;
+    bool bot_chat_history = 10;
+    bool bot_no_chats = 11;
+    int32 dc_id = 12;
+    pbcomm.Debug debug = 13;
+    string country_code = 14; // 国家码
+    string local_phone = 15; // 不带国家码的号码
+}
+
+message AuthSignUpResult {
+    ResultCode code = 1;
+    userInfo userInfo = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 服务器内部错误
+        PhoneNumberInvalid = 2; // 无效的电话号码
+        PhoneNumberOccupied = 3; // 电话号码已注册
+        CaptchaExpired = 4; // 验证码失效
+        CaptchaInvalid = 5; // 验证码无效
+        FloodWait = 6;
+        SignUpRobotBlocked = 7; // 机器人注册接口暂时关闭
+    }
+}
+
+//更改电话号码的请求参数
+message ChangePhoneReq {
+    int32 userId = 1; //用户的ID
+    int64 keyId = 2; //用户的keyId(端的标识)
+    string Phone_number = 3; //更改的新电话号码
+    string PhoneCodeHash = 4;
+    string PhoneCode = 5; //验证码
+    pbcomm.Debug debug = 6;
+    string country_code = 7; // 国家码
+    string local_phone = 8; // 不带国家码的电话号码
+}
+
+//更改电话号码的返回
+message ChangePhoneResult {
+    userInfo userInfo = 1; //用户的具体信息
+    ResultCode ErrorCode = 2; // 失败的错误码
+    bool Result = 3; //成功或者失败
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        PhoneNumberOccupied = 2; // 电话已注册
+        PhoneCodeExpired = 3; // 验证码已过期
+        PhoneCodeInvalid = 4; // 验证码无效
+        FloodWait = 5;
+    }
+}
+
+//两步验证校验密码
+message AuthCheckPasswdReq {
+    int32 UserId = 1; //用户自己的ID
+    bytes PasswordHash = 2;
+    pbcomm.Debug debug = 3;
+    uint64 key_id = 4; // 20171221,增加端表示，用于更新session登陆信息
+}
+
+//校验两步验证的返回
+message AuthCheckPasswdResult {
+    userInfo userInfo = 1; //用户的具体信息
+    ResultCode ErrorCode = 2; // 失败的错误码
+    bool Result = 3; //成功或者失败
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        WrongPassword = 2;
+    }
+}
+
+//importAuthorization  请求
+message AuthImportAuthorizationReq {
+    int32 userId = 1; //用户的ID
+    int64 keyId = 2; //用户的keyId(端的标识)
+    bytes Bytes = 3;
+    int32 dcid = 4;
+    int32 authid = 5;
+    pbcomm.Debug debug = 6;
+}
+
+//importAuthorization 的返回
+message AuthImportAuthorizationResult {
+    userInfo userInfo = 1; //用户的具体信息
+    ResultCode ErrorCode = 2; // 失败的错误码
+    bool Result = 3; //成功或者失败
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// export auth 请求
+message AuthExportAuthorizationReq {
+    int32 userid = 1; //用户id
+    int64 keyid = 2; //用户的端标识
+    int32 dcid = 3;
+    pbcomm.Debug debug = 4;
+}
+
+// export auth 返回
+message AuthExportAuthorizationResult {
+    ResultCode code = 1;
+    bytes data = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//恢复两步验证密码
+message AuthRecoverPasswdReq {
+    int32 userId = 1; //用户的ID
+    int64 keyId = 2; //用户的keyId(端的标识)
+    string Code = 3;
+    pbcomm.Debug debug = 4;
+    string phone_number = 5;
+}
+
+//恢复两步验证密码 的返回
+message AuthRecoverPasswdResult {
+    userInfo userInfo = 1; //用户的具体信息
+    ResultCode ErrorCode = 2; // 失败的错误码
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        CaptchaInvalid = 2; // 验证码无效
+        CaptchaExpired = 3; // 验证码过期
+        FloodWait = 4; // 攻击
+    }
+}
+
+//联系人搜索的请求
+message ContactsSearchReq {
+    int32 userId = 1; //用户的ID
+    string Q = 2; //需要搜索的用户名
+    int32 Limit = 3; //最多发挥
+    pbcomm.Debug debug = 4;
+
+}
+
+//搜索的结果
+message ContactsSearcResult {
+    UserInfoArray users = 1; //搜到的用户信息
+    repeated bytes channel = 2; //搜到的超级群或者频道的信息
+    ResultCode ErrorCode = 3; // 失败的错误码
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//发送重置密码验证码
+message AuthRequestPasswordRecoveryReq {
+    string phone_number = 1;
+    int32 user_id = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message AuthRequestPasswordRecoveryResult {
+    ResultCode code = 1;
+    string email_pattern = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        MissingEmailPattern = 2; //没有设置恢复邮箱
+    }
+}
+
+//电话功能
+message PhonecallSessionInformation {
+    int64 session_id = 1; // 通话会话id
+    int64 access_hash = 2; // 通话会话哈希
+    int32 admin_id = 3; // 发起通话人的userid
+    uint64 admin_keyid = 4; // 发起通话的端标识
+    int32 participant_id = 5; // 接收通话人的userid
+    uint64 participant_keyid = 6; // 接听通话的端标识
+    bytes g_b = 7; // 接听通话的端信息
+    int32 call_requested_at = 8; // 通话发起时间
+    int32 call_received_at = 9; // 通话接听时间
+    int32 call_confirmed_at = 10; // 通话确认握手完成时间
+    bytes peer_tag = 11; // 通话会话的唯一标识
+    uint32 cur_status = 12; // 通话会话的当前状态 0-CallRequested 1-CallAccepted 2-CallConfirmed 3-CallDiscarded
+}
+
+message PhonecallEndpointInformation {
+    int64 id = 1; // udp server唯一id
+    string ip = 2; // udp IPv4
+    string ipv6 = 3; // udp IPv6
+    int32 port = 4; // udp端口
+}
+
+message PhonecallAllocSessionReq {
+    int32 caller_id = 1; // 发起通话人的userid
+    int32 receiver_id = 2; // 接受通话人的userid
+    uint64 caller_keyid = 3; // 发起通话人的端标识
+    pbcomm.Debug debug = 4;
+}
+
+message PhonecallAllocSessionResult {
+    ResultCode code = 1;
+    int64 session_id = 2; //通话会话id
+    int64 access_hash = 3; //通话会话哈希
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 服务器内部错误
+        SessionAlreadyExist = 2; // 重复alloc
+    }
+}
+
+message PhonecallOnReceivedCallCheckReq {
+    int64 session_id = 1;
+    int64 access_hash = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message PhonecallOnReceivedCallCheckResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        SessionExist = 0;
+        SessionNotFound = 1;
+        InternalError = 2; // 服务器内错误
+    }
+}
+
+message PhonecallOnAcceptCallUpdateReq {
+    int64 session_id = 1; // 会话id
+    int64 access_hash = 2; // 会话哈希
+    int32 participant_id = 3; // 接受通话人的userid
+    uint64 participant_keyid = 4; //接听通话的端标识
+    bytes g_b = 5; // 接听通话的端信息
+    pbcomm.Debug debug = 6;
+}
+
+message PhonecallOnAcceptCallUpdateResult {
+    ResultCode code = 1;
+    PhonecallSessionInformation information = 2;
+
+    enum ResultCode {
+        Success = 0;
+        SessionNotFound = 1; // 未找到通话信息
+        DuplicateAccept = 2; // 该通话已经accept
+        InternalError = 3; //发生内部错误
+    }
+}
+
+message PhonecallOnConfirmCallUpdateReq {
+    int64 session_id = 1; // 会话id
+    int64 access_hash = 2; // 会话哈希
+    int32 admin_id = 3; // 发起通话人的userid
+    uint64 admin_keyid = 4; // 发起通话端标识
+    pbcomm.Debug debug = 5;
+}
+
+message PhonecallOnConfirmCallUpdateResult {
+    ResultCode code = 1;
+    PhonecallSessionInformation information = 2;
+
+    enum ResultCode {
+        Success = 0;
+        SessionNotFound = 1; // 未找到通话信息
+        DuplicateConfirm = 2; // 该通话已经confirm
+        InternalError = 3; // 发生内部错误
+    }
+}
+
+message PhonecallOnDiscardCallUpdateReq {
+    int32 discarder_id = 1;
+    int64 session_id = 2;
+    int64 access_hash = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message PhonecallOnDiscardCallUpdateResult {
+    ResultCode code = 1;
+    PhonecallSessionInformation information = 2;
+
+    enum ResultCode {
+        Success = 0;
+        SessionNotFound = 1; // 未找到通话信息
+        InternalError = 2; // 发生内部错误
+    }
+}
+
+message PhonecallQueryEndpointsReq {
+    pbcomm.Debug debug = 4;
+}
+
+message PhonecallQueryEndpointsResult {
+    ResultCode code = 1;
+    repeated PhonecallEndpointInformation informations = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 发生内部错误
+    }
+}
+
+
+message AuthCancelCodeReq {
+    int32 user_id = 1;
+    int64 key_id = 2;
+    string phone_number = 3;
+    string phone_code_hash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message AuthCancelCodeResult {
+    bool code_canceled = 1;
+}
+
+// 语言包信息
+message Langpack {
+    uint32 platform = 1;
+    string name = 2;
+    string native_name = 3;
+    string lang_code = 4;
+    int32 from_version = 5;
+    int32 version = 6;
+    bytes strings = 7;
+}
+
+message LangpackList {
+    repeated Langpack vector = 1;
+}
+
+message LangpackStrings {
+    string key = 1;
+    string value = 2;
+}
+
+message LangpackStringsList {
+    repeated LangpackStrings vector = 1;
+}
+
+// 获取语言包列表rpc请求
+message LangPacktReq {
+    uint32 platform = 1; // 客户端平台
+    string lang_code = 2;
+    int32 from_version = 3;
+    string keystrings = 4;
+    ReqType type = 5;
+
+    enum ReqType {
+        LangPackGetLanguages = 0;
+        LangPackGetLangInfo = 1;
+        LangPackGetStrings = 2;
+        LangPackGetDifference = 3;
+    }
+}
+
+// 虚拟号信息
+message VirtualPhoneNumberInfo {
+    string virtual_phone = 1; // 虚拟号
+    string real_phone = 2; // 绑定的真实电话号码
+    uint32 activated = 3; // 是否为激活状态
+    int64 bind_time = 4; // 绑定电话号码的时间 unix timestamp
+    int64 activate_time = 5; // 激活时间
+    int32 activate_admin_id = 6; // 激活该虚拟号的管理员id
+    int32 bind_admin_id = 7; // 为该虚拟号码绑定电话的管理员id
+    int32 owner_id = 8; // user id of whom owns the phone
+    string initial_phone_code = 9; // phone code for register if not bind yet
+}
+
+// 虚拟号生成
+message CmdVirtualPhoneNumberGenerateReq {
+    pbcomm.Debug debug = 1; // 跟踪信息
+    uint32 quantity = 2; // 需要生成的数量
+    int32 admin_id = 3; //管理员id
+    int32 owner_id = 4; // user if of owner
+}
+
+message CmdVirtualPhoneNumberGenerateResult {
+    ResultCode code = 1;
+    repeated VirtualPhoneNumberInfo infos = 2; //生成的虚拟号的信息
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// 生成指定的虚拟号
+message CmdVirtualPhoneNumberSpecialGenReq{
+    string special_number = 1; // 指定的号码
+    int32 admin_id = 2; // 管理员id
+    int32 owner_id = 3; // user id of owner
+}
+
+message CmdVirtualPhoneNumberSpecialGenResult{
+    bool success = 1; // 是否激活成功
+    VirtualPhoneNumberInfo info = 2; //
+}
+
+// 虚拟号绑定
+message CmdVirtualPhoneNumberBindRealPhoneNumberReq {
+    pbcomm.Debug debug = 1; // 跟踪信息
+    string virtual_phone_number = 2; // 虚拟号
+    string real_phone_number = 3; // 真实电话号码
+    int32 admin_id = 4; // 管理员id
+}
+
+message CmdVirtualPhoneNumberBindRealPhoneNumberResult {
+    ResultCode code = 1;
+    string current = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        InvalidVirtualPhoneNumber = 2; // 无效的虚拟号
+        VirtualPhoneNumberOccupied = 3; // 虚拟号已经绑定
+        InvalidRealPhoneNumber = 4; // 要绑定的真实电话号码无效, 一般都是格式无效
+    }
+}
+
+// 虚拟号解绑
+message CmdVirtualPhoneNumberUnbindRealPhoneNumberReq {
+    pbcomm.Debug debug = 1; // 跟踪信息
+    string virtual_phone_number = 2; // 虚拟号
+    int32 admin_id = 3; //管理员id
+}
+
+message CmdVirtualPhoneNumberUnbindRealPhoneNumberResult {
+    ResultCode code = 1;
+    string before_delete = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        InvalidVirtualPhoneNumber = 2; // 无效的虚拟号
+    }
+}
+
+// 虚拟号信息查询
+message CmdVirtualPhoneNumberQueryInfoReq {
+    pbcomm.Debug debug = 1;
+    string virtual_phone_number = 2;
+}
+
+message CmdVirtualPhoneNumberQueryInfoResult {
+    ResultCode code = 1;
+    VirtualPhoneNumberInfo info = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        InvalidVirtualPhoneNumber = 2; // 无效的虚拟号
+    }
+}
+
+// 绑定服务号码
+message CmdSysPhoneNumberBindRealPhoneNumberReq {
+    pbcomm.Debug debug = 1;
+    string sys_no = 2; // 服务号显示的号码
+    string phone_number = 3; // 要绑定的真实电话号码 国家码+号码
+}
+
+message CmdSysPhoneNumberBindRealPhoneNumberResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        Success = 0; // 绑定成功
+        InternalError = 1; // 绑定出错
+    }
+}
+
+// 阻止登陆
+message CmdBlockSignInReq {
+    repeated string phone_numbers = 1; // 要阻止登陆的号码列表，为空表示阻止所有人登陆
+}
+
+message CmdBlockSignInResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        Success = 0; // 操作成功
+        InternalError = 1; // 操作失败，通常是数据库报错
+    }
+}
+
+// 接触登陆禁止
+message CmdUnblockSignInReq {
+    repeated string phone_numbers = 1; // 需要解除禁制的号码列表，为空表示除了使用CmdBlockSignInReq指定禁止的号码 之外的号码 都解除禁止登录的设置
+}
+
+message CmdUnblockSignInResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        Success = 0; // 操作成功
+        InternalError = 1; // 操作失败，通常是数据库错误
+    }
+}
+
+// 阻止注册
+message CmdBlockSignUpReq {
+    // 当前服务器域禁止注册, 理论上应该是针对所有人的。。。
+}
+
+message CmdBlockSignUpResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        Success = 0; // 操作成功
+        InternalError = 1; // 操作失败，通常是数据库报错
+    }
+}
+
+// 解除禁止注册
+message CmdUnblockSignUpReq {
+
+}
+
+message CmdUnblockSignUpResult {
+    ResultCode code = 1;
+
+    enum ResultCode {
+        Success = 0; // 操作成功
+        InternalError = 1; // 操作失败，通常都是数据库拨错
+    }
+}
+
+//根据username 来查找具体的超级群/人的请求
+message ContactRevoleUserNameReq {
+    int32 self_id = 1; //用户自己的ID
+    string username = 2;
+    pbcomm.Debug debug = 3;
+
+}
+//根据username 来查找具体的超级群/人的结果
+message ContactRevoleUserNameResult {
+    userInfo uinfo = 1;
+    bytes channel = 2; //超级群的mtp的二进制
+    ResultCode code = 3;
+    enum ResultCode {
+        IsUser = 0;
+        IsChannel = 1;
+        InternalError = 2;
+    }
+}
+
+//getfull user的请求
+message GetFullUserReq {
+    int32 selfId = 1; //自己的用户Id
+    int32 UserId = 2; // 需要获取的用户的ID
+    int64 AccessHash = 3; //需要获取的用户的哈希值
+    pbcomm.Debug debug = 4; //日志记录相关的
+}
+
+//getfull user的请求
+message GetFullUserResult {
+    userInfo uinfo = 1; //用户的基础信息
+    bool isblocked = 2; //此用户是否是自己的黑名单
+    bool phone_calls_private = 3; //userfull需要
+    bool phone_calls_available = 4; //userfull需要
+    string about = 5; //用户的个性签名
+    int32 common_chat = 6; //共同群的个数
+    ReErrCode Errorcode = 7; //返回错误码
+}
+
+//服务接口
+service InfoServerService {
+    //发送短信验证码的接口(yuankan)
+    rpc SendCode (sendCodeReq) returns (SendCodeResult) {
+    }
+
+    //resendcode的接口（目前处理的是直接发送短信验证码）(yuankan)
+    rpc ReSendCode (sendCodeReq) returns (SendCodeResult) {
+    }
+    //更改电话号码的发送短信(yuankan)
+    rpc SendChangePhoneCode (sendChangePhoneCodeReq) returns (SendCodeResult) {
+    }
+    //登录接口(yuankan和lxl)
+    rpc AuthSignIn (SignInReq) returns (SignInOrReqitsterResult) {
+    }
+    //注册用户的接口(yuankan和lxl)
+    rpc AuthSignUp (SignUpReq) returns (AuthSignUpResult) {
+    }
+    //更改电话号码的接口(yuankan和lxl)
+    rpc AccountChangePhone (ChangePhoneReq) returns (ChangePhoneResult) {
+    }
+
+    //校验两步验证的密码(yuankan)
+    rpc AuthCheckPassWord (AuthCheckPasswdReq) returns (AuthCheckPasswdResult) {
+    }
+    //i导入authr (yuankan )
+    rpc AuthImPortAuthorizion (AuthImportAuthorizationReq) returns (AuthImportAuthorizationResult) {
+    }
+    //导出auth
+    rpc AuthExportAuthorization (AuthExportAuthorizationReq) returns (AuthExportAuthorizationResult) {
+
+    }
+    //恢复量保护验证的密码
+    rpc AuthRecoverPassword (AuthRecoverPasswdReq) returns (AuthRecoverPasswdResult) {
+    }
+
+    //根据Username搜索人或者超级群、频道(lxl\tanyuzhou)
+    rpc ContactsSearch (ContactsSearchReq) returns (ContactsSearcResult) {
+    }
+
+    //getfulluser
+    rpc GetFullUser (GetFullUserReq) returns (GetFullUserResult) {
+    }
+
+    //根据userName 来查找具体的人或者超级群
+    rpc ContactRevoleUserName (ContactRevoleUserNameReq) returns (ContactRevoleUserNameResult) {
+    }
+
+    //忘记两步验证密码(yuankan)
+    rpc AuthRequestPasswordRecovery (AuthRequestPasswordRecoveryReq) returns (AuthRequestPasswordRecoveryResult) {
+    }
+
+    //电话功能 对应的每一个步骤名称
+    rpc PhonecallAllocSession (PhonecallAllocSessionReq) returns (PhonecallAllocSessionResult) {
+    }
+
+    rpc PhonecallOnReceivedCallCheck (PhonecallOnReceivedCallCheckReq) returns (PhonecallOnReceivedCallCheckResult) {
+    }
+
+    rpc PhonecallOnAcceptCallUpdate (PhonecallOnAcceptCallUpdateReq) returns (PhonecallOnAcceptCallUpdateResult) {
+    }
+
+    rpc PhonecallOnConfirmCallUpdate (PhonecallOnConfirmCallUpdateReq) returns (PhonecallOnConfirmCallUpdateResult) {
+    }
+
+    rpc PhonecallOnDiscardCallUpdate (PhonecallOnDiscardCallUpdateReq) returns (PhonecallOnDiscardCallUpdateResult) {
+    }
+
+    rpc PhonecallQueryEndpoints (PhonecallQueryEndpointsReq) returns (PhonecallQueryEndpointsResult) {
+    }
+
+    // 取消验证码
+    rpc AuthCancelCode (AuthCancelCodeReq) returns (AuthCancelCodeResult) {
+
+    }
+
+    // 虚拟号摇号
+    rpc CmdVirtualPhoneNumberGenerate (CmdVirtualPhoneNumberGenerateReq) returns (CmdVirtualPhoneNumberGenerateResult) {
+
+    }
+
+    // 虚拟号激活指定的号
+    rpc CmdVirtualPhoneNumberSpecialGen (CmdVirtualPhoneNumberSpecialGenReq) returns (CmdVirtualPhoneNumberSpecialGenResult){
+
+    }
+
+    // 虚拟号绑定
+    rpc CmdVirtualPhoneNumberBindRealPhoneNumber (CmdVirtualPhoneNumberBindRealPhoneNumberReq) returns (CmdVirtualPhoneNumberBindRealPhoneNumberResult) {
+
+    }
+
+    // 虚拟号解绑
+    rpc CmdVirtualPhoneNumberUnbindRealPhoneNumber (CmdVirtualPhoneNumberUnbindRealPhoneNumberReq) returns (CmdVirtualPhoneNumberUnbindRealPhoneNumberResult) {
+
+    }
+
+    // 虚拟号信息查询
+    rpc CmdVirtualPhoneNumberQueryInfo (CmdVirtualPhoneNumberQueryInfoReq) returns (CmdVirtualPhoneNumberQueryInfoResult) {
+
+    }
+
+    // 服务号绑定电话号码
+    rpc CmdSysPhoneNumberBindRealPhoneNumber (CmdSysPhoneNumberBindRealPhoneNumberReq) returns (CmdSysPhoneNumberBindRealPhoneNumberResult) {
+
+    }
+
+    // 阻止登陆
+    rpc CmdBlockSignIn (CmdBlockSignInReq) returns (CmdBlockSignInResult) {
+    }
+
+    // 解除禁止登陆
+    rpc CmdUnblockSignIn (CmdUnblockSignInReq) returns (CmdUnblockSignInResult) {
+    }
+
+    // 阻止注册
+    rpc CmdBlockSignUp (CmdBlockSignUpReq) returns (CmdBlockSignUpResult) {
+    }
+
+    // 解除禁止注册
+    rpc CmdUnblockSignUp (CmdUnblockSignUpReq) returns (CmdUnblockSignUpResult) {
+    }
+
+    // 语言包列表查询
+    rpc LangpackGetLanguages (LangPacktReq) returns (LangpackList) {
+    }
+    // 语音包详细查询
+    rpc LangpackGetLangPack (LangPacktReq) returns (Langpack) {
+    }
+    // 语言包修改确认提示语查询
+    rpc LangpackGetStrings (LangPacktReq) returns (LangpackStringsList) {
+    }
+    // 语言包版本对比
+    rpc LangpackGetDifference (LangPacktReq) returns (Langpack) {
+    }
+
+    //根据UserName来获取用户信息或者群信息
+    rpc GetUserChannelByUserName (GetUserChannelByUserNameReq) returns (GetUserChannelByUserNameResult) {
+    }
+
+    // 删除电话号码当前所有authkey
+    rpc DeleteAuthKeys (DeleteAuthKeysReq) returns (DeleteAuthKeysResult){}
+
+    // get all useid in debuging
+    rpc QueryDebugingUserID (QueryDebugingUserIDReq) returns (QueryDebugingUserIDResult){}
+
+    // heartbeat
+    rpc Heartbeat(HeartbeatReq) returns (HeartbeatResult){}
+
+    // check device ban
+    rpc CheckDeviceBan(CheckDeviceBanReq) returns (CheckDeviceBanResult){}
+
+    // login and register with password
+    rpc AuthSignUpPassword (AuthSignUpPasswordReq) returns (AuthSignUpPasswordResult){}
+    rpc AuthSignInPassword (AuthSignInPasswordReq) returns (AuthSignInPasswordResult){}
+    rpc AccountResetPassword (AccountResetPasswordReq) returns (AccountResetPasswordResult) {}
+
+    //***************** simple im chat *********************
+    rpc GetFullUserSim (GetFullUserSimReq) returns (GetFullUserSimResult) {
+    }
+
+    //设置密码发送短信验证码
+    rpc SendSetPasswordCode (sendSetPasswordPhoneCodeReq) returns (SendCodeResult) {
+    }
+
+}
+
+
+message GetFullUserSimReq{
+    int32 selfId = 1; //自己的用户Id
+    int32 UserId = 2; // 需要获取的用户的ID
+    int64 AccessHash = 3; //需要获取的用户的哈希值
+    pbcomm.Debug debug = 4; //日志记录相关的
+}
+
+message UserLocation {
+    string Country = 1;
+    string City = 2;
+    string Detail = 3;
+}
+
+message GetFullUserSimResult{
+    userInfo uinfo = 1; //用户的基础信息
+    bool isblocked = 2; //此用户是否是自己的黑名单
+    bool phone_calls_private = 3; //userfull需要
+    bool phone_calls_available = 4; //userfull需要
+    string about = 5; //用户的个性签名
+    int32 common_chat = 6; //共同群的个数
+    int32 Gender = 7;
+	string Email = 8;
+    UserLocation Location = 9;
+    ReErrCode Errorcode = 10; //返回错误码
+}
+
+
+message AuthSignUpPasswordReq{
+    SignUpReq base = 1;
+    string pwd_hash = 2;
+}
+
+message AuthSignUpPasswordResult{
+    userInfo user_info = 1;
+    Code code = 2;
+
+    enum Code{
+        Success = 0;
+        InternalError = 1;
+        CaptchaInvalid = 2;
+        CaptchaExpired = 3;
+        PhoneNumberOccupied = 4;
+        Flood = 5;
+    }
+}
+
+message AuthSignInPasswordReq{
+    SignInReq base = 1;
+    string pwd_hash = 2;
+}
+
+message AuthSignInPasswordResult{
+    userInfo user_info = 1;
+    Code code = 2;
+
+    enum Code{
+        Success = 0;
+        InternalError = 1;
+        PhoneNumberUnoccupied = 2;
+        Flood = 3;
+        PasswordInvalid = 4;
+    }
+}
+
+message AccountResetPasswordReq{
+    string phone_number = 1;
+    bool forget = 2;
+    string phone_code = 3;
+    string current_pwd_hash = 4;
+    string new_pwd_hash = 5;
+    int64 key_id = 6;
+    string phone_code_hash = 7;
+}
+
+message AccountResetPasswordResult{
+    Code code = 1;
+
+    enum Code{
+        Success = 0;
+        Internal = 1;
+        CaptchaInvalid = 2;
+        CaptchaExpired = 3;
+        Flood = 4;
+        PhoneNumberUnoccupied = 5;
+        PasswordInvalid = 6;
+        PasswordMustDifferent = 7;
+    }
+}
+
+message CheckDeviceBanReq{
+    string unique_number = 1;
+    uint64 key_id = 2;
+}
+message CheckDeviceBanResult{
+    bool banned = 1;
+}
+
+message HeartbeatReq{}
+message HeartbeatResult{}
+
+message QueryDebugingUserIDReq{
+
+}
+
+message QueryDebugingUserIDResult{
+    repeated int32 user_id_list = 1;
+}
+
+//根据UserName来获取用户信息或者群信息请求
+message GetUserChannelByUserNameReq {
+    int32 self_id = 1;
+    string username = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//根据UserName来获取用户信息或者群信息返回
+message GetUserChannelByUserNameResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    bytes channelInfo = 2; // 超级群信息
+    int32 Type = 3; //1代表查找到的是用户 2超找到的超级群信息
+    ErrorCode errcode = 4;//错误码
+    enum ErrorCode {
+        Success = 0; //成功
+        NOTFOUND = 2; //没有查找到
+    }
+}
+
+// 根据电话号码删除当前所有端的authkey
+message DeleteAuthKeysReq{
+   string phone_number = 1;
+}
+
+message DeleteAuthKeysResult{
+    repeated int64 key_id = 1;
+}
+
+//更改电话号码发送短信的接口
+message sendSetPasswordPhoneCodeReq {
+    string PhoneNumber = 1; //客户端传过来的电话号码 未处理过的
+    int32 userId = 2; //用户的ID
+    int64 keyId = 3; //用户的keyId(端的标识)
+    pbcomm.Debug debug = 4;
+    string country_code = 5; // 国家码
+    string local_phone = 6; // 不带国家码的号码
+}

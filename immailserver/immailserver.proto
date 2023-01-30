@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package immailserver;
+
+service ImMailServer {
+
+    rpc SendMail (SendMailReq) returns (SendMailResult) {
+    };
+
+    //发送邮件
+    rpc SendMailSSL (SendMailSSLReq) returns (SendMailSSLResult) {
+    };
+}
+
+
+message SendMailReq {
+    int32 userId = 1; //用户id
+    repeated string toAddrs = 2; // 发送地址
+    string subject = 3; //标题
+    bytes content = 4; //内容
+}
+
+message SendMailResult {
+    ResultCode code = 1;
+    string err = 2;
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+        SendTooFast = 2;
+        NotFountEmail = 3;
+    }
+}
+
+
+message SendMailSSLReq {
+    repeated string toAddrs = 1; // 发送地址
+    string subject = 2; //标题
+    bytes content = 3; //内容
+}
+
+message SendMailSSLResult {
+    ResultCode code = 1; //接口标识
+    string err = 2; //错误消息
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+

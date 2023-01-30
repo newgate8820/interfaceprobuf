@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package imsendsmsserver;
+
+// protoc -I . -I $GOPATH/src --gogofast_out=plugins=grpc:. *.proto
+
+
+service SendSmsServer {
+    // 发送手机验证码
+    rpc SendPhoneCode (SendPhoneCodeReq) returns (SendPhoneCodeReply) {
+    }
+    // 重发手机验证
+    rpc ReSendPhoneCode (SendPhoneCodeReq) returns (SendPhoneCodeReply) {
+    }
+    // 校验手机验证码
+    rpc CheckPhoneCode (CheckPhoneCodeReq) returns (CheckPhoneCodeReply) {
+    }
+    // 批量发送手机短信
+    rpc BatchSendSMS (BatchSendSMSReq) returns (BatchSendSMSReply) {
+    }
+    // 发送邮件验证码
+    rpc SendEmailCode (SendEmailCodeReq) returns (SendEmailCodeReply) {
+    }
+    // 重发邮件验证码
+    rpc ReSendEmailCode (SendEmailCodeReq) returns (SendEmailCodeReply) {
+    }
+    // 校验邮箱验证码
+    rpc CheckEmailCode (CheckEmailCodeReq) returns (CheckEmailCodeReply) {
+    }
+}
+
+
+enum ReErrCode {
+    //成功
+    Success = 0;
+    // 手机号错误
+    Phone_Error = 1;
+    // 邮箱错误
+    Email_Error = 2;
+}
+
+// 发送手机验证码请求
+message SendPhoneCodeReq {
+    //客户端传过来的电话号码 未处理过的
+    string phone_number = 1;
+    // 语言代码
+    string lang_code = 2;
+    //用户的ID
+    int32 user_id = 3;
+    //用户的keyId(端的标识)
+    int64 key_id = 4;
+    //国家码
+    string country_code = 5;
+    //不带国家码的电话号码
+    string local_phone = 6;
+}
+
+// 发送验证码响应
+message SendPhoneCodeReply {
+    // 发送是否成功
+    bool success = 1;
+    //验证码的哈希值
+    string phone_hash_code = 2;
+    //短信的失效时间
+    int32 timeout = 3;
+    // 错误信息
+    ReErrCode error_code = 4;
+}
+
+// 校验验证码请求
+message CheckPhoneCodeReq {
+    //客户端传过来的电话号码 未处理过的
+    string phone_number = 1;
+    //用户的ID
+    int32 user_id = 2;
+    //用户的keyId(端的标识)
+    int64 key_id = 3;
+    // 验证码
+    string code = 4;
+}
+
+// 校验验证码响应
+message CheckPhoneCodeReply {
+    // 验证码校验是否成功
+    bool success = 1;
+}
+
+// 发送邮件验证码请求
+message SendEmailCodeReq {
+    // 邮箱地址
+    string email = 1;
+    // 语言代码
+    string lang_code = 2;
+    //用户的ID
+    int32 user_id = 3;
+    //用户的keyId(端的标识)
+    int64 key_id = 4;
+}
+
+// 发送验证码响应
+message SendEmailCodeReply {
+    // 发送是否成功
+    bool success = 1;
+    //验证码的哈希值
+    string email_code_hash = 2;
+    //短信的失效时间
+    int32 timeout = 3;
+    // 错误信息
+    ReErrCode error_code = 4;
+}
+
+// 校验邮箱验证码请求
+message CheckEmailCodeReq {
+    //邮箱
+    string email = 1;
+    //用户的ID
+    int32 user_id = 2;
+    //用户的keyId(端的标识)
+    int64 key_id = 3;
+    // 验证码
+    string code = 4;
+}
+
+// 校验验证码响应
+message CheckEmailCodeReply {
+    // 验证码校验是否成功
+    bool success = 1;
+}
+
+// 批量发送信息请求
+message BatchSendSMSReq {
+    // 手机号,数据库取出的手机号
+    repeated string phone_numbers = 1;
+    // 文本内容
+    string text = 2;
+}
+
+// 发送短信详细
+message SendSmsDetail {
+    // 手机号码
+    string mobile = 1;
+    // 错误信息
+    string msg = 2;
+    // 消息id
+    int64 sid = 3;
+    // code 0 成功
+    int32 code = 4;
+    // 数量
+    int32 count = 5;
+}
+
+// 批量发送信息响应
+message BatchSendSMSReply {
+    // 发送成功数
+    int32 total_count = 1;
+    // 批量发送详细
+    repeated SendSmsDetail data = 2;
+}

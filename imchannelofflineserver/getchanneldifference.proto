@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package imchannelofflineserver;
+import "gitlab.chatserver.im/interfaceprobuf/dialogserver/dialogserver.proto";
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+service ChannelOfflineServerService {
+    rpc GetChannelDifference (ReqGetChannelDifference) returns (RspGetChannelDifference) {
+    };
+    rpc GetChannelDifferenceIos (ReqGetChannelDifference) returns (RspGetChannelDifference) {
+    };
+}
+
+//#####################超级群get diff###################
+message ReqGetChannelDifference {
+    int32 UserId = 1;     //用户ID
+    int64 KeyId = 2;  //用户KeyId
+    uint64 reMessageId = 18;
+    uint32 CrcId =  12;
+    int32 Flags = 8;
+    bool  Force = 9;
+    int32 device = 6; //1, pc 2, android 3, ios
+    bytes reqBin = 7;
+    int32 rangeMinId = 10;
+    int32 rangeMaxId = 11;
+    int32 layer = 3; // 层
+    string appVision = 4;
+    string phone = 5;
+    string ip = 13;
+    uint64 sessionId = 14;
+    uint32 ostype = 16;
+    uint32 currentCrc = 17;
+    int32 channelId = 19;
+
+
+
+}
+//入参结构体
+message ChanDiffStr {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    int32 flags = 3;
+    bool  force = 4;
+    int32 channelId = 5;
+    int32 pts = 6;
+    int32 limit = 7;
+    int32 range_MinId = 8;
+    int32 range_MaxId = 9;
+    int32 device = 10; //1, pc 2, android 3, ios
+    uint64 reMessageId = 13;
+    dialogserver.UserDialog userDialog = 11;
+    pbcomm.Debug debug = 12;
+}
+
+//返回
+message RspGetChannelDifference{
+    bytes result = 1;
+    int32 errorCode = 2;
+}

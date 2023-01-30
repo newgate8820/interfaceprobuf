@@ -1,0 +1,25 @@
+syntax = "proto3";
+// protoc --gogofast_out=plugins=grpc:. *.proto
+// sudo protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/digtranserver/digtranserver.proto
+package digtranserver;
+
+// 币币交易服务
+service DigitalTransferService{
+    // 币币交易业务通用协议
+    rpc DigitalTransferUniversalBusiness(ReqDigitalTransferUniversalBusiness) returns (ReplyDigitalTransferUniversalBusiness) {};
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 币币交易业务通用协议请求
+message ReqDigitalTransferUniversalBusiness {
+    string                             ip                                = 1;     // 用户IP
+    int64                              userId                            = 2;     // 交易所用户唯一标识
+    int64                              appUserId                         = 3;     // 第三方应用用户唯一标识
+    int32                              businessId                        = 4;     // 业务标识
+    bytes                              data                              = 5;     // JSON数据
+}
+
+// 币币交易业务通用协议响应
+message ReplyDigitalTransferUniversalBusiness {
+    string                              data                             = 1;     // JSON数据
+}

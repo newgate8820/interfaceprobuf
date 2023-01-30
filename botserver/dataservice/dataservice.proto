@@ -1,0 +1,148 @@
+/**
+ * 定义提供开放性的API
+ * 允许任何服务调用
+ */
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/im/iminterfaceprotobufs/botserver/dataservice/dataservice.proto
+
+syntax = "proto3";
+
+package dataservice;
+
+// 定义机器人服务
+service Bot {
+    // GetBot 获取机器人信息
+    rpc GetBot(GetBotRequest) returns (GetBotReply) {}
+
+    // GetBotToken 获取机器人Token
+    rpc GetBotToken(GetBotTokenRequest) returns (GetBotTokenReply) {}
+
+    // GetBotCertificate 获取机器人证书
+    rpc GetBotCertificate(GetBotCertificateRequest) returns (GetBotCertificateReply) {}
+
+    // ForbidBot 封机器人账号 解封机器人账号
+    rpc ForbidBot(ForbidBotRequest) returns (ForbidBotReply) {}
+
+    // GetUserOwnedBots 获取某个用户拥有的所有机器人
+    rpc GetUserOwnedBots(GetUserOwnedBotsRequest) returns (GetUserOwnedBotsReply) {}
+
+    // GetUerIDbyBot 获取某个机器人所属用户的ID
+    rpc GetUerIDbyBot(GetUerIDbyBotRequest) returns (GetUerIDbyBotReply) {}
+
+    // GetGame 获取游戏信息根据游戏ID
+    rpc GetGame(GetGameRequest) returns (GetGameReply) {}
+
+    // GetGameByName 获取游戏信息 通过游戏名称 和 所属机器人ID
+    rpc GetGameByName(GetGameByNameRequest) returns (GetGameReply) {}
+
+    // 获取游戏分数
+    rpc GetGameScore (GetGameScoreRequest) returns (GetGameScoreReply) {}
+}
+
+// GetBotRequest 获取机器人信息请求
+message GetBotRequest {
+    uint32 botID = 1; // 机器人ID
+}
+
+// GetBotRequest 获取机器人信息响应
+message GetBotReply {
+    uint32 botID = 1;       // 机器人ID
+    string commands = 2;    // 机器人命令列表
+    string description = 3; // 机器人描述
+    string about = 4;       // 关于机器人
+    bool allow_push = 5;    // 允许推送
+}
+
+// GetBotToken 获取机器人Token请求
+message GetBotTokenRequest {
+    uint32 botID = 1; // 机器人ID
+}
+
+// GetBotTokenReply 获取机器人Token响应
+message GetBotTokenReply {
+    uint32 botID = 1;       // 机器人ID
+    string token = 2;       // 机器人Token
+}
+
+// GetBotCertificateRequest 获取机器人证书请求
+message GetBotCertificateRequest {
+    uint32 botID = 1; // 机器人ID
+}
+
+// GetBotCertificateReply 获取机器人证书响应
+message GetBotCertificateReply {
+    uint32 botID = 1;       // 机器人ID
+    string webhook = 2;     // 回调地址
+    bytes certificate = 3;  // 机器人证书
+}
+
+// ForbidBotRequest 封或者解封机器人账号请求
+message ForbidBotRequest {
+    uint32 botID = 1;       // 机器人ID
+    int32 action = 2;       // 1 封账号   0 解封账号
+}
+
+// ForbidBotReply 封或者解封机器人账号响应
+message ForbidBotReply {
+    int32 result = 1;        // 成功 0  失败 非0
+}
+
+// GetUserOwnedBotsRequest 获取某个用户拥有的机器人请求
+message GetUserOwnedBotsRequest {
+    uint32 userID = 1;      // 用户ID
+}
+
+// GetUserOwnedBotsReply 获取某个用户拥有的机器人响应
+message GetUserOwnedBotsReply {
+    repeated uint32 botIDs = 2; // 机器人ID数组 失败为空
+}
+
+// GetUerIDbyBotRequest 获取某个机器人所属用户ID请求
+message GetUerIDbyBotRequest {
+    uint32 botID = 1;       // 机器人ID
+}
+
+// GetUerIDbyBotReply 获取某个机器人所属用户ID响应
+message GetUerIDbyBotReply {
+    uint32 userID = 1;       // 用户ID
+}
+
+// GetGameRequest 获取游戏信息请求
+message GetGameRequest {
+    uint32 gameID = 1; // 游戏ID
+}
+
+// GetGameByNameRequest 获取游戏信息请求 通过所属机器人ID和名称
+message GetGameByNameRequest {
+    uint32 botID = 1; // 机器人ID
+    string name = 2;  // 游戏名称
+}
+
+// GetGameReply 获取游戏信息响应
+message GetGameReply {
+    int64 gameID = 1;           // 游戏ID
+    string name  = 2;           // 游戏名称
+    string description = 3;     // 游戏描述
+    string title = 4;           // 游戏标题
+    uint32 ownerID = 5;         // 游戏所属的机器人ID
+    int64  accessHash = 6;      // 游戏hash
+    bytes  photo =7;            // 游戏预览图
+    bytes  Animation = 8;       // 游戏预览视频
+}
+
+// 获取分数请求
+message GetGameScoreRequest {
+    int64 Gameid = 1;  // 游戏id 对应消息media里的gameid
+}
+
+// 获取分数返回
+message GetGameScoreReply {
+    bool succeed = 1;  // 是否成功
+    string error = 2;  // 原因
+    repeated UserScore scores = 3;  // 完整的分数集合
+}
+
+// 用户分数
+message UserScore {
+    int32 user_id = 1;  // 用户id
+    int32 score = 2;  // 用户分数
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+// protoc --gogofast_out=plugins=grpc:. *.proto
+package templateserver;
+
+service ServerService {
+    //
+    rpc Hello (HelloReq) returns (HelloResp) {
+    };
+}
+
+message HelloReq {
+}
+message HelloResp {
+    bytes result = 1;
+    int32 errorCode = 2;
+}

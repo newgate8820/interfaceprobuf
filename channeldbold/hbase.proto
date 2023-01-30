@@ -1,0 +1,276 @@
+// protoc --gogofast_out=plugins=grpc:. ./hbase.proto
+// protoc  --java_out=. ./hbase.proto
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "im.pt.cmessage.proto";
+
+package channeldbold;
+
+
+// channeldb冷数据查询服务
+service ChanneldbOldService{
+    // 查询单条ChannelMsgId， 返回最新的ChannelMsgId
+    rpc GetChannelMsgId(GetChannelMsgIdReq) returns (GetChannelMsgIdResp) {}
+
+    // 删除单条信息
+    rpc DeleteChannelMessage(DeleteChannelMessageReq) returns (DeleteChannelMessageResp) {}
+
+    // 批量删除信息
+    rpc DeleteMsgs(DeleteMsgsReq) returns (DeleteMsgsResp) {}
+
+    // 超级群中删除指定用户信息
+    rpc DeleteUserHistory(DeleteUserHistoryReq) returns (DeleteUserHistoryResp) {}
+
+    // 删除超级群所有消息
+    rpc DeleteChannelMsg(DeleteChannelMsgReq) returns (ReplyErr) {}
+
+    // 获取指定msgid信息
+    rpc GetChannelMessage(GetChannelMessageReq) returns (GetChannelMessageResp) {}
+
+    // 获取批量msgids信息集合
+    rpc GetChannelMsgsByMsgIds(GetChannelMsgsByMsgIdsReq) returns (GetChannelMsgsByMsgIdsResp) {}
+
+    // 获取历史
+    rpc GetChannelMsgHistory(GetChannelMsgHistoryReq) returns (GetChannelMsgHistoryResp) {}
+
+    // 分页查询媒体消息
+    rpc GetChannelMediaMessageHistoryByMedia(GetChannelMediaMessageHistoryByMediaReq) returns (GetChannelMediaMessageHistoryByMediaResp) {}
+
+    // 搜索
+    rpc SearchMessage(SearchChannelMsgReq) returns (SearchChannelMsgResp) {}
+
+}
+
+message ChannelMsgId {
+    int32   Id          = 1; // 唯一键
+    int32   ChannelId   = 2; // 超级群ID
+    int32   MsgId       = 3; // 超级群消息ID
+    int32   Pts         = 4; // 超级群PTS
+    int32   LastDate    = 5; // 最后的时间
+}
+
+message MsgsAndMaxId {
+    int32          MaxMsgId = 1; // 最大消息ID
+    repeated int32 Msgs     = 2; // 消息ID集合
+}
+
+message ReplyErr {
+    uint32 ErrCode = 1; // 錯誤碼 200 成功 201-300 緩存錯誤 301-400 database錯誤
+    string ErrMsg  = 2; // 錯誤信息描述
+}
+
+message UserMsg {
+    int64   Id              = 1;  // 唯一键
+    int32   UserId          = 2;  // 用户ID
+    int32   WithId          = 3;  // 消息交互方
+    int32   WithIdType      = 4;  // 消息交互方类型 1.user 2:chat 3:channel
+    int32   MessageType     = 5;  // 消息类型
+    int32   Flags           = 6;  // 消息标识
+    bool    Out             = 7;  // 是否为自己发送
+    bool    Mentioned       = 8;  // 是否提及他人
+    bool    MediaUnread     = 9;  // 媒体是否已读
+    bool    Silent          = 10; // 是否静音
+    bool    Post            = 11; // 是否邮递
+    int64   GroupId         = 12; // 图片组ID
+    int32   MsgId           = 13; // 消息id
+    int32   ToId            = 14; // 接收方id
+    int32   Pts             = 15; // 消息的pts
+    bytes   FwdFrom         = 16; // 引用
+    int32   ViaBotId        = 17; // 机器人id
+    int32   ReplyToMsgId    = 18; // 回复id
+    int32   Date            = 19; // 时间
+    string  Message         = 20; // 消息内容
+    int64   Media           = 21; // 媒体id
+    bytes   MediaData       = 22; // 媒体二进制
+    bytes   ReplyMarkup     = 23; // 小键盘
+    repeated bytes Entities = 24; // 高亮
+    int32   FromId          = 25; // 发送方
+    int32   Views           = 26; // 查看人数
+    int32   EditDate        = 27; // 编辑时间
+    bytes   Action          = 28; // 行为
+    int64   RandomId        = 29; // 随机id
+    int64   Uuid            = 30; // 消息全局唯一id
+    int32   InsertDate      = 31; // 插入时间
+    int32   UpdateDate      = 32; // 更新时间
+    int32   Encry           = 33; // 是否加密信息 0: 不加密 1：加密
+    Combination Combination = 34; // 预留字段
+}
+
+message Combination {
+    repeated MentionStatus MentionedSlice = 1; // @人 二进制
+    repeated int64 KeyId                  = 2; // keyId 判断
+}
+
+message MentionStatus {
+    int32 UserId = 1;
+    int32 Status = 2;
+}
+
+// 数据库类型
+enum DATABASETYPE {
+    _        = 0;
+    UN_ENCRY = 1; // 非加密库
+    ENCRY    = 2; // 加密库     预留
+    VIP      = 4; // 3549VIP库 预留
+}
+
+message UserMsgListAndPts {
+    repeated UserMsg UserMsgs = 1; // 消息集合
+    int32 Pts                 = 2; // 当前PTS
+    int32 Count               = 3; // 超级群中总共有多少消息
+}
+
+message GetChannelMediaMessageHistoryByMediaConfig {
+    int32 ChannelId       = 1; // 超级群ID
+    int32 UserId          = 2; // 群成员ID
+    repeated int32 Medias = 3; // 媒体消息类型
+    int32 MaxId           = 4; // 最大MsgID 如果为0 则查询总数
+    int32 Limit           = 5; // 分页查询条数
+    int32 encry           = 6; // 是否加密群
+}
+
+message GetChannelMsgIdReq {
+    int32 ChannelId     = 1;    // 超级群ID
+    DATABASETYPE DType  = 2;
+}
+
+message GetChannelMsgIdResp {
+    ChannelMsgId ChannelMsgId = 1; // 最新的ChannelMsgId
+    ReplyErr     ReplyErr     = 2; // 返回错误描述结构体
+}
+
+message DeleteChannelMessageReq {
+    int32 ChannelId    = 1; // 超级群ID
+    int32 MsgId        = 2; // MSGID
+    DATABASETYPE DType = 3;
+}
+
+message DeleteChannelMessageResp {
+    int32 UserId       = 1; // 用户ID
+    int32 CurrentMsgId = 2; // 最新的MSGID
+    int32 UpdateDate   = 3; // topMsg的date字段
+    ReplyErr ReplyErr  = 4; // 返回错误描述结构体
+}
+
+message DeleteMsgsReq {
+    int32          ChannelId = 1; // 超级群ID
+    repeated int32 MsgIds    = 2; // 消息ID集合
+    DATABASETYPE   DType     = 3;
+}
+
+message DeleteMsgsResp {
+    int32    CurrentMsgId = 1; // 最新的ChannelMsgId
+    int32    UpdateDate  = 2; // topMsg的date字段
+    ReplyErr ReplyErr    = 3; // 返回错误描述结构体
+}
+
+message DeleteUserHistoryReq {
+    int32 ChannelId    = 1; // 超级群ID
+    int32 UserId       = 2; // 用户ID
+    DATABASETYPE DType = 3;
+}
+
+message DeleteUserHistoryResp {
+    MsgsAndMaxId MsgsAndMaxId = 1; // 最大的msgID和msgID集合
+    repeated int32    Ptss    = 2; // 返回删除消息的pts集合
+    int32    UpdateDate       = 3; // topMsg的date字段
+    ReplyErr     ReplyErr     = 4; // 返回错误描述结构体
+}
+
+message DeleteChannelMsgReq {
+    int32        ChannelId = 1; // 超级群ID
+    DATABASETYPE DType     = 2;
+}
+
+message GetChannelMessageReq {
+    int32 ChannelId    = 1; // 超级群ID
+    int32 MsgId        = 2; // MSGID
+    DATABASETYPE DType = 3;
+}
+
+message GetChannelMessageResp {
+    UserMsg   UserMsg   = 1; // 消息信息
+    ReplyErr  ReplyErr  = 2; // 返回错误描述结构体
+}
+
+message GetChannelMsgsByMsgIdsReq {
+    int32 ChannelId       = 1; // 超级群ID
+    repeated int32 MsgIds = 2; // MSGID
+    DATABASETYPE DType    = 3;
+}
+
+message GetChannelMsgsByMsgIdsResp {
+    UserMsgListAndPts UserMsgListAndPts = 1; // 消息集合 当前最大pts
+    ReplyErr          ReplyErr          = 2; // 返回错误描述结构体
+}
+
+message GetChannelMsgHistoryReq {
+    int32 ChannelId    = 1; // 超级群ID
+    int32 OffsetId     = 2; // 消息ID， 查询小于OFfsetID limit- addoffset条 如果offsetID 等于0 则取最新的limit条
+    int32 OffsetDate   = 3; // 未使用字段
+    int32 AddOffset    = 4; // 向下取消息条数， 如果不等于0 则取 大于且等于OffsetId addOffset绝对值条
+    int32 MinId        = 5; // 未使用字段
+    int32 MaxId        = 6; // 未使用字段
+    int32 Limit        = 7; // 查询条数
+    int32 Encry        = 8; // 是否加密 0: 不加密 1：加密
+    DATABASETYPE DType = 9;
+}
+
+message GetChannelMsgHistoryResp {
+    UserMsgListAndPts UserMsgListAndPts = 1; // 消息集合 当前最大pts
+    ReplyErr          ReplyErr          = 2; // 返回错误描述结构体
+}
+
+message GetChannelTopMsgReq {
+    int32 ChannelId    = 1;
+    DATABASETYPE DType = 2;
+}
+
+message GetChannelTopMsgResp {
+    UserMsg UserMsg   = 1; // 消息
+    ReplyErr ReplyErr = 2; // 返回错误描述结构体
+}
+
+// 查询打电话历史消息记录config 当 withid == withtype == 0 时 只搜索userid
+message GetMessageHistoryPageByMediaConfig {
+    int32 UserId          = 1; // 用户ID
+    int32 WithId          = 2; // 消息交互方
+    int32 WithType        = 3; // 对话框类型
+    int32 MaxId           = 4; // 消息Id 如果为0 则从最后一条开始查询
+    int32 Encry           = 5; // 是否加密
+    repeated int32 Medias = 6; // 媒体类型 20 电话
+    int32 Limit           = 7; // 分页查询条数
+}
+
+
+message GetChannelMediaMessageHistoryByMediaReq {
+    GetChannelMediaMessageHistoryByMediaConfig GetChannelMediaMessageHistoryByMediaConfig = 1;
+    DATABASETYPE DType                                                                    = 2; // 日志前缀信息
+}
+
+message GetChannelMediaMessageHistoryByMediaResp {
+    repeated UserMsg ChannelMsgs = 1; // 消息列表
+    ReplyErr ReplyErr         = 2; // 返回错误描述结构体
+
+}
+
+message SearchChannelMsgReq {
+    int32 UserID  =1;      // 消息查询者（更具UserID 查询deleteMarkID）
+    int32 ChannelID  =2;  // 消息接收者
+    int32 FromID       =3;// 消息发送者
+    repeated int32 Medias=4; // 媒体类型
+    int32 OffsetID     =5;// 偏移的MsgID
+    int32 AddOffset    =6;// 向后偏移量 （包括OffsetID）
+    int32 Encry        =7;// 是否是加密库
+    int32 Limit        =8;// 获取消息的条数限制
+    int32 MinDate      =9;// 最小日期 暂时不用
+    int32 MaxDate      =10;// 最大日期 暂时不用
+    int32 MinID        =11;// 最小MsgID
+    int32 MaxID        =12;// 最大MsgID 暂时不用
+}
+
+message SearchChannelMsgResp {
+    repeated UserMsg Messages=1;
+}
+
+//=============================================================================

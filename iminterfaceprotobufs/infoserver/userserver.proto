@@ -1,0 +1,1673 @@
+//协议文件用途:  操作和获取用户基础信息和用户的联系人信息、黑名单列表信息
+//作者：lxl
+//日期: 2017/6/22
+//版本：0.0.1
+//修改日期：
+//修改日志：
+
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/userserver.proto
+syntax = "proto3";
+package infoserver;
+
+import "gitlab.chatserver.im/im/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+
+enum ReErrCode {
+    Success = 0; //成功
+    DBError = 1; //数据库错误
+    InternalError = 2; //内部其他错误
+    NotExist = 3; //用户不存在
+    UserNameOccupied = 4; //用户名已占用
+    Register = 5; //已经注册
+    Unregister = 6; //用户注册
+    NotModify = 7; //联系人没有变化
+    Blocked = 8; //是黑名单
+    UnBlocked = 9; //不是黑明单
+    Valid = 10; //隐私选项等可用的返回
+    UnValid = 11; //隐私选项校验失败的情况
+    Failed = 12; //失败
+    HashNotSuccess = 13; //用户哈希值不合法
+    UsernameNotEmpty = 14; // user already has username
+    VipOnly = 15;
+}
+
+//根据用户id获取用户ID
+message GetUserInfoByIdReq {
+    int32 self_id = 1; //自己的用户ＩＤ
+    int32 user_id = 2; //需要获取的用户ID
+    pbcomm.Debug debug = 3;
+}
+
+message GetUserInfoByIdArrReq {
+    int32 self_id = 1; //自己的用户ＩＤ
+    repeated int32 user_ids = 2; //需要获取的用户ID
+    pbcomm.Debug debug = 3;
+}
+
+
+//用户信息数组
+message UserInfoArray {
+    repeated userInfo userin = 1;
+}
+
+//查询出来的用户基础信息（self 、contact、 mutual_contact 需要在逻辑中判断 ）
+message userInfo {
+    int32 user_id = 1; //用户的id
+    int64 access_hash = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string username = 5;
+    string phone = 6; //用户的电话号码
+    int32 status = 7; //是否在线的标识	0 代表不在线 1代表在线
+    int32 last_logout = 8; //最后在线时间
+    int32 cluster_region = 9; // 用户所在的dc
+    string font_rgb = 10; //用户的特色字体颜色（扩展使用） {0,0,0}
+    string country_code = 11; //用户的国家码
+    string photo = 12; //用户头像为json格式
+    int32 bot_info_version = 13; //机器人version
+    string bot_inline_placeholder = 14; //机器人相关
+    string restriction_reason = 15;
+    string lang_code = 16; //国家语言代码
+    string local_phone = 17;
+    bool deleted = 18;
+    bool bot = 19;
+    bool bot_chat_history = 20;
+    bool bot_nochats = 21;
+    bool verified = 22;
+    bool restricted = 23;
+    bool min = 24;
+    bool bot_inline_geo = 25;
+    bool self = 26; //是否是自己
+    bool contact = 27; //是否是自己联系人
+    bool mutal_contact = 28; //是否是双向联系人
+    bool star_mark = 29; // 是否星标联系人
+    bool show_contact_phone = 30; //是否显示联系人手机
+    int32 group_id = 31; // 组
+}
+
+//根据用户id获取用户销毁时间
+message GetUserExpireByIdReq {
+    int32 user_id = 1; //需要获取的用户ID
+    pbcomm.Debug debug = 2;
+}
+
+//获取用户账号销毁时间返回
+message GetUserExpireByIdResult {
+    int32 expire = 1; //账号销毁时间
+    ReErrCode Errorcode = 2; //返回错误码
+
+}
+
+//根据用户电话号码来获取用户信息
+message GetUserByphone {
+    string phone = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//获取用户基本信息的返回结果
+message GetUserInfoResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+message GetUserInfoByIdArrResult {
+    repeated userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//根据用户userName来获取用户基本信息
+message GetUserByUsername {
+    int32 self_id = 1;
+    string username = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//更新用户头像请求
+message updatePhotoInfoReq {
+    int32 user_id = 1; //用户ID
+    string photo = 2; //用户头像的json格式
+    int64 key_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message GetPhotoInfoReq {
+    int32 user_id = 1; //用户ID
+    pbcomm.Debug debug = 4;
+}
+
+//更新用户头像的返回
+message UpdateUserPhotoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+message GetUserPhotoResult {
+    string Photo = 1; //json photo
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新用户信息
+message UpdateUserProfileReq {
+    int32 user_id = 1; //用户ID
+    int32 flags = 2; // flags 第0 位 为更新firstName 第一位 last_name 第二位为 about
+    string first_name = 3;
+    string last_name = 4;
+    string about = 5;
+    pbcomm.Debug debug = 6;
+}
+
+//更新用户昵称等的返回结果
+message UpdateUserProfileResult {
+    userInfo Uinfo = 1; //用户基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//用户在线状态的更新
+message StatusReq {
+    int32 self_id = 1; //自己的用户ID
+    int64 key_id = 2; //用户的key_ID(自己端的keyID )
+    bool status = 3; //是否在线 true代表在线，false代表离线
+    int32 offline = 4; //离线时间
+    double longitude = 5; //地理坐标的经度
+    double latitude = 6; //地理坐标的纬度
+    pbcomm.Debug debug = 7;
+}
+
+//用户在线状态的结果
+message StatusResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//用户销毁时间的设置
+message UpdateExpireReq {
+    int32 self_id = 1; //自己的用户ID
+    int32 expire = 2; // 销毁时间单位是天
+    pbcomm.Debug debug = 3;
+}
+
+//设置账号销毁时间的返回结果
+message UpdateExpireResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//用户dc的迁移
+message UserClusterChange {
+    int32 self_id = 1; //自己的用户ID
+    int32 clusterId = 2; // 目标DcID
+    string from_ip = 4; //迁移来自哪个IP
+    int32 from_id = 5; //来自哪个用户
+    pbcomm.Debug debug = 6;
+}
+
+//用户域的迁移结果
+message UserClusterChangeResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户的username的请求
+message UpdateuserNameReq {
+    int32 user_id = 1; //用户的ID
+    string userName = 2; //需要更新的用户名
+    pbcomm.Debug debug = 3;
+    int64 key_id = 4;
+}
+
+//更新用户的username的返回结果
+message UpdateuserNameResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//检查电话号码是否已经注册
+message CheckPhoneRegisterReq {
+    string phone = 1; //需要检查的电话号码(传没处理过的电话号码)
+    pbcomm.Debug debug = 2;
+}
+
+//检查电话号码是否已经注册的返回结果
+message CheckPhoneRegisterResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除账号的请求
+message DeleteAccountByIdReq {
+    int32 user_id = 1; //被删除账号的用户id
+    int32 del_id = 2; //删除者的Id
+    pbcomm.Debug debug = 3;
+}
+
+//删除账号的返回结果
+message DelAccountResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//机器人基础信息更改
+message BotUpdateInfo {
+    int32 user_id = 1;
+    int32 bot_info_version = 2;
+    bool bot_chat_history = 3;
+    bool bot_no_chat = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//机器人更改信息的返回结果
+message BotUpdateInfoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除单个联系人的请求
+message DelContactReq {
+    //联系人的基本信息
+    int32 user_id = 1; //用户自己的id
+    int32 contact_id = 2; //联系人的id
+    int64 access_hash = 3;
+    int64 key_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//删除联系人的返回结果
+message DelContactResult {
+    userInfo Uinfo = 1; ///用户的基本信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//需要删除联系人的信息
+message ContactIdHash {
+    int32 contact_id = 1; //联系人的ID
+    int64 access_hash = 2; //联系人的用户哈希值
+}
+
+//批量删除用户的联系人
+message DelContactArrReq {
+    int32 user_id = 1; //用户自己的id
+    repeated ContactIdHash contactidArr = 2; //联系人的id数组
+    int64 key_id = 3;
+    pbcomm.Debug debug = 4;
+}
+
+// 重置user联系人信息
+message CmdResetUserContactsReq{
+    int32 amdin_id = 1; // 使用命令的人的id
+    string phone_number = 2; // 要重置联系人的电话号码
+}
+
+message CmdResetUserContactsResult{
+    repeated int32 current_contact_ids = 1; // 操作成功后当前的联系人id列表
+}
+
+//批量删除用户的联系人的返回
+message DelContactArrResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取用户联系人列表的请求
+message ContatsGetContactsReq {
+    int32 userId = 1; //用户的Id
+    int64 keyId = 2; // 用户的keyId
+    string contacthash = 3; //用户联系人的哈希值
+    pbcomm.Debug debug = 4;
+}
+
+//联系人的基本信息
+message contactInfo {
+    int32 user_id = 1; //用户自己的id
+    int32 contact_id = 2; //联系人的id
+    string first_name = 3; //联系人备注
+    string last_name = 4; //联系人备注
+    bool is_self_contacted = 5; //此联系人是否是自己的联系人
+    bool self_is_contacted = 6; //自己是不是此联系人的联系人
+    bool star_mark = 7; //  是否为星标联系人
+    bool has_phone = 8; // 是否通过电话号码添加
+}
+
+//用户联系人列表获取的返回
+message ContatsGetContactsResult {
+    repeated contactInfo contactArr = 1; //联系人的的信息们
+    repeated userInfo userInfoArr = 2; //联系人们的用户信息们
+    ReErrCode Errorcode = 3; //返回错误码
+
+}
+
+//电话本联系人信息
+message PhoneBookContact {
+    int64 client_id = 1;
+    string phone = 2; //电话号码
+    string first_name = 3;
+    string last_name = 4;
+}
+
+//导入\添加联系人的请求包
+message ContactsImportPhoneContactsReq {
+    int64 key_id = 1; //端标识
+    int32 user_id = 2; //用户的ID
+    repeated PhoneBookContact phoneContactArr = 3; //联系人的电话号码的列表
+    pbcomm.Debug debug = 4;
+}
+
+//导入联系人详细信息
+message ImportContact {
+    int32 user_id = 1;
+    int64 client_id = 2;
+}
+
+message PopularContact {
+    int64 client_id = 1;
+    int32 importers = 2;
+}
+
+//导入联系人的返回结果
+message ContactsImportPhoneContactsResult {
+    repeated ImportContact imContactDetail = 1; //导入联系人的信息
+    repeated userInfo userInfoArr = 2; //联系人们的用户信息们
+    repeated PopularContact PopuContact = 3;
+    ReErrCode Errorcode = 4; //返回错误码
+}
+
+//关联用户ｉＤ结构
+message AddRelationIdInfo {
+    int32 user_id = 1; //用户自己的id
+    int32 relation_id = 2; //联系人的id
+    pbcomm.Debug debug = 3;
+}
+
+//解除用户关联的
+message DelRelationIdInfo {
+    int32 user_id = 1; //用户自己的id
+    int32 relation_id = 2; //联系人的id
+    pbcomm.Debug debug = 3;
+}
+
+//关联用户用户关系的返回
+message AddRelationIdInfoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//解除用户用户关系的返回
+message DelRelationIdInfoResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//拉黑用户的请求
+message BlockeduserReq {
+    int32 user_id = 1; //用户自己的id
+    int32 blocked_id = 2; //联系人的id
+    int64 Access_hash = 3; //联系人id对应的哈希值
+    int64 key_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//拉黑用户的返回
+message BlockeduserResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//将用户从黑明单中移除的请求
+message ContactUnblockedReq {
+    int32 user_id = 1; //用户自己的id
+    int32 blocked_id = 2; //联系人的id
+    int64 Access_hash = 3; //联系人id对应的哈希值
+    int64 key_id = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//获取黑明单列表
+message ContactsGetBlockedReq {
+    int32 user_id = 1; //用户自己的id
+    pbcomm.Debug debug = 5;
+}
+
+//黑名单用户的信息
+message blockeduser {
+    int32 user_id = 1; //黑明单的用户
+    int32 date = 2;
+}
+
+//获取黑明单列表的返回
+message ContactsGetBlockedResult {
+    repeated int32 blockeduser = 1; //黑明单的ID
+    repeated userInfo InfoArr = 2; //黑名单的用户的基础信息们
+    ReErrCode Errorcode = 3; //返回错误码
+}
+
+//系统白名单的基础信息
+message SystemWhiteUser {
+    int32 user_id = 1; //用户自己的id
+    int32 level = 2; //白名单的权限级别
+    int32 proby = 3; //将用户白名单修改的用户
+    bool is_white = 4; // true if user is white
+}
+
+//存储系统白名单的请求
+message StoreSysWhiteUserReq {
+    int32 user_id = 1; //用户自己的id
+    int32 level = 2; //白名单的权限级别
+    int32 proby = 3; //将用户白名单修改的用户
+    pbcomm.Debug debug = 4;
+}
+
+//存储系统白名单的返回结果
+message StoreSysWhiteUserResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户系统白名单的请求
+message UpdateSystemWhiteUserLevelReq {
+    int32 user_id = 1; //用户自己的id
+    int32 level = 2; //白名单的权限级别
+    int32 proby = 3; //将用户白名单修改的用户
+    pbcomm.Debug debug = 4;
+}
+
+//更新用户系统白名单的返回结果
+message UpdateSystemWhiteUserLevelResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取系统白名单权限
+message GetSysWhiteUserReq {
+    int32 userId = 1; // 需要获取指定白名单人的权限
+    pbcomm.Debug debug = 2;
+}
+
+//获取系统白名单权限结果
+message GetSysWhiteUserResult {
+    SystemWhiteUser sysWhiteInfo = 1; //系统白名单信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取系统所有白名单请求
+message GetSysWhiteUserArrReq {
+    pbcomm.Debug debug = 1;
+}
+
+//获取系统所有白名单返回
+message GetSysWhiteUserArrResult {
+    repeated SystemWhiteUser sysWhiteInfoArr = 1; //系统白名单信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//删除系统白名单用户的请求
+message DelSysWhiteUserReq {
+    int32 userId = 1; //需要删除的系统白名单的用户的ID
+    int32 ProUser = 2; //删除用户白名单的人
+    pbcomm.Debug debug = 3;
+}
+
+//删除系统白名单用户的返回结果
+message DelSysWhiteUserResult {
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//user的ＤＣ的信息
+message UserDc {
+    int32 user_id = 1; //userId
+    int32 dc_id = 2; //用户的DCId
+    pbcomm.Debug debug = 3;
+}
+
+//拉取所有用户的DC的请求
+message GetAllDcReq {
+    pbcomm.Debug debug = 1;
+}
+
+//设置隐私选项的接口的请求
+message SetPrivacyReq {
+    int32 user_id = 1;
+    int32 privacy_type = 2; //隐私选项的类型 1 代表 在线时间的设置  2 代表群组邀请的设置  3、代表phonecall的设置
+    int32 range = 3; // 1 代表每个人 2 代表 我的联系人  3、代表没有人
+    repeated int32 always_disallow = 4; //永不分享的列表
+    repeated int32 always_allow = 5; //总是分享的列表
+    string ip = 6;
+    int64 keyId = 7;
+    int64 session_id = 8;
+    string phone = 9;
+    pbcomm.Debug debug = 10;
+}
+
+//设置隐私选项的接口的返回
+message SetPrivacyResult {
+    repeated userInfo UinfoArr = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取隐私选项的接口
+message GetPrivacyReq {
+    int32 user_id = 1; //需要请求的用户的Id
+    int32 privacy_type = 2; //隐私选项的类型 1 代表 在线时间的设置  2 代表群组邀请的设置  3、代表phonecall的设置
+    int64 keyId = 3;
+    int64 session_id = 4; //
+    string ip = 5;
+    string phone = 6;
+    pbcomm.Debug debug = 7;
+}
+
+//检查相应的隐私设置是否被允许的请求接口
+message CheckPrivacyReq {
+    int32 self_id = 1; //检查自己是否是在 userId 相应权限允许列表中
+    int32 user_id = 2;
+    int32 privacy_type = 3; //隐私选项的类型 1 代表 在线时间的设置  2 代表群组邀请的设置  3、代表phonecall的设置
+    pbcomm.Debug debug = 4;
+}
+
+//检查相应的隐私设置是否被允许的请求返回
+message CheckPrivacyResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//隐私选项获取的结果
+message GetPrivacyResult {
+    int32 range = 1; // 1 代表每个人 2 代表 我的联系人  3、代表没有人 4、代表不允许我的所有联系人
+    repeated int32 always_disallow = 2; //永不分享的列表
+    repeated int32 always_allow = 3; //总是分享的列表
+    repeated userInfo userInfos = 4; //永不分享的列表和总是分享列表的 用户信息们
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+//存储sticker 集合概要的请求参数
+message StoreShopStickerSetReq {
+    int64 access_hash = 1;
+    bool free = 2;
+    bool official = 3;
+    bool masks = 4;
+    string title = 5;
+    string short_name = 6;
+    int32 count = 7;
+    int64 hash = 8;
+    string emoticon = 9;
+    repeated int32 documents = 10;
+    pbcomm.Debug debug = 11;
+    int32 user_id = 12; //sticker作者id - 2018.10.18 新增
+}
+//存储sticker 集合概要的返回
+message StoreShopStickerSetResult {
+    int32 id = 1; //Sticker生成的id
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//存储sticker 集合概要 Documents请求
+message StoreShopStickerSetDocumentsReq {
+    int32 id = 1;
+    repeated int32 documents = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//存储sticker 集合概要 Documents返回结果
+message StoreShopStickerSetDocumentsResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除sticker商城的请求
+message DeleteStickerSetReq {
+    int32 stickerId = 1;
+    pbcomm.Debug debug = 2;
+    int32 user_id = 3; //sticker作者id - 2018.10.18 新增
+}
+
+//删除sticker商城的返回
+message DeleteStickerSetResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//sticker set 的基础信息
+message StickerSetInfo {
+    int32 id = 1;
+    int64 access_hash = 2;
+    bool free = 3;
+    bool official = 4;
+    bool masks = 5;
+    string title = 6;
+    string short_name = 7;
+    int32 count = 8;
+    int64 hash = 9;
+    string emoticon = 10;
+    repeated int32 documents = 11;
+}
+
+//获取指定的sticker集合的请求
+message GetStickerSetInfoReq {
+    int32 id = 1; //sticker的id
+    string short_name = 2;
+    bool is_id = 3; //是否是根据Id来查 true 根据Id查询 false根据short_name 查询
+    pbcomm.Debug debug = 4;
+}
+
+////获取指定的sticker集合的返回
+message GetStickerSetInfoResult {
+    StickerSetInfo stickerSetInfo = 1; //sticker的基础信息
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//sticker集合里面具体内容
+//存储单个sticker内容请求
+message StickerPackDocumentBase {
+    int64 attributes_stiker_set_id = 1;
+    uint64 document_id = 2;
+    int64 access_hash = 3;
+    string mime_type = 4;
+    int32 size = 5;
+    string thumb = 6;
+    int32 dc_id = 7;
+    int32 date = 8;
+    int32 attributes_image_size_w = 9;
+    int32 attributes_image_size_h = 10;
+    string attributes_stiker_alt = 11;
+    int64 attributes_stiker_set_access_hash = 12;
+    string attributes_file_name = 13;
+}
+
+
+message StickerPackDocumentInfo {
+    int32 id = 1;
+    StickerPackDocumentBase infoBase = 2;
+}
+
+//存储sticker文档的请求
+message StoreStickerPackDcReq {
+    StickerPackDocumentBase stickpackbase = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//存储sticker文档的返回
+message StoreStickerPackDcResult {
+    int32 id = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//批量导入sticker的请求
+message StoreStickerPackDcArrReq {
+    repeated StickerPackDocumentBase StPDB = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//批量导入sticker的返回
+message StoreStickerPackDcArrResult {
+    repeated int32 idArr = 1; //导入后的id的列表
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取一个sticker下面的所有贴图信息的请求
+message GetStickerSetPackDcInfosReq {
+    int32 id = 1; //stickerSet 的id
+    pbcomm.Debug debug = 2;
+}
+
+//获取一个sticker下面的所有贴图信息的返回
+message GetStickerSetPackDcInfosResult {
+    repeated StickerPackDocumentInfo StPDcInfo = 1;
+}
+
+// 添加喜欢的sticker 请求
+message AddOrDeleteFaveSticerReq {
+    int32 UserId       = 1; // 用户ID
+    int64 StickerId    = 2; // sticker 的 id
+    bool Unfave        = 3; // 是否取消 true: 取消喜欢 false: 添加为喜欢
+    pbcomm.Debug debug = 4;
+}
+
+// 添加喜欢的sticker 返回
+message AddOrDeleteFaveSticerResult {
+    ReErrCode ErrorCode = 1; // 返回错误码
+}
+
+// 获取已经添加的的喜爱单个贴图 请求
+message GetFavedStickersReq {
+    int32 UserId       = 1;
+    int32 Hash         = 2;
+    pbcomm.Debug debug = 3;
+}
+
+// 获取已经添加的的喜爱单个贴图 返回
+message GetFavedStickersResult {
+    int32 Hash = 1;
+    repeated StickerPack packs = 2;
+    repeated StickerPackDocumentBase stickers = 3;
+    ReErrCode ErrorCode        = 4; // 返回错误码
+}
+
+message StickerPack {
+    string Emoticon = 1;
+    int64 DocumentId = 2;
+}
+
+//用户安装sticker集合的请求
+message StoreUserStickerSetReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    bool installed = 3;
+    bool disabled = 4;
+    int32 order = 5;
+    bool archived = 6;
+    pbcomm.Debug debug = 7;
+}
+
+//用户安装sticker集合的返回
+message StoreUserStickerSetResult {
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新用户stickerdisable请求
+message UpdateUserStickerSetDisabledReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    bool disabled = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//更新用户stickerdisable结果
+message UpdateUserStickerSetDisabledResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户的Sticker的顺序
+message UpdateUserStickerSetOrderReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    int32 order = 3;
+    pbcomm.Debug debug = 4;
+}
+
+//更新用户的Sticker的顺序返回
+message UpdateUserStickerSetOrderResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//更新用户的Sticker install和archived
+message UpdateUserStickerSetInstallArReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    bool archived = 3;
+    bool installed = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//更新用户的Sticker install和archived的返回
+message UpdateUserStickerSetInstallArResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除sticker的请求
+message DeleteuserStickerReq {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    pbcomm.Debug debug = 3;
+}
+
+//删除sticker的返回
+message DeleteuserStickerResult {
+    int32 user_id = 1;
+    int32 stickerset_id = 2;
+    ReErrCode Errorcode = 3; //返回错误码
+}
+
+//用户Sticker的信息
+message UserStickerInfo {
+    int32 stickerset_id = 1;
+    bool installed = 2;
+    bool disabled = 3;
+    int32 order = 4;
+    int64 access_hash = 5;
+    bool free = 6;
+    bool official = 7;
+    bool archived = 8;
+    bool masks = 9;
+    string title = 10;
+    string short_name = 11;
+    int32 count = 12;
+    int64 hash = 13;
+    string emotico = 14;
+    repeated int32 documents = 15;
+}
+
+//获取的sticker信息的列表
+message UserStickerInfoArr {
+    repeated UserStickerInfo stickerInfo = 1;
+}
+
+//获取的sticker集合的所有信息
+message StickerSetInfoArr {
+    repeated StickerSetInfo stickerInfo = 1;
+}
+
+//获取用户的所有的贴图请求
+message GetuserAllStickersReq {
+    int32 user_id = 1;
+    pbcomm.Debug debug = 2;
+
+}
+
+//获取用户的所有的贴图的返回
+message GetuserAllStickersResult {
+    repeated UserStickerInfo stickerInfoArr = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取所有sticker集合信息
+message GetAllStickerSetsReq {
+    pbcomm.Debug debug = 1;
+
+}
+
+//获取所有sticker集合信息的返回
+message GetAllStickerSetsResult {
+    repeated StickerSetInfo stickerInfoArr = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//删除单个sticker
+message DeleteStickerPackDocumentReq{
+    int32 id = 1;
+    int64 stickerset_id = 2;
+}
+
+//删除单个sticker返回
+message DeleteStickerPackDocumentResult{
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取作者sticker
+message GetAuthorStickerSetReq{
+    int32 user_id = 1;
+    int64 set_id =2;
+}
+
+//获取作者sticker返回
+message GetAuthorStickerSetResult{
+   ReErrCode ErrorCode = 1; //返回错误码
+   AuthorStickerSet set = 2;
+}
+
+//获取作者所有sticker
+message GetAuthorAllStickerSetReq{
+   int32 user_id = 1;
+}
+
+//获取作者所有sticker返回
+message GetAuthorAllStickerSetResult{
+   ReErrCode ErrorCode = 1; //返回错误码
+   repeated AuthorStickerSet sets = 2;
+}
+
+//结构体AuthorStickerSet
+message AuthorStickerSet{
+    int32 user_id =1;
+    int64 stickerset_id = 2;
+    string short_name = 3;
+    bool archived = 4;
+    bool installed = 5;
+    bool disabled = 6;
+    int32 ordered = 7;
+    int32 created = 8;
+    int32 updated = 9;
+}
+
+//统计sticker数量
+message CountAuthorAllStickerSetReq{
+    int32 user_id = 1;
+}
+
+//统计拥有sticker数量返回
+message CountAuthorAllStickerSetResult{
+    ReErrCode ErrorCode = 1; //返回错误码
+    int64 count = 2;
+}
+
+//用户gif的动态图集合
+message userGifInfoArr {
+    repeated userSaveGifInfo gif_arr = 1;
+}
+
+//保存用户动态图的请求
+message userSaveGifInfo {
+    int32 user_id = 1;
+    string gif_id = 2;
+    uint64 fid = 3;
+    int64 git_hash = 4;
+}
+
+//保存gif动态图的请求
+message SaveUserGifReq {
+    int32 user_id = 1;
+    string gif_id = 2;
+    uint64 fid = 3;
+    int64 git_hash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//保存gif动态图的请求返回
+message SaveUserGifResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//删除动态图的请求
+message DelUserGifReq {
+    int32 user_id = 1;
+    uint64 fid = 3;
+    int64 git_hash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+//删除动态图的返回
+message DelUserGifResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取用户的gifs
+message GetUserGifsReq {
+    int32 userId = 1;
+    int32 hash = 2; //校验hash
+    pbcomm.Debug debug = 3;
+}
+
+//获取用户的gifs返回
+message GetUserGifsResult {
+    int32 userId = 1;
+    int32 hash = 2; //校验hash
+    repeated userSaveGifInfo gif_arr = 3;
+    ReErrCode Errorcode = 4; //返回错误码
+}
+
+//检测用户是否是黑名单的请求
+message CheckUserIsBlockedReq {
+    int32 self_id = 1; //自己的id
+    int32 user_id = 2; //需要判断是否是自己黑名单的ID
+    pbcomm.Debug debug = 3;
+}
+
+//检测用户黑名单的返回
+message CheckUserIsBlockedResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//注册用户请求的基础信息
+message registerUserInfo {
+    int32 user_id = 1; //国家码
+    int64 access_hash = 2; //给用户生成的哈希值
+    string phone = 3; //用户的电话号码
+    string country_code = 4; //国家码
+    string local_phone = 5; //去掉国家码的电话号码
+    string first_name = 6;
+    string last_name = 7;
+    bool is_bot = 8; //是否是机器人
+    int32 bot_info_version = 9;
+    bool bot_chat_history = 10;
+    bool bot_no_chats = 11;
+}
+
+//更新用户信息返回
+message UpdateUserInfoResult {
+    userInfo uinfo = 1; //用户的具体信息
+    int32 ErrorCode = 2; // 失败的错误码
+    bool Result = 3; //成功或者失败
+}
+
+//检测用户哈希值是否合法请求参数
+message checkUserAccessHashValidReq {
+    int32 UserId = 1; //需要校验的用户的ID
+    int64 AccessHash = 2; //需要校验的用户的哈希值
+    pbcomm.Debug debug = 3; //日志记录相关的
+}
+
+//检测用户哈希值是否合法返回结构
+message checkUserAccessHashValidResult {
+    bool isValid = 1; //是否可用
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//注册指定用户的请求
+message RegisterUserInfoReq {
+    int32 user_id = 1;
+    int64 access_hash = 2;
+    string PhoneNumber = 3; //电话号码
+    string FirstName = 4;
+    string LastName = 5;
+    bool is_bot = 6;
+    int32 bot_info_version = 7;
+    bool bot_chat_history = 8;
+    bool bot_no_chats = 9;
+    pbcomm.Debug debug = 10;
+}
+
+//注册指定用户的请求
+message RegisterUserInfoResult {
+    userInfo uinfo = 1;
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+// 获取音效设置
+message GetNotifySettingsReq {
+    int32 from_id = 1;
+    int32 req_type = 2; // 1表示获取用户的  2.表示获取群的
+    pbcomm.Debug debug = 3;
+}
+
+// 音效设置返回
+message GetNotifySettingsResult {
+    bool Show_previews = 1; // 是否展示预览
+    bool Silent = 2; // 是否静音
+    int32 Mute_until = 3; // 静音时长
+    string Sound = 4; // 声音类型
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+// 更新音效设置
+message UpdateNotifySettingsReq {
+    int32 from_id = 1;
+    int32 req_type = 2; // 1表示获取用户的  2.表示获取群的
+    bool Show_previews = 3;
+    bool Silent = 4;
+    int32 Mute_until = 5;
+    string Sound = 6;
+    pbcomm.Debug debug = 7;
+}
+
+// 更新音效
+message UpdateNotifySettingsResult {
+    ReErrCode Errorcode = 1; //返回错误码
+}
+
+//获取自己所有联系人的在线状态请求
+message GetContactsStatusReq {
+    int32 self_id = 1;
+    pbcomm.Debug debug = 2;
+}
+
+//联系人的在线状态
+message UserStaus {
+    int32 user_id = 1; //用户的Id
+    int32 status = 2; //用户的在线状态
+    int32 offline_time = 3; //用户的最后的在线时间
+}
+
+//获取自己所有联系人的在线状态返回
+message GetContactsStatusResult {
+    repeated UserStaus contactStatusArr = 1; //联系人的在线状态
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//更新机器人头像请求
+message UpdateBotPicRequest {
+    int32 bot_id = 1;
+    bytes photo = 2; //(mtproto.TL_photo_layer105)
+    pbcomm.Debug debug = 3;
+}
+
+message UpdateBotPicResult {
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//获取所有代理的IP和端口请求
+message GetAllProxyConfigReq {
+    pbcomm.Debug debug = 1;
+}
+
+//代理的配置的地址结构
+message ProxyAddr {
+    string ip = 1; //代理的IP地址
+    string innerIp =2;//代理的内网ip地址
+    int32 port = 3; //代理的端口号
+
+}
+//获取所有代理的IP和端口返回结构
+message GetAllProxyConfigResult {
+    repeated ProxyAddr addrs = 1; //代理转发的IP地址们
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+//检查用户名是否经被占用请求
+message CheckUserNameOccupiedReq {
+    int32 userid = 1;
+    string user_name = 2; //需要被监测的用户名称
+    pbcomm.Debug debug = 3;
+}
+
+//检查用户名是否经被占用返回结果
+message CheckUserNameOccupiedResult {
+    bool occpuy = 1; //是否被占用
+}
+
+//获取用户最新的GPS的请求
+message GetUserGpsReq {
+    int32 userid = 1; //需要获取用户GPs的用户的ID
+    pbcomm.Debug debug = 2;
+}
+
+//获取用户的GPS的请求
+message GetUserGpsResult {
+    double latitude = 1;
+    double longitude = 2;
+    string device_module = 3;
+    int32 timestamp = 4; //最新的时间
+    ReErrCode Errorcode = 5; //返回错误码
+}
+
+//检测是否是自己是否是对方的联系人
+message CheckSelfIsContactReq {
+    int32 selfId = 1; //自己的Id
+    int32 userId = 2; //检测方的id
+    pbcomm.Debug debug = 3;
+}
+
+//检测是否是自己是否是对方的联系人的返回结果
+message CheckSelfIsContactResult {
+    bool SelfIsContact = 1; //自己是否是对方的联系人
+    ReErrCode Errorcode = 2; //返回错误码
+}
+
+// user switch type
+enum Switch{
+    Unused = 0;
+    UsernameSearch = 1;
+    UnreadIncludeMuted = 2;
+    DisableMultiSignIn = 3;
+}
+
+// update switch setting
+message UpdateSwitchReq{
+    int32 user_id = 1;
+    Switch switch = 2;
+    bool on_off = 3;
+
+}
+
+message UpdateSwitchResult{
+    ResultCode code = 1;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// get switch setting
+message GetSwitchStatusReq{
+    int32 user_id = 1;
+    Switch switch = 2;
+}
+
+message GetSwitchStatusResult{
+    bool on_off = 1;
+    ResultCode code = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//*************************************API ******************************************************
+//user service 接口
+service UserServerService {
+    //注册指定用户的接口()
+    rpc RegisterUserInfo (RegisterUserInfoReq) returns (RegisterUserInfoResult) {
+    }
+    //获取用户信息
+    rpc GetUserInfoById (GetUserInfoByIdReq) returns (GetUserInfoResult) {
+    }
+    rpc GetUserInfoByIdArr (GetUserInfoByIdArrReq) returns (GetUserInfoByIdArrResult) {
+    }
+    //获取账号的销毁时间f
+    rpc GetUserExpierById (GetUserExpireByIdReq) returns (GetUserExpireByIdResult) {
+    }
+    //通过用户电话号码获取用户基本信息
+    rpc GetUserInfoByPhone (GetUserByphone) returns (GetUserInfoResult) {
+    }
+    //通过username获取用户基本信息
+    rpc GetUserInfoByUsername (GetUserByUsername) returns (GetUserInfoResult) {
+    }
+    //更新用户头像
+    rpc UpdateUserPhoto (updatePhotoInfoReq) returns (UpdateUserPhotoResult) {
+    }
+    //获取用户头像
+    rpc GetUserPhoto (GetPhotoInfoReq) returns (GetUserPhotoResult) {
+    }
+    //更新用户名称和about
+    rpc UpdateUserProfile (UpdateUserProfileReq) returns (UpdateUserProfileResult) {
+    }
+    //更新用户用户status
+    rpc UpdateUserStatus (StatusReq) returns (StatusResult) {
+    }
+    //update user online status
+    rpc UpdateUserStatusV2(StatusReq) returns (StatusResult){
+    }
+    //设置用户账号销毁时间
+    rpc UpdateUserExpire (UpdateExpireReq) returns (UpdateExpireResult) {
+    }
+    //用户DC的迁移
+    rpc UpdateUserCluster (UserClusterChange) returns (UserClusterChangeResult) {
+    }
+    //更新用户的username
+    rpc UpdateUserName (UpdateuserNameReq) returns (UpdateuserNameResult) {
+    }
+    //校验用户名称是否被占用
+    rpc CheckUserNameOccupied (CheckUserNameOccupiedReq) returns (CheckUserNameOccupiedResult) {
+    }
+
+    //检查电话号码是否已经注册
+    rpc CheckPhoneRegister (CheckPhoneRegisterReq) returns (CheckPhoneRegisterResult) {
+    }
+    //账号(标记删除)
+    rpc DeleteUserInfoById (DeleteAccountByIdReq) returns (DelAccountResult) {
+    }
+    //更新机器人相关信息
+    rpc UpdateBotInfo (BotUpdateInfo) returns (BotUpdateInfoResult) {
+    }
+    //更新机器人头像
+    rpc UpdateBotPic (UpdateBotPicRequest) returns (UpdateBotPicResult) {
+    }
+    //检测用户哈希是否合法
+    rpc checkUserAccessHashValid (checkUserAccessHashValidReq) returns (checkUserAccessHashValidResult) {
+    }
+    //********************************联系人的相关接口
+    //删除单个联系人的接口
+    rpc ContactsDelContact (DelContactReq) returns (DelContactResult) {
+    }
+    //批量删除用户联系人的接口
+    rpc ContactsDelContactsArr (DelContactArrReq) returns (DelContactArrResult) {
+    }
+    // 重置用户联系人信息，删除所有联系人
+    rpc CmdResetUserContacts (CmdResetUserContactsReq) returns (CmdResetUserContactsResult) {
+    }
+    //获取用户联系人列表
+    rpc ContactsGetContacts (ContatsGetContactsReq) returns (ContatsGetContactsResult) {
+    }
+    //批量导入联系人的操作(具体业务逻辑在用户服务来实现)
+    rpc ImportContacts (ContactsImportPhoneContactsReq) returns (ContactsImportPhoneContactsResult) {
+    }
+    //获取自己所有联系人的在线状态
+    rpc GetContactsStatus (GetContactsStatusReq) returns (GetContactsStatusResult) {
+    }
+    //检测自己是否是对方的联系人
+    rpc CheckSelfIsContact (CheckSelfIsContactReq) returns (CheckSelfIsContactResult) {
+    }
+    //************用户关联表 用户在线状态的更新*******************
+    //创建dialog的增加用户关系（单聊）
+    rpc DialogUserRelation (AddRelationIdInfo) returns (AddRelationIdInfoResult) {
+    }
+    //删除dialog的剔除用户关系
+    rpc DelDialogUserRelation (DelRelationIdInfo) returns (DelRelationIdInfoResult) {
+    }
+    //**********用户黑名单的管理 ***************
+    //拉黑用户
+    rpc BlockedUser (BlockeduserReq) returns (BlockeduserResult) {
+    }
+    //移除拉黑的用户
+    rpc ContactUnBlockedUser (ContactUnblockedReq) returns (BlockeduserResult) {
+    }
+    //获取用户的黑明单列表
+    rpc ContactsGetBlocked (ContactsGetBlockedReq) returns (ContactsGetBlockedResult) {
+    }
+    //检测用户是否是黑名单
+    rpc CheckUserIsBlocked (CheckUserIsBlockedReq) returns (CheckUserIsBlockedResult) {
+    }
+
+    //***********系统白名单的相关操作和管理*******************
+    //存储白名单
+    rpc StoreSystemWhiteUser (StoreSysWhiteUserReq) returns (StoreSysWhiteUserResult) {
+    }
+    //更新用户白名单的级别
+    rpc UpdateSystemWhiteUserLevel (UpdateSystemWhiteUserLevelReq) returns (UpdateSystemWhiteUserLevelResult) {
+    }
+    //获取指定的白名单人信息
+    rpc GetSysWhiteUser (GetSysWhiteUserReq) returns (GetSysWhiteUserResult) {
+    }
+    //获取白名单列表 )
+    rpc GetSysWhiteUserArr (GetSysWhiteUserArrReq) returns (GetSysWhiteUserArrResult) {
+    }
+    //移除指定的白名单人
+    rpc DelSysWhiteUser (DelSysWhiteUserReq) returns (DelSysWhiteUserResult) {
+    }
+    //拉取所有用户的DC
+    rpc GetAllUserDc (GetAllDcReq) returns (stream UserDc) {
+    }
+
+    //************************* 有关隐私选项设置的接口们 ****************************************
+    //设置隐私选项的接口
+    rpc SetUserPrivacy (SetPrivacyReq) returns (SetPrivacyResult) {
+    }
+    //获取隐私选项的接口
+    rpc GetUserPrivacy (GetPrivacyReq) returns (GetPrivacyResult) {
+    }
+    //检测用户的隐私选项
+    rpc CheckUserPrivacy (CheckPrivacyReq) returns (CheckPrivacyResult) {
+    }
+
+    //************************* 有关sticker的设置和获取 ****************************************
+    //存储sticker集合的概要
+    rpc StoreStickerSet (StoreShopStickerSetReq) returns (StoreShopStickerSetResult) {
+    }
+
+    //存储sickerSet 的documents
+    rpc StoreStickerSetDocument (StoreShopStickerSetDocumentsReq) returns (StoreShopStickerSetDocumentsResult) {
+    }
+    //删除指定的sticker集合
+    rpc DeleteShopStickerSet (DeleteStickerSetReq) returns (DeleteStickerSetResult) {
+    }
+    //获取指定的sticker集合
+    rpc GetStickerSetInfo (GetStickerSetInfoReq) returns (StickerSetInfo) {
+    }
+
+    //存储stickerSet下面的单个贴图
+    rpc StoreStickerPackDc (StoreStickerPackDcReq) returns (StoreStickerPackDcResult) {
+    }
+    //批量导入sticker
+    rpc StoreStickerPackDcArr (StoreStickerPackDcArrReq) returns (StoreStickerPackDcArrResult) {
+    }
+    //获取一个sticker下面的所有贴图信息
+    rpc GetStickerSetPackDcInfos (GetStickerSetPackDcInfosReq) returns (GetStickerSetPackDcInfosResult) {
+    }
+
+    // 添加或者取消喜欢的sticker unfave = true: 取消喜欢 unfave = false: 添加为喜欢
+    rpc AddOrDeleteFaveSticer (AddOrDeleteFaveSticerReq) returns (AddOrDeleteFaveSticerResult) {}
+
+    // 获取已经添加的的喜爱单个贴图集合
+    rpc GetFavedStickers (GetFavedStickersReq) returns (GetFavedStickersResult) {}
+
+    //***************用户安装sticker的操作*******
+    rpc StoreUserStickerSet (StoreUserStickerSetReq) returns (StoreUserStickerSetResult) {
+    }
+    //更新sticker的用户禁用状态
+    rpc UpdateUserStickerDisable (UpdateUserStickerSetDisabledReq) returns (UpdateUserStickerSetDisabledResult) {
+    }
+    //更新sticker的order
+    rpc UpdateUserStickerOrder (UpdateUserStickerSetOrderReq) returns (UpdateUserStickerSetOrderResult) {
+    }
+    //更新sticker的installed和archived
+    rpc UpdateUserStickerInstallArchived (UpdateUserStickerSetInstallArReq) returns (UpdateUserStickerSetInstallArResult) {
+    }
+    //删除用户指定的Sticker
+    rpc DeleteUserSticker (DeleteuserStickerReq) returns (DeleteuserStickerResult) {
+    }
+    //获取用户sticker集合信息
+    rpc GetuserAllStickers (GetuserAllStickersReq) returns (GetuserAllStickersResult) {
+    }
+    //获取所有sticker集合信息
+    rpc GetAllStickerSets (GetAllStickerSetsReq) returns (GetAllStickerSetsResult) {
+    }
+    //删除指定sticker包的单个sticker
+    rpc DeleteStickerPackDocument (DeleteStickerPackDocumentReq) returns (DeleteStickerPackDocumentResult) {
+    }
+    //根据setId查询作者的sticker
+    rpc GetAuthorStickerSet(GetAuthorStickerSetReq) returns (GetAuthorStickerSetResult){
+    }
+    //查询作者所有的sticker
+    rpc GetAuthorAllStickerSet(GetAuthorAllStickerSetReq) returns (GetAuthorAllStickerSetResult){
+    }
+    //计算作者拥有sticker数量
+    rpc CountAuthorAllStickerSet(CountAuthorAllStickerSetReq) returns (CountAuthorAllStickerSetResult){
+    }
+
+    //********************用户动态图的接口们 *********
+    //保存gif动态图
+    rpc SaveUserGif (SaveUserGifReq) returns (SaveUserGifResult) {
+    }
+    //删除动态图
+    rpc DelUserGif (DelUserGifReq) returns (DelUserGifResult) {
+    }
+    //获取用户的gifs
+    rpc GetUserGifs (GetUserGifsReq) returns (GetUserGifsResult) {
+    }
+
+    //********************推送音效等设置 *****************
+    // 获取音效设置
+    rpc GetNotifySettings (GetNotifySettingsReq) returns (GetNotifySettingsResult) {
+    }
+    // 更新音效设置
+    rpc UpdateNotifySettings (UpdateNotifySettingsReq) returns (UpdateNotifySettingsResult) {
+    }
+    //********************代理配置的获取 *****************
+    //获取所有的代理的配置们
+    rpc GetAllProxyConfig (GetAllProxyConfigReq) returns (GetAllProxyConfigResult) {
+    }
+
+    //********* 用户相关的GPS *********
+    rpc GetUserGps (GetUserGpsReq) returns (GetUserGpsResult) {
+    }
+
+    //********* switches ****************
+    rpc UpdateSwitch (UpdateSwitchReq) returns (UpdateSwitchResult) {
+    }
+
+    rpc GetSwitchStatus (GetSwitchStatusReq) returns(GetSwitchStatusResult) {
+    }
+
+    //****************** only for  simple chat *************************
+    rpc UpdateUserGrender (UpdateUserGrenderReq) returns (UpdateUserGrenderResult) {
+    }
+
+    rpc UpdateUserEmail (UpdateUserEmailReq) returns (UpdateUserEmailResult) {
+    }
+
+    rpc UpdateUserLocation (UpdateUserLocationReq) returns (UpdateUserLocationResult) {
+    }
+    //上传保存联系人
+    rpc UploadContacts(UploadContactsReq) returns (UploadContactsResult) {
+    }
+
+    //联系人申请
+    rpc ApplyContact(ApplyContactReq)returns(ApplyContactResult){
+    }
+
+    //确认添加申请
+    rpc VerifyContact(VerifyContactReq)returns(VerifyContactResult){
+    }
+
+    //获取被添加用户申请列表
+    rpc GetAppliedContacts(GetAppliedContactsReq)returns(GetAppliedContactsResult){
+    }
+
+    //删除单个申请列表
+    rpc DeleteAppliedContact(DeleteAppliedContactReq)returns(DeleteAppliedContactResult){
+    }
+
+    //联系人搜索用户
+    rpc SearchUserByPhone(SearchUserByPhoneReq)returns(SearchUserByPhoneResult){
+    }
+
+    //delete username
+    rpc DeleteUserUsername(DeleteUserUsernameReq)returns(DeleteUserUsernameResult){
+    }
+
+    //补充 更新机器人相关信息
+    rpc UpdateBotInfoSupp(UpdateBotInfoSuppReq)returns(UpdateBotInfoSuppResult){
+    }
+
+    rpc UGetUsersChats (UGetUsersChatsReq) returns (UGetUsersChatsResult) {
+    }
+}
+
+//获取用户信息、群、超级群信息的请求
+message UGetUsersChatsReq {
+    int32 userid             = 1; // 获取方id
+    repeated int32 users     = 2; // 获取用户信息的用户id数组
+    repeated int32 chatid    = 3; //获取普通群信息的群id数组
+    repeated int32 channelid = 4; // 获取超级群用户信息的超级群id数组
+    int32 protocol_layer     = 5; // 协议层数
+    pbcomm.Debug Dlog        = 6; //日志
+}
+
+//获取用户信息、群、超级群信息的返回
+message UGetUsersChatsResult {
+    //repeated ChannelInfoBase channels = 1;
+    //repeated GetChatInfoResp chats = 3;
+    repeated bytes channels = 1;
+    UserInfoArray users = 2;
+    repeated bytes chats = 3;
+    repeated int32 no_chats = 4;
+    repeated int32 no_chans = 5;
+    UChatResultCode resultcode = 6;//结果码
+}
+
+enum UChatResultCode {
+    Chat_RPC_OK                           = 0;         //成功
+    Chat_ADDUSER3549_EXP                  = 4000;       //3549隐私选项
+    Chat_User_Priavcay                    = 4001;       //隐私选项 没有权限
+    Chat_To_User_Blocked                  = 4002;       //block你将用户拉入黑名单  隐私选项
+    Chat_User_Blocked                     = 4003;       //block用户将你拉入黑名单  隐私选项
+    Chat_REPEAT_CREAT                     = 4004;       //短时间重复创建群
+    Chat_REPEAT_ADD_USER                  = 4005;       //重复添加群成员
+    Chat_EXCEED_CREATE_MAXNUM             = 4006;       //超过最大建群数量
+    Chat_EXCEED_TODAY_CREATE_MAXNUM       = 4007;       //超过当日最大建群数量
+    Chat_EXCEED_ADD_USER_MAXNUM           = 4008;       //超过群最大添加人数
+    Chat_PROHIBIT_ADD_GROUP               = 4009;       //禁止加入群组
+    Chat_ADMINLEVEL_EXCEPTION             = 4010;       //没有邀请权限
+    Chat_ALREADYLEFT_EXCEPTION            = 4011;       //用户不在群里
+    Chat_GROUP_DISBAND                    = 4012;       //该群已经解散
+    Chat_GROUP_KICKED                     = 4013;       //该群以将你拉黑
+    Chat_HOURS_ADD_USER_MAXNUM            = 4114;       //超过每小时最多添加群成员数
+    Chat_ONCE_ADD_USER_MAXNUM             = 4115;       //超过单次最多添加群成员数
+    //
+    Chat_UNKNOWN                      	  = 4100;       //未知异常
+    Chat_PARAMETER_EXCEPTION              = 4101;       //参数异常
+    Chat_LOGIC_EXCEPTION                  = 4102;       //逻辑异常
+    Chat_REDIS_EXCEPTION                  = 4103;       //redis异常
+    Chat_DB_EXCEPTION                     = 4104;       //数据库异常
+    Chat_AllocId_EXCEPTION                = 4105;       //群id分配错误
+    Chat_CallGetUser_EXCEPTION            = 4106;       //获取user出错  刘鑫磊提供接口
+    Chat_DB_NORECORD                      = 4107;       //无记录
+    Chat_Group_NORECORD                   = 4108;       //无群记录
+}
+
+message UpdateBotInfoSuppReq{
+    int32 UserId = 1;
+    string Placeholder = 2;
+    bool  geo = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message UpdateBotInfoSuppResult{
+    ReErrCode Errorcode = 1;
+}
+
+message DeleteUserUsernameReq{
+    int32 admin_id = 1; // 调用者id
+    string username = 2;
+    bool force_delete = 3; // 强制删除
+    pbcomm.Debug debug = 4;
+}
+
+message DeleteUserUsernameResult{
+    Code code = 1;
+    string internal_error_message = 2; // 发生内部错误时的错误信息
+    int32 owner_id = 3; // 用户名拥有者id
+
+    enum Code{
+        Success = 0;
+        PermissionDenied = 1; // 权限不够
+        UsernameNotExist = 2; // 用户名不存在
+        InvalidUsername = 3; // 无效的用户名
+        UserIsBot = 4; // 用户为bot
+        UsernameOccupied = 5; // 用户名使用中，需要设置force_delete强制删除
+        InternalError = 6; // 内部错误，错误信息保存在internal_error_message字段
+    }
+}
+
+
+message UpdateUserLocationReq{
+    int32 UserId = 1;
+    string Country = 2;
+    string City = 3;
+    string Detail = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message UpdateUserLocationResult{
+    bool Success = 1;
+    string Reason = 2;
+}
+
+message UpdateUserGrenderReq{
+   int32 UserId = 1;
+   int32 Grender = 2;
+   pbcomm.Debug debug = 3;
+}
+
+message UpdateUserGrenderResult{
+    bool Success = 1;
+    string Reason = 2;
+}
+
+message UpdateUserEmailReq{
+    int32 UserId = 1;
+    string Email = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message UpdateUserEmailResult{
+    bool Success = 1;
+    string Reason = 2;
+}
+message UploadContactsReq{
+    int64 key_id = 1; //端标识
+    int32 user_id = 2; //用户的ID
+    repeated PhoneBookContact phoneContactArr = 3; //联系人的电话号码的列表
+}
+
+message UploadContactsResult{
+    bool error = 1;     //是否上传失败
+    string message = 2; //提示消息
+}
+
+message ApplyContactReq{
+    int32 user_id = 1 ; //被添加人user_id
+    int32 apply_user_id = 2; //添加发起者user_id
+    string with_message = 3; //附带消息
+}
+
+message ApplyContactResult{
+    bool error = 1;     //是否失败
+    string message = 2; //提示消息
+}
+
+message GetAppliedContactsReq{
+    int32 user_id = 1; //查询用户ID
+}
+
+message GetAppliedContactsResult{
+    bool error = 1;
+    string message = 2; //提示消息
+    repeated Applied applied_arr = 3;//数据
+}
+
+message Applied{
+    int64 id =1 ;
+    int32 user_id = 2 ;//被添加者用户ID
+    userInfo apply_user = 3;//发起申请用户
+    string with_message = 4;//附加消息
+    int32 status = 5;//状态消息 0-申请;1-同意;2-不同意;3-忽略
+    int32 flag = 6;//标识 0-未读;1-已读
+    int32 gender = 7;//性别
+    string email = 8; //邮箱
+    string Country = 9;//国家
+    string City = 10;//城市
+    string Detail = 11;//详情
+}
+
+message VerifyContactReq{
+    int64 id=1; //申请好友唯一ID
+    int32 verify_user_id = 3; //确认者user_id
+    int32 status = 4;//状态消息
+}
+
+message VerifyContactResult{
+    bool error = 1;
+    string message = 2; //提示消息
+}
+
+message DeleteAppliedContactReq{
+    int64 id = 1;
+}
+
+message DeleteAppliedContactResult{
+    bool error = 1;
+    string message = 2; //提示消息
+}
+
+message SearchUserByPhoneReq{
+    string phone = 1;//手机号-带国家码
+}
+
+message SearchUserByPhoneResult{
+    userInfo user_info=1;//用户信息
+    int32 gender = 2; //性别
+    string email = 3;//邮箱
+    string country = 4;//国家
+    string City = 5;//城市
+    string Detail = 6;//详情
+}

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package imslowmodeserver;
+
+////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imslowmodeserver/imslowmodeserver.proto
+service ServerService {
+    // 切换慢速模式
+    rpc ToggleSlowMode (ToggleSlowModeReq) returns (ToggleSlowModeRsp) {};
+
+    // 检查慢速限制
+    rpc CheckSlowLimit (CheckSlowLimitReq) returns (CheckSlowLimitRsp) {};
+
+}
+
+message ToggleSlowModeReq {
+    int32       Chnl_id = 1;
+    int32       Seconds = 2;   // 间隔时间
+}
+
+message ToggleSlowModeRsp {
+    int32       Res_code = 1; // 返回状态
+    string      Res_info = 2;
+}
+
+message CheckSlowLimitReq {
+    int32      Chnl_id = 1;
+    int32      Memb_id = 2;
+    int64      MsgTime = 3; // 消息时间（s)
+    int32      Seconds = 4; // 消息间隔时间
+}
+
+message CheckSlowLimitRsp {
+    bool      Is_Limit = 1;
+    int64     NextTime = 2;
+}

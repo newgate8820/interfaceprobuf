@@ -1,0 +1,24 @@
+syntax = "proto3";
+package chatcommon;
+
+
+// 
+enum ChatResultCode {
+    Chat_RPC_OK                           = 0;        // 成功
+    Chat_PARAMETER_EXCEPTION              = 101;        // 参数异常
+    Chat_LOGIC_EXCEPTION                  = 102;        // 逻辑异常
+    Chat_REDIS_EXCEPTION                  = 103;        // redis异常 
+    Chat_DB_EXCEPTION                     = 104;        // 数据库异常  
+    Chat_UNKNOWN                      	  = 65535;   // 未知异常
+}
+
+//日志需要打印
+message ChatLogPrefix {
+    int32    userid      = 1;
+    string   Phone       = 2;
+    string   ip          = 3;
+    uint64   key_id      = 4;
+    uint64   session_id  = 5;
+    int32    layer       = 6;
+    uint32   ostype      = 7; //1 是安卓 2 是Iphone/IPAD 3 是PC 4是web
+}

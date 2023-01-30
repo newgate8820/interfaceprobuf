@@ -1,0 +1,278 @@
+syntax = "proto3";
+package imchannelserver;
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+
+// 返回channel
+message ReplyChannelData {
+    bytes reply = 1; // 二进制，真实类型是mtproto.tl_updates_layer62
+    int32 error_code = 2;
+}
+
+message ReqCreateChannel {
+    int32 channelId = 1; // channelid
+    int32 userId = 2; // userid
+    string title = 3; // 群标题
+    string about = 4; // 描述
+    int64 from_keyid = 5; // 创建者的KEYID
+    bool broadCast = 6; // 是否频道
+    bool megagroup = 7; // 是否超级群
+    uint64 replyMsgId = 8; // infoserver给的ID
+    pbcomm.Debug debug = 9;
+}
+
+//邀请用户进入超级群
+message ReqInviteChannelMember {
+    int32 channelId = 1; // 频道超级群ID
+    string title = 2; // 标题
+    int32 userId = 3; // 邀请者的ID
+    repeated int32 peerId = 4; // 被邀请者的ID
+    int64 from_keyid = 5; // 邀请者的KEYID
+    int64 accessHash = 6; // 频道超级群的哈希
+    pbcomm.Debug debug = 7;
+}
+
+// deletechannel 请求参数
+message ReqDeleteChannel {
+    int32 fromId = 1;
+    int64 fromKeyId = 2;
+    int32 channelId = 3;
+    int64 accessHash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+// 请求参数
+message ReqDeleteChannelMsg {
+    int32 fromid = 1; // 删除方id
+    uint64 from_keyid = 2;
+    int32 flags = 3; //标识
+    bool revoke = 4; // shifou wei duifang shanchu
+    repeated int32 id = 5;
+    int32 channelid = 6;
+    pbcomm.Debug debug = 8;
+}
+
+// 请求参数
+message ReqEditChannelAbout {
+    int32 from_id = 1;
+    int64 fromKeyId = 2;
+    int32 channelId = 3;
+    string about = 4;
+    int64 accessHash = 5;
+    pbcomm.Debug debug = 6;
+}
+
+// 请求参数
+message ReqEditChannelAdmin {
+    int32 from_id = 1; //请求者ID
+    int32 channelId = 2; //频道ID
+    int32 userId = 3; //被升级或降级的人
+    int64 fromKeyId = 4; //请求者的KEYID
+    bytes role = 5; //admin rights
+    uint64 keyId = 6;
+    int64 accessHash = 7; //哈希
+    pbcomm.Debug debug = 8;
+}
+
+//edit photo
+message ReqEditChannelPhoto {
+    int32 channelId = 1;
+    int32 userId = 2;
+    bytes photo = 3;
+    int64 from_keyid = 4;
+    pbcomm.Debug debug = 5;
+}
+
+// edit title
+message ReqEditChannelTitle {
+    int32 channelId = 1;
+    string title = 2;
+    int32 userId = 3;
+    int64 from_keyid = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message ReqEditEveryoneQuiet {
+    int32 UserId = 1; // 是否频道
+    int32 ChannelId = 2; // 是否超级群
+    bool quiet = 3; // infoserver给的ID
+    pbcomm.Debug debug = 4;
+}
+
+//创建超级群的邀请链接
+message ReqExportChannelLink {
+    int32 channelId = 1;
+    int32 fromId = 2;
+    pbcomm.Debug debug = 4;
+}
+
+message ReqGetChannelMessageExportLink {
+    bytes result = 1;
+    pbcomm.Debug debug = 2;
+}
+
+
+message ReqEditPrivateChat {
+    int32 UserId = 1;
+    int32 ChannelId = 2;
+    bool ok = 3;
+    pbcomm.Debug debug = 4;
+}
+
+
+message ReqChannelsReadMessageContents {
+    uint64 keyid = 1; // 创建者的KEYID
+    int32 UserId = 2; // 是否频道
+    bytes result = 3;
+    pbcomm.Debug debug = 4;
+}
+
+//是否允许普通成员邀请人
+message ReqChannelToggleInvite {
+    int32 channelId = 1;
+    int32 userId = 2;
+    bool enabled = 3;
+    int64 accessHash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+// 请求参数
+message ReqUpdatePinnedChannelMessage {
+    int32 from_id = 1;
+    int32 flags = 2;
+    bool silent = 3;
+    //    InputChannel channel = 4;
+    int32 channelId = 4;
+    int32 id = 5;
+    int64 from_keyid = 6;
+    pbcomm.Debug debug = 7;
+
+}
+
+//修改channel user name
+message ReqUpdateChannelUserName {
+    int32 channelId = 1;
+    int64 accessHash = 2;
+    int32 fromId = 3;
+    string userName = 4;
+    pbcomm.Debug debug = 5;
+}
+
+message ReqGetChannelAdminLog {
+    int32 channelId = 1;
+    int32 fromId = 2;
+    int64 fromKeyId = 3;
+    int64 accessHash = 4;
+    string q = 5;
+    ChannelAdminLogEventFilter eventFilter = 6;
+    repeated int32 admins = 7;
+    int32 max_id = 8;
+    int32 min_id = 9;
+    int32 limit = 10;
+    pbcomm.Debug debug = 11;
+}
+
+message ChannelAdminLogEventFilter {
+    int32 flags = 1;
+    bool join = 2;
+    bool leave = 3;
+    bool invite = 4;
+    bool ban = 5;
+    bool unban = 6;
+    bool kick = 7;
+    bool unkick = 8;
+    bool promote = 9;
+    bool demote = 10;
+    bool info = 11;
+    bool setting = 12;
+    bool pinned = 13;
+    bool edit = 14;
+    bool delete = 15;
+}
+
+//获取participant
+message ReqGetParticipant {
+    int32 channelid = 1;
+    int32 fromId = 2;
+    int32 userId = 3;
+    int64 accessHash = 4;
+    pbcomm.Debug debug = 5;
+}
+
+// 升级超级群之前的普通群消息元数据
+message ChatMsgMeta {
+    int32 topMsg = 1;
+    int32 topPts = 2;
+    int32 toDate = 3;
+}
+
+// 超级群发送数字钱包红包
+message ReqSendRpm {
+    int64 fromKeyId = 1;
+    int32 fromId = 2;
+    bytes req = 3;
+    bytes rpmResp = 4;
+    pbcomm.Debug dbg = 5;
+}
+
+// 超级群发送数字钱包红包返回结果
+message ReplySendRpm {
+    bytes Result = 1;
+    ChatMsgMeta meta = 2;
+    int32 errCode = 3;
+    string error = 4;
+}
+
+message ReqEditRpm {
+    int64 fromKeyId = 1;
+    int32 fromId = 2;
+    int32 chanId = 3;
+    int32 msgId = 4;
+    int64 chanAccHash = 5;
+    int32 rpmResultCode = 6;
+    pbcomm.Debug dbg = 7;
+}
+
+message ReqEditRpmV2 {
+    int64 fromKeyId = 1;
+    int32 fromId = 2;
+    int32 chanId = 3;
+    int32 msgId = 4;
+    int64 chanAccHash = 5;
+    bytes rpmResult = 6;
+    pbcomm.Debug dbg = 7;
+}
+
+message ReqEditPayment {
+    int64 fromKeyId = 1;
+    int32 fromId = 2;
+    int32 chanId = 3;
+    int32 msgId = 4;
+    int32 flags = 5;
+    int64 chanAccHash = 6;
+    bytes rpmResult = 7;
+    bytes options = 8;
+    pbcomm.Debug dbg = 9;
+}
+
+
+message ReplyEditRpm {
+    bytes Result = 1;
+    int32 errCode = 2;
+    string error = 3;
+}
+
+// 领取超级群红包请求
+message ReqRecvRpm {
+    int64 fromKeyId = 1;
+    int32 fromId = 2;
+    bytes req = 3;
+    bytes metaData = 4;
+    pbcomm.Debug dbg = 5;
+}
+
+message ReplyRecvRpm {
+    bytes Result = 1;
+    int32 errCode = 2;
+    string error = 3;
+}

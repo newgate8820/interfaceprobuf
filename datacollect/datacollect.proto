@@ -1,0 +1,296 @@
+//当前目录执行
+//protoc --go_out=. ./datacollect.proto
+//protoc --java_out=. ./datacollect.proto
+
+syntax = "proto3";
+
+package datacollect;
+
+option java_package = "im.bigdata.handling.domain.proto";
+option java_outer_classname="DataCollect";
+
+//## 数据采集kafka_topic ## (使用enum string)
+enum CollectTopic{
+    TOPIC_DEFAULT = 0;          // topic-默认
+    TOPIC_DEVICE_INFO = 1;      // topic-设备信息
+    TOPIC_PUSH_MESSAGE = 2;     // topic-推送消息
+    TOPIC_SEND_MESSAGE = 3;     // topic-发送消息
+    TOPIC_COUNT_DATA = 4;       // topic-协议调用频率
+    TOPIC_USER_TRACE = 5;       // topic-用户记录
+    TOPIC_USER_SESSION = 6;     // topic-用户session
+}
+
+//## 数据采集kafka_key ## (使用enum string)
+enum CollectKey{
+    KEY_DEVICE_INFO = 0;        // key-设备信息
+    KEY_PUSH_MESSAGE = 1;       // key-推送消息
+    KEY_SEND_MESSAGE = 2;       // key-发送消息
+    KEY_COUNT_DATA = 3;         // key-协议调用频率
+    KEY_USER_TRACE = 4;         // key-用户记录
+    KEY_USER_SESSION = 5;       // Key-用户session
+    KEY_FILE_UPLOAD = 6;        // key-文件上传
+    KEY_FILE_DOWNLOAD = 7;      // key-文件下载
+    KEY_AUDIO_VOICE = 8;        // key-语音
+    KEY_PHONE_CALL = 9;         // key-电话
+    KEY_FILE_DOWNLOAD_ID = 10;  // key-文件下载id
+    KEY_USER_EXPANSION = 11;    // key-用户扩展信息
+    KEY_ACTIVE_GROUP = 12;      // key-活跃群
+    KEY_ACTIVE_GROUP_ID = 13;   // key-活跃群id
+}
+
+//## 数据采集kafka_消费组 ## (使用enum string)
+enum CollectGroup{
+    GROUP_MONITOR_SERVER = 0;     // group-监控服务
+    GROUP_ACTIVE_USER_SERVER = 1; // group-活跃用户服务
+    GROUP_BG = 2;                 // group-数据服务
+}
+
+enum LinkInformation{
+    pt_monitor_kafka=0;
+}
+
+//#############################################################################
+//############################## 以下是所有结构定义 ##############################
+//#############################################################################
+
+//## mime类型 ##
+enum MimeType{
+    UNKNOWN = 0;      // 未知-其他类
+    APPLICATION = 1;  // 应用程序类
+    TEXT = 2;         // 文本类
+    IMAGE = 3;        // 图片类
+    AUDIO = 4;        // 音频类
+    VIDEO = 5;        // 视频类
+    MESSAGE = 6;      // message类
+    DRAWING = 7;      // drawing类
+    JAVA = 8;         // java类
+}
+
+
+//## 推送消息-数据类型 ##
+enum PushMessageType{
+    ANDROID = 0; // 推送消息量-android
+    IOS = 1;     // 推送消息量-ios
+}
+
+//## 推送消息-数据对象 ##
+message PushMessageData{
+    PushMessageType type = 1; // 类型
+    int32 succ = 2;           // succ 成功数
+    int32 fail = 3;           // fail 失败数
+}
+
+//## 推送消息-数据对象列表 ##
+message PushMessageDataList {
+    repeated PushMessageData data = 1; // data 数据列表
+    int32 timestamp = 2;               // timestamp 当前时间戳-秒
+}
+
+//## 发送消息-数据对象列表 ##
+message SendMessageDataList{
+    repeated SendMessageData data = 1; // data 数据列表
+    int32 timestamp = 2;               // timestamp 当前时间戳-秒
+}
+
+//## 发送消息-数据类型 ##
+enum SendMessageType{
+    U_SendUserMessage = 0;      //用户-发送消息-单聊
+    U_SendChatMessage = 1;      //用户-发送消息-普通群
+    U_SendChannelMessage = 2;   //用户-发送消息-超级群
+    U_SendUserMedia = 3;        //用户-发送媒体-单聊
+    U_SendChatMedia = 4;        //用户-发送媒体-普通群
+    U_SendChannelMedia = 5;     //用户-发送媒体-超级群
+    U_EditMessage = 6;          //用户-编辑消息-总数
+    U_DeleteMessage = 7;        //用户-删除消息-总数
+    U_ForwardMessage = 8;       //用户-转发消息-总数
+    B_SendUserMessage = 9;      //bot-发送消息-单聊
+    B_SendChatMessage = 10;     //bot-发送消息-普通群
+    B_SendChannelMessage = 11;  //bot-发送消息-超级群
+    B_SendUserMedia = 12;       //bot-发送媒体-单聊
+    B_SendChatMedia = 13;       //bot-发送媒体-普通群
+    B_SendChannelMedia = 14;    //bot-发送媒体-超级群
+    B_EditMessage = 15;         //bot-编辑消息-总数
+    B_DeleteMessage = 16;       //bot-删除消息-总数
+    B_ForwardMessage = 17;      //bot-转发消息-总数
+    B_InlineSendUserMessage = 18;    //bot-内联发送媒体-单聊
+    B_InlineSendChatMessage = 19;    //bot-内联发送媒体-普通群
+    B_InlineSendChannelMessage = 20; //bot-内联发送媒体-超级群
+    B_InlineSendUserMedia = 21;      //bot-内联发送媒体-单聊
+    B_InlineSendChatMedia = 22;      //bot-内联发送媒体-普通群
+    B_InlineSendChannelMedia =23;    //bot-内联发送媒体-超级群
+    U_SendUserMessage_354 = 24;      //用户-发送消息-单聊354
+    U_SendChatMessage_354 = 25;      //用户-发送消息-普通群354
+    U_SendChannelMessage_354 = 26;   //用户-发送消息-超级群354
+    U_SendUserMedia_354 = 27;        //用户-发送媒体-单聊354
+    U_SendChatMedia_354 = 28;        //用户-发送媒体-普通群354
+    U_SendChannelMedia_354 = 29;     //用户-发送媒体-超级群354
+}
+
+//## 发送消息-数据对象 ##
+message SendMessageData{
+    SendMessageType type = 1; // type 类型
+    int32 succ = 2;           // succ 成功数
+    int32 fail = 3;           // fail 失败数
+    repeated ErrorData ErrorCodes = 4;
+}
+
+//## 统计次数-数据项列表 ##
+message CountDataList {
+    repeated CountData data = 1; // data 数据列表
+    int32 timestamp = 2;         // timestamp 当前时间戳-秒
+}
+
+//## 统计次数-数据项 ##
+message CountData{
+    int64 id = 1;   // 协议id
+    int64 data = 2; // 计数值
+}
+
+//## 设备信息 ##
+message DeviceInfoData {
+    int64 key_id = 1;          // key_id
+    int32 user_id = 2;         // user_id
+    int32 api_id = 3;          // api_id 通过此字段判断设备类型(30915-android, ios-32237, pc-17349)
+    string unique_number = 4;  // unique_number 设备唯一识别码
+    string device_model = 5;   // device_model 设备型号
+    string system_version = 6; // system_version 系统版本
+    string app_version = 7;    // app_version app版本
+    string lang_code = 8;      // lang_code 语言
+}
+
+//## 设备信息列表 ##
+message DeviceInfoDataList{
+    repeated DeviceInfoData data = 1; // data 数据列表
+    int32 timestamp = 2;              // timestamp 当前时间戳-秒
+}
+
+//## 用户记录信息 ##
+message UserTraceData{
+    int64 key_id = 1;       // key_id
+    int32 user_id = 2;      // user_id
+    int32 api_id = 3;       // api_id 通过此字段判断设备类型(30915-android, ios-32237, pc-17349)
+    int64 module_id = 4;    // module_id 通过此字段区分是登录、注册、发送短信等
+    string phone = 5;       // phone 手机号
+    string client_ip = 6;   // client_ip
+    string meta_data = 7 ;  // meta_data 其他信息
+    int32 timestamp = 8;    // timestamp 当前时间戳-秒
+    string app_version = 9; // app_version app版本
+}
+
+//## 用户记录信息列表 ##
+message UserTraceDataList{
+    repeated UserTraceData data = 1; // data 数据列表
+    int32 timestamp = 2;             // timestamp 当前时间戳-秒
+}
+
+message UserSessionData{
+    int64 key_id = 1;      // key_id
+    int32 user_id = 2;     // user_id
+    int32 online_flag = 3; // online_flag 上线标识
+    int32 api_id = 4;      // api_id
+}
+
+message UserSessionDataList{
+    repeated UserSessionData data = 1; // data 数据列表
+    int32 timestamp = 2;               // timestamp 当前时间戳-秒
+}
+
+// 语音时长
+message AudioVoiceData{
+    int64 duration = 1;       // duration 总时长
+    int32 timestamp = 2;      // timestamp 当前时间戳-秒
+    int32 api_id = 3;         // api_id
+}
+
+message AudioVoiceDataList{
+    repeated AudioVoiceData data = 1; // data 数据列表
+    int32 timestamp = 2;              // timestamp 当前时间戳-秒
+}
+
+// 电话时长
+message PhoneCallData{
+    int64 duration = 1;       // duration 总时长
+    int32 timestamp = 2;      // timestamp 当前时间戳-秒
+    int32 api_id = 3;         // api_id
+}
+
+message PhoneCallDataList{
+    repeated PhoneCallData data = 1; // data 数据列表
+    int32 timestamp = 2;             // timestamp 当前时间戳-秒
+}
+
+// 文件上传
+message FileUploadData{
+    MimeType type = 1;        // 类型
+    int32 succ = 2;           // succ 成功数
+    int32 fail = 3;           // fail 失败数
+}
+
+// 文件上传list
+message FileUploadDataList{
+    repeated FileUploadData data = 1; // data 数据列表
+    int32 timestamp = 2;              // timestamp 当前时间戳-秒
+}
+
+// 文件下载
+message FileDownloadData{
+    MimeType type = 1;        // type 类型
+    int32 succ = 2;           // succ 成功数
+    int32 fail = 3;           // fail 失败数
+}
+
+// 文件下载list
+message FileDownloadDataList{
+    repeated FileDownloadData data = 1; // data 数据列表
+    int32 timestamp = 2;                // timestamp 当前时间戳-秒
+}
+
+// 文件下载 fid
+message FileDownloadIdData{
+    int64 id = 1;             //
+    int64 access_hash = 2;    //
+    int32 succ = 3;           // succ 成功数
+    int32 fail = 4;           // fail 失败数
+}
+
+// 文件下载fid list
+message FileDownloadIdDataList{
+    repeated FileDownloadIdData data = 1; // data 数据列表
+    int32 timestamp = 2;          // timestamp 当前时间戳-秒
+}
+
+message UserExpansionData{
+    int32 user_id = 1;
+    string data =2;
+}
+
+
+//
+message ActiveGroupData{
+    int32 type = 1;    //群类型
+    int32 data = 2;    //数据
+}
+
+//活跃群
+message ActiveGroupDataList{
+    repeated ActiveGroupData data= 1; // data 数据
+    int32 timestamp = 2;              // timestamp 当前时间戳-秒
+}
+
+//活跃群id
+message ActiveGroupIdData{
+    int32 group_id = 1;    //群id
+    int32 group_type = 2;  //群类型
+}
+
+message ActiveGroupIdDataList{
+    repeated int32 group_ids= 1;    // data 数据
+    int32 group_type= 2;            // 群类型
+    int32 timestamp = 3;            // timestamp 当前时间戳-秒
+}
+
+
+message ErrorData{
+    int32 Code = 1;
+    int32 Count = 2;
+}

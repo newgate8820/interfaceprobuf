@@ -1,0 +1,186 @@
+syntax="proto3";
+package infoserver;
+
+import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+
+
+service PhoneCall{
+    // 电话功能重做
+    //phone.acceptCall
+    rpc PhoneAcceptCall(PhoneAcceptCallReq) returns (PhoneAcceptCallResult){}
+    //phone.confirmCall
+    rpc PhoneConfirmCall(PhoneConfirmCallReq) returns (PhoneConfirmCallResult){}
+    //phone.discardCall
+    rpc PhoneDiscardCall(PhoneDiscardCallReq) returns (PhoneDiscardCallResult){}
+    //phone.getCallConfig
+    rpc PhoneGetCallConfig(PhoneGetCallConfigReq) returns (PhoneGetCallConfigResult){}
+    //phone.receivedCall
+    rpc PhoneReceivedCall(PhoneReceivedCallReq) returns (PhoneReceivedCallResult){}
+    //phone.requestCall
+    rpc PhoneRequestCall(PhoneRequestCallReq) returns (PhoneRequestCallResult){}
+    //phone.saveCallDebug
+    rpc PhoneSaveCallDebug(PhoneSaveCallDebugReq) returns (PhoneSaveCallDebugResult){}
+    //phone.setCallRating
+    rpc PhoneSetCallRating(PhoneSetCallRatingReq) returns (PhoneSetCallRatingResult){}
+    // 用户重连或触发getdifference时做检查
+    rpc PhoneCheckUpdates(PhoneCheckUpdatesReq) returns (PhoneCheckUpdatesResult){}
+}
+
+message PhoneCheckUpdatesReq{
+    int32 user_id = 1;
+    pbcomm.Debug debug = 2;
+    uint64 key_id = 3;
+    int64 timestamp = 4;
+}
+
+message PhoneCheckUpdatesResult{
+    repeated bytes updates = 1;
+}
+
+
+// phone.acceptCall
+message PhoneAcceptCallReq{
+    bytes tl_phone_acceptCall = 1;
+    pbcomm.Debug debug = 2;
+    int32 user_id = 3;
+    uint64 user_keyid = 4;
+    int32 user_layer = 5;
+    uint64 dc_id = 6;
+}
+
+message PhoneAcceptCallResult{
+    ResultCode code = 1;
+    bytes tl_phone_phoneCall = 2;
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// phone.confirmCall
+message PhoneConfirmCallReq{
+    bytes tl_phone_confirmCall = 1;
+    pbcomm.Debug debug = 2;
+    int32 user_id = 3;
+    uint64 user_keyid = 4;
+    int32 user_layer = 5;
+    uint64 dc_id = 6;
+}
+
+message PhoneConfirmCallResult{
+    ResultCode code = 1;
+    bytes tl_phone_phoneCall = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// phone.discardCall
+message PhoneDiscardCallReq{
+    bytes tl_phone_discardCall = 1;
+    pbcomm.Debug debug = 2;
+    int32 user_id = 3;
+    uint64 user_keyid = 4;
+    int32 user_layer = 5;
+    uint64 dc_id = 6;
+}
+
+message PhoneDiscardCallResult{
+    ResultCode code = 1;
+    bytes tl_updates = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+        UnauthorizedUser = 2; // userid既不是admin也不是participant
+    }
+}
+
+// phone.getCallConfig
+message PhoneGetCallConfigReq{
+    bytes tl_phone_getCallConfig = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message PhoneGetCallConfigResult{
+    ResultCode code = 1;
+    bytes tl_data_json = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// phone.receivedCall
+message PhoneReceivedCallReq{
+    bytes tl_phone_receivedCall = 1;
+    pbcomm.Debug debug = 2;
+    uint64 key_id = 3; // 端表示
+}
+
+message PhoneReceivedCallResult{
+    ResultCode code = 1;
+    bytes tl_bool_true_false = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// phone.requestCall
+message PhoneRequestCallReq{
+    bytes tl_phone_requestCall = 1;
+    pbcomm.Debug debug = 2;
+    int32 user_id = 3;
+    uint64 user_keyid = 4;
+    int32 user_layer = 5;
+    uint64 dc_id = 6;
+}
+
+message PhoneRequestCallResult{
+    ResultCode code = 1;
+    bytes tl_phone_phoneCall = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+        UserPrivacyRestricted = 2; // 对方隐私选项设置了阻止
+    }
+}
+
+// phone.saveCallDebug
+message PhoneSaveCallDebugReq{
+    bytes tl_phone_saveCallDebug = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message PhoneSaveCallDebugResult{
+    ResultCode code = 1;
+    bool tl_bool = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+// phone.setCallRating
+message PhoneSetCallRatingReq{
+    bytes tl_phone_setCallRating = 1;
+    pbcomm.Debug debug = 2;
+}
+
+message PhoneSetCallRatingResult{
+    ResultCode code = 1;
+    bytes tl_updates = 2;
+
+    enum ResultCode{
+        Success = 0;
+        InternalError = 1;
+    }
+}

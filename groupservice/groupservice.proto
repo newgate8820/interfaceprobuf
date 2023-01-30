@@ -1,0 +1,130 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto
+syntax = "proto3";
+
+package groupservice;
+
+//返回错误码
+enum ActiveErrorCode {
+    Active_OK                           = 0;         //ok
+    Active_SYSERR                       = 1001;      //系统错误
+    Active_NOT_FIND                     = 1002;      //未找到数据
+}
+
+//username和邀请链接对应的对象类型
+enum PeerType {
+    PeerUser = 0;       //用户
+    PeerChat = 1;       //普通群
+    PeerChannel = 2;    //频道
+    PeerSuperChat = 3;  //超级群
+}
+
+//群成员搜索类型
+enum ChannelSearchType {
+    SearchAll = 0;      //所有用户
+    SearchAdmin = 1;    //管理员
+    SearchBanned = 2;   //被禁权
+    SearchBot = 3;      //机器人
+    SearchKicked = 4;   //被踢
+}
+
+//username存储结构
+message UserNameBase {
+    string Username =1;
+    int32 Id =2;
+    PeerType Type =3;
+}
+
+//超级群信息
+message ChatChannel{
+	int32 Channel_id                    = 1;
+	int64 Access_hash                   = 2;
+	bool Encry                          = 3;
+	bool Broadcast_or_megagroup         = 4;
+	bool Verified                       = 5;
+	bool Restricted                     = 6;
+	bool Democracy                      = 7;
+	bool Signatures                     = 8;
+	bool Min                            = 9;
+	string Title                        = 10;
+	string User_name                    = 11;
+	string About                        = 12;
+	string Photo                        = 13;
+	int32 Date                          = 14;
+	int32 Version                       = 15;
+	string Restriction_reason           = 16;
+	int32 Participants_count            = 17;
+	int32 Admins_count                  = 18;
+	int32 Kicked_count                  = 19;
+	int32 Banned_count                  = 20;
+	string Exported_invite_link         = 21;
+	int32 Bot_count                     = 22;
+	int32 Migrated_from_max_id          = 23;
+	int32 Migrated_from_chat_id         = 24;
+	int32 Pinned_msg_id                 = 25;
+	int32 Cluster                       = 26;
+	int32  Invite_Rule                  = 27;
+	int32 Creator                       = 28;
+	bool Everyone_quiet                 = 29;
+	bool Private_chat                   = 30;
+	int32 Id                            = 31;
+}
+
+//超级群用户信息   60个字节
+message ChannelParticipants {
+	int32 Channel_id            =1;
+	int32 User_id               =2;
+	bool Is_bot                 =3;
+	int32 Invite_id             =4;
+	bool Can_set_username       =5;
+	bool Can_view_participants  =6;
+	bool Is_creator             =7;
+	bool Is_admin               =8;
+	bool Is_ban                 =9;
+	int32 Promoted_by           =10;
+	bool Change_group_info      =11;
+	bool Delete_messages        =12;
+	bool Ban_users              =13;
+	bool Pin_messages           =14;
+	bool Add_new_admin          =15;
+	bool Can_read_messages      =16;
+	bool Can_send_message       =17;
+	bool Can_send_media         =18;
+	bool Can_send_sticker       =19;
+	bool Can_send_gifs          =21;
+	bool Can_send_games         =22;
+	bool Can_send_inline        =23;
+	bool Can_embed_links        =24;
+	int32 Kicked_by             =25;
+	int32 Until_date            =26;
+	int32 Join_time             =27;
+	bool Post_messages          =28;
+	bool Edit_Messages          =29;
+	bool Invite_users           =30;
+	bool Invite_link            =31;
+	string Export_invite_link   =32;
+	int32 Id                    =33;
+	bool Can_send_polls 	    =34; // add by qingsong at 2019-11-15
+	int32 Start_msgid			=35; // add by qingsong at 2019-12-06
+}
+
+//被踢用户信息
+message ChannelKickedLeft {
+	int32 Channel_id        =1;
+	int32 User_id           =2;
+	bool Kicked_or_left     =3;
+	int32 Kicked_by         =4;
+	int32 Date              =5;
+	int32 Last_date         =6;
+	bool Is_ban             =7;
+	bool Can_read_messages  =8;
+	bool Can_send_message   =9;
+	bool Can_send_media     =10;
+	bool Can_send_inline    =11;
+	bool Can_send_games     =12;
+	bool Can_send_gifs      =13;
+	bool Can_send_sticker   =14;
+	bool Can_embed_links    =15;
+	bool Can_send_polls 	=16; // add by qingsong at 2019-11-15
+	int32 Id                =17;
+}
+

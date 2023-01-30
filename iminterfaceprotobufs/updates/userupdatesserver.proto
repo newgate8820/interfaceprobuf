@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package updates;
+import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+
+// protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/updates/*.proto
+
+import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/messagedb/messagedb.proto";
+
+service UserUpdatesServer {
+    // 单聊、普通群离线pts消息
+    rpc StoreUserPtsHandle(ReqStoreUserPtsHandle) returns (ReplyStoreUserPtsHandle) {}
+
+    // 获取单聊、普通群离线pts消息
+    rpc GetUserPtsHandle(ReqGetUserPtsHandle) returns (ReplyGetUserPtsHandle) {}
+
+    // 删除单条pts离线消息
+    rpc DeleteUserPtsHandle(ReqDeleteUserPtsHandle) returns (ReplyDeleteUserPtsHandle) {}
+
+    // 清除用户单聊、普通群所有的离线消息
+    rpc ClearUserPtsHandle(ReqClearUserPtsHandle) returns (ReplyClearUserPtsHandle) {}
+
+    // 清除对话框的离线消息
+    rpc ClearUserDialogPtsHandle(ReqClearUserDialogPtsHandle) returns (ReplysClearUserDialogPtsHandle) {}
+
+    // ================== 存储 电话信息 联系人 加密聊天请求 二进制信息 ==================
+    // infoService 调用存储信息
+    rpc StoreOtherInfoMsg(ReqStoreOtherInfoMsg) returns (ReplyStoreOtherInfoMsg) {}
+
+    // 批量 存储 otherInfoMsg
+    rpc BatchStoreOtherInfoMsg(ReqBatchStoreOtherInfoMsg) returns (ReplyBatchStoreOtherInfoMsg) {}
+
+    // 获取infoMsg信息
+    rpc GetOtherInfoMsg(ReqGetOtherInfoMsg) returns (ReplyGetOtherInfoMsg) {}
+
+    // 用与实时交互查数据
+    rpc Monitor(ReqMonitor) returns(ReplyMonitor) {}
+
+    // pts矫正
+    rpc GetDiffByPts (ReqDiffByPts) returns (ReplyDiffByPts) {
+    }
+}
+
+message ReqMonitor {
+    string Command       = 1; // 命令
+    string SubCommand    = 2; // 子命令
+    repeated string Args = 3; // 参数
+}
+
+message ReplyMonitor {
+    string Message = 1; // 返回消息
+}
+
+message ReqStoreOtherInfoMsg {
+    messagedb.OtherInfoMsg OtherInfoMsg = 1;
+}
+
+message ReplyStoreOtherInfoMsg {}
+
+message ReqBatchStoreOtherInfoMsg {
+    repeated messagedb.OtherInfoMsg OtherInfoMsgs = 1; // otherInfoMsg 消息数组
+}
+
+message ReplyBatchStoreOtherInfoMsg {}
+
+message ReqGetOtherInfoMsg {
+    int32 UserId       = 1; // 用户ID
+    int64 Date         = 2; // 时间戳 纳秒
+}
+
+message ReplyGetOtherInfoMsg {
+    repeated messagedb.OtherInfoMsg OtherInfoMsgs = 1;
+}
+
+message ReqStoreUserPtsHandle {
+    messagedb.PtsHandle PtsHandle = 1; // ptsHandle
+}
+
+message ReplyStoreUserPtsHandle {}
+
+message ReqGetUserPtsHandle {
+    int32 UserId = 1; // [must] 用户ID [must]
+    int32 Pts    = 2; // 查询 > pts的limit条数据
+    int32 Limit  = 3; // [must] 查询条数
+}
+
+message ReplyGetUserPtsHandle {
+    repeated bytes Msgs = 1; // 消息二进制集合
+    int32 LastPts       = 2; // 返回二进制中最大的PTS
+}
+
+message ReqDeleteUserPtsHandle{
+    int32 UserId        = 1; // [must] 用户ID
+    repeated int32 Ptss = 2; // [must] 待删除的pts切片
+}
+
+message ReplyDeleteUserPtsHandle{
+
+}
+
+message ReqClearUserPtsHandle {
+    int32 UserId = 1; // [must] 用户ID
+    int32 MaxPts = 2; // 最大的Pts 删除 <= pts 的数据， 如果为0 则全删除
+}
+
+message ReplyClearUserPtsHandle {
+
+}
+
+message ReqClearUserDialogPtsHandle {
+    int32 UserId = 1; // [must] 用户ID
+    int32 WithId = 2; // [must] 消息接收者ID
+    int32 MaxPts = 3; // 最大的Pts 删除 <= pts 的数据， 如果为0 则全删除
+}
+
+message ReplysClearUserDialogPtsHandle {
+
+}
+
+// ############################# pts 矫正 ##########################
+message ReqDiffByPts {
+    int32 fromid = 1;
+    uint64 from_keyid = 2;
+    int32 pts = 3;
+    int32 flags = 4;
+    int32 Pts_total_limit = 5;
+    int32 Date = 6;
+    int32 Qts = 7;
+    pbcomm.Debug debug = 8;
+}
+
+message ReplyDiffByPts {
+    bytes result = 1;
+    int32 error = 2; // 1. 获取普通历史失败 2. 获取其他特殊操作失败 3. 获取超级群失败 4. 获取加密聊天数据失败 5.服务器出错
+    int32 usetime = 3; // use time
+}

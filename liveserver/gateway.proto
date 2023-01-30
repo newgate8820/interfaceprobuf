@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+// sudo protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/liveserver/gateway.proto
+
+service GateWay{
+   rpc LiveRouterForwarding(Request)returns(Response){};
+}
+
+
+//@Description 操作行为的详细说明。
+message Request{
+  int32 BusCode = 1; // 业务Id
+  int32 UserID = 2; // 用户ID
+  int64 KeyID = 3;//前端ID
+  string DataJson =4; // 业务数据的请求json byte
+}
+
+message Response{
+  int32 BusCode =1; // 业务Id
+  string DataJson =2; // 业务数据返回的json byte
+  repeated int32 UserIDs = 3; // 用户Id列表
+}

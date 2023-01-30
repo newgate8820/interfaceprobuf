@@ -1,0 +1,117 @@
+/**
+ * 定义提供给消息服务使用的API
+ * 原则上只能由消息服务来调用
+ */
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/im/iminterfaceprotobufs/botserver/updateservice/updateservice.proto
+syntax = "proto3";
+
+package updateservice;
+
+import "gitlab.chatserver.im/im/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+
+// 定义机器人服务
+service Bot {
+    // GetOldBots 获取旧机器人
+    rpc GetOldBots(GetOldBotsRequest) returns (GetOldBotsReply) {}
+    // PushMessage 推送消息
+    rpc PushMessage(PushMessageRequest) returns (PushMessageReply) {}
+    // PushMessageList 推送消息
+    rpc PushMessageList(PushMessageListRequest) returns (PushMessageReply) {}
+    // PushCallbackQuery 推送回调查询
+    rpc PushCallbackQuery(CallbackQueryRequest) returns (CallbackQueryReply) {}
+    // GetInlineQuery 获取内联查询
+    rpc GetInlineQuery(GetInlineQueryRequest) returns (GetInlineQueryReply) {}
+    // SendInlineQuery 发送内联查询
+    rpc SendInlineQuery(SendInlineQueryRequest) returns (SendInlineQueryReply) {}
+    // PushInlineQuery 内联查询
+    rpc PushInlineQuery(PushInlineQueryRequest)returns(SendInlineQueryReply){}
+    // PushInlineQuery 内联查询
+    rpc PushInlineQueryV2(PushInlineQueryRequestV2)returns(SendInlineQueryReply){}
+}
+
+// 获取旧机器人请求
+message GetOldBotsRequest {
+}
+
+// 获取旧机器人响应
+message GetOldBotsReply {
+   repeated int32 bots = 1; // 机器人ID列表 
+}
+
+// 推送消息请求
+message PushMessageListRequest {
+    repeated uint32 bot_id = 1;      // 机器人ID
+    bytes user_data = 2;    // 用户数据
+    uint32 brforeMirageChatid       = 3; // 升级前的chatid
+}
+
+// 推送消息请求
+message PushMessageRequest {
+    uint32 bot_id = 1;      // 机器人ID
+    bytes user_data = 2;    // 用户数据
+    uint32 brforeMirageChatid       = 3; // 升级前的chatid
+    string lang = 4; // 当前终端语言
+}
+
+// 推送消息响应
+message PushMessageReply {
+}
+
+// 推送回调查询请求
+message CallbackQueryRequest {
+    uint32 from_id = 1;             // 来源用户
+    uint64 inline_message_id = 2;   // 消息ID
+    bytes user_data = 3;            // 用户数据
+    uint32 date = 4;                // 消息日期
+    string lang = 5;                // 当前终端语言
+}
+
+// 推送回调查询响应
+message CallbackQueryReply {
+}
+
+//推送内联查询请求
+message GetInlineQueryRequest{
+    int32 from_id = 1;             //来源用户
+    bytes inline_query_data = 2;   //TL_messages_getInlineBotResults
+
+}
+
+//推送内联查询响应
+message GetInlineQueryReply{
+    bool ok = 1;
+    string msg = 2;
+    bytes inline_result_data = 3;  //TL_botInlineResult
+}
+
+message SendInlineQueryRequest{
+    int32 from_id = 1;
+    bytes send_query_data = 2;   //TL_messages_sendInlineBotResult
+}
+
+message SendInlineQueryReply{
+    bool ok = 1;
+    string msg = 2;
+    bytes send_result_data = 3;   //
+}
+
+message PushInlineQueryRequest{
+    int32 user_id = 1;
+    uint64 message_id = 2;
+    uint64 key_id = 3;
+    uint64 session_id = 4;
+    int64 datetime = 5;
+    bytes data = 6;
+    pbcomm.Debug dbg = 7;
+}
+
+message PushInlineQueryRequestV2{
+    int32 user_id = 1;
+    uint64 message_id = 2;
+    uint64 key_id = 3;
+    uint64 session_id = 4;
+    int64 datetime = 5;
+    bytes data = 6;
+    pbcomm.Debug dbg = 7;
+    string lang = 8;
+}

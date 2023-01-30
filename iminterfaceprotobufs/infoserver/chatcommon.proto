@@ -1,0 +1,45 @@
+syntax = "proto3";
+package infoserver;
+
+
+// 
+enum ChatResultCode {
+    Chat_RPC_OK                           = 0;         //成功
+    Chat_ADDUSER3549_EXP                  = 4000;       //3549隐私选项
+    Chat_User_Priavcay                    = 4001;       //隐私选项 没有权限
+    Chat_To_User_Blocked                  = 4002;       //block你将用户拉入黑名单  隐私选项
+    Chat_User_Blocked                     = 4003;       //block用户将你拉入黑名单  隐私选项
+    Chat_REPEAT_CREAT                     = 4004;       //短时间重复创建群
+    Chat_REPEAT_ADD_USER                  = 4005;       //重复添加群成员
+	Chat_EXCEED_CREATE_MAXNUM             = 4006;       //超过最大建群数量
+	Chat_EXCEED_TODAY_CREATE_MAXNUM       = 4007;       //超过当日最大建群数量
+    Chat_EXCEED_ADD_USER_MAXNUM           = 4008;       //超过群最大添加人数
+    Chat_PROHIBIT_ADD_GROUP               = 4009;       //禁止加入群组
+    Chat_ADMINLEVEL_EXCEPTION             = 4010;       //没有邀请权限
+    Chat_ALREADYLEFT_EXCEPTION            = 4011;       //用户不在群里
+    Chat_GROUP_DISBAND                    = 4012;       //该群已经解散
+    Chat_GROUP_KICKED                     = 4013;       //该群以将你拉黑
+    Chat_HOURS_ADD_USER_MAXNUM            = 4114;       //超过每小时最多添加群成员数
+    Chat_ONCE_ADD_USER_MAXNUM             = 4115;       //超过单次最多添加群成员数
+    //
+    Chat_UNKNOWN                      	  = 4100;       //未知异常
+    Chat_PARAMETER_EXCEPTION              = 4101;       //参数异常
+    Chat_LOGIC_EXCEPTION                  = 4102;       //逻辑异常
+    Chat_REDIS_EXCEPTION                  = 4103;       //redis异常
+    Chat_DB_EXCEPTION                     = 4104;       //数据库异常
+    Chat_AllocId_EXCEPTION                = 4105;       //群id分配错误
+    Chat_CallGetUser_EXCEPTION            = 4106;       //获取user出错  刘鑫磊提供接口
+    Chat_DB_NORECORD                      = 4107;       //无记录
+    Chat_Group_NORECORD                   = 4108;       //无群记录
+}
+
+//日志需要打印
+// message ChatLogPrefix {
+//     int32    userid      = 1;
+//     string   Phone       = 2;
+//     string   ip          = 3;
+//     uint64   key_id      = 4;
+//     uint64   session_id  = 5;
+//     int32    layer       = 6;
+//     uint32   ostype      = 7; //1 是安卓 2 是Iphone/IPAD 3 是PC 4是web
+// }

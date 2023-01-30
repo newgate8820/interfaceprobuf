@@ -1,0 +1,436 @@
+/*
+    存储文件相关接口定义
+    作者：Ligl
+    日期：2017-06-20
+    版本：1.0
+    修改日期：
+    修改日志：
+    Date                  Desc
+    -----------------------------------------------------
+    2017-08-16            DC操作存储对象有些客户端没有携带访问哈希，约定没有访问哈希及为零时不做鉴权处理
+	protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/storageservice/.proto
+*/
+
+syntax = "proto3";
+
+import "gitlab.chatserver.im/interfaceprobuf/storageservice/storage_pub.proto";
+
+package storageservice;
+
+// 文件存储RPC接口
+service FileStorageService {
+    // ServiceLimit 服务上传下载限制
+    rpc ServiceLimit(MsgServiceLimitReq) returns (MsgServiceLimitResp) {}
+
+    // QueryFileIsExist 查询文件是否存在
+    //rpc QueryFileIsExist(MsgQueryFileIsExistReq) returns (MsgQueryFileIsExistResp) {}
+
+    // ApplyFid 申请Fid, 仅用于分片上传文件时
+    //rpc ApplyFid(MsgApplyFidReq) returns (MsgApplyFidResp) {}
+    
+    // UploadFile 上传文件或文件片
+    rpc UploadFile(MsgUploadFileReq) returns (MsgUploadFileResp) {}
+
+    // DownloadFile 下载文件或文件片
+    rpc DownloadFile(MsgDownloadFileReq) returns (MsgDownloadFileResp) {}
+
+    // DownloadFile 下载大块文件到缓存
+    rpc DownloadFileCache(MsgDownloadFileReq) returns (MsgDownloadFileResp) {}
+
+    // DeleteFile 删除已经存储的文件或引用
+    //rpc DeleteFile(MsgDeleteFileReq) returns (MsgDeleteFileResp) {}
+    
+    // InnerDeleteFile 仅用于存储系统内部服务使用
+    //rpc InnerDeleteFile(MsgDeleteFileReq) returns (MsgDeleteFileResp) {}
+    
+    // ImmediateDeleteFile 仅用于存储系统内部服务使用
+    //rpc ImmediateDeleteFile(MsgDeleteFileReq) returns (MsgDeleteFileResp) {}
+
+    // 取消文件分片上传，仅用于正准备或正在分片上传文件场景（如：调用ApplyFid接口之后且正准备或正在调用UploadFile分片上传文件的场景）
+    //rpc CancelUpload(MsgCancelUploadReq)  returns (MsgCancelUploadResp) {}
+
+    // AddRefCount 添加文件的引用计数
+    //rpc AddRefCount(MsgAddRefCountReq) returns (MsgAddRefCountResp) {}
+
+    // ModifyTTL 修改fid的TTL
+    //rpc ModifyTTL(MsgModifyTTLReq) returns (MsgModifyTTLResp) {}
+
+    // QueryObjInfo 查询对象信息
+    rpc QueryObjInfo(MsgQueryObjInfoReq) returns (MsgQueryObjInfoResp) {}
+
+    // 网关上传文件
+    rpc GatewayUploadFile(MsgFilePartsReq) returns (MsgFilePartsResp) {}
+
+    // 网关取上传文件的Fid, 与DC约定：1.收到此消息认为文件片已经传完；2.keyid+fileid与存储fid映射关系丢弃
+    rpc GatewayGetUploadFileFid(MsgGetFidReq) returns (MsgGetFidResp) {}
+
+    // 网关上传文件描述信息
+    rpc GatewayUploadFileDesc(MsgFileDescReq) returns (MsgFileDescResp) {}
+
+    // 网关获取文件描述信息
+    rpc GatewayGetFileDesc(MsgGetFileDescReq) returns (MsgGetFileDescResp) {}
+
+    // 存储裁剪图与原图映射
+    //rpc SaveCutPictureMap(MsgCutPictureMapReq) returns (MsgCutPictureMapResp) {}
+    
+    // 获取裁剪图与原图映射
+    //rpc GetCutPictureMap(MsgGetCutPictureMapReq) returns (MsgGetCutPictureMapResp) {}
+
+    // 删除裁剪图与原图映射
+    //rpc DelCutPictureMap(MsgDelCutPictureMapReq) returns (MsgDelCutPictureMapResp) {}
+	
+	// GetWebPhoto
+    //rpc GetWebPhoto(MsgGetWebPhotoReq) returns (MsgGetWebPhotoResp){}
+    // GetWebPhoto
+    //rpc GetSendPhotoSize(MsgGetSendPhotoSizeReq) returns (MsgGetSendPhotoSizeResp){}
+    // GetWebPhoto
+    //rpc GetPhotoCachedSize(MsgGetPhotoCachedSizeReq) returns (MsgGetPhotoCachedSizeResp){}
+    // GetWebPhoto
+    //rpc GetPhoto(MsgGetPhotoReq) returns (MsgGetPhotoResp){}
+}
+
+// ----------------------------------------------------
+// 服务上传下载限制请求
+message MsgServiceLimitReq {
+    uint32                 reserved      = 1;        // 保留用
+}
+
+// 服务上传下载限制响应(单位：Byte)
+message MsgServiceLimitResp {
+    uint32                 usfsl         = 1;        // 上传小文件大小限制，usfsl=>upload small file size limit
+    uint32                 ubfssl        = 2;        // 上传大文件分片大小限制，ubfsl=>upload big file slice size limit
+    uint32                 dssl          = 3;        // 下载分片大小限制，usfsl=>download slice size limit
+}
+// ----------------------------------------------------
+
+// 查询文件是否存在请求（仅用于非分片上传文件时）
+message MsgQueryFileIsExistReq {
+    string                 file_hash     = 1;        // 文件全量Hash
+}
+
+// 查询文件是否存在响应
+message MsgQueryFileIsExistResp {
+    FileHashPara           para          = 1;        // Ref, 保留可选用
+    uint64                 fid           = 2;        // 存储服务分配存储文件的唯一标识，注意：如果逻辑层需要直接引用（无需重复上传）此对象，需要调用AddRefCount接口
+    uint64                 access_hash   = 3;        // 存储之后的访问hash
+    bool                   is_exist      = 4;        // 是否存在，false：不存在；true:存在
+}
+// ----------------------------------------------------
+
+// 申请fid请求（仅用于分片上传文件时）
+message MsgApplyFidReq {
+    string                 file_name     = 1;        // 上传文件的文件名
+    uint32                 part_total    = 2;        // 文件片总数
+    uint32                 ttl           = 3;        // 文件存储周期（秒）, 为0时表示永久存储（可通过接口修改）
+}
+
+// 申请fid响应参数
+message ApplyFidRespPara {
+    string                 file_name     = 1;        // 上传文件的文件名
+}
+
+// 申请fid响应
+message MsgApplyFidResp {
+    ApplyFidRespPara       para          = 1;        // Ref, 保留选用
+    uint64                 fid           = 2;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 3;        // 存储之后的访问hash
+}
+// ----------------------------------------------------
+
+// 上传请求参数1（仅用于分片上传文件时）
+message UploadReqPara1 {
+    uint64                 fid           = 1;        // 之前申请的Fid
+    uint32                 part_id       = 2;        // 文件片ID，备注：从0开始分配
+    uint32                 part_size     = 3;        // 文件片大小
+}
+
+// 上传请求参数2（仅用于非分片上传文件时）
+message UploadReqPara2 {
+    string                 file_name     = 1;        // 上传文件的文件名
+    uint32                 file_size     = 2;        // 文件大小
+    string                 file_hash     = 3;        // 文件Hash SHA-256
+    uint32                 ttl           = 4;        // 文件存储周期（秒）, 为0时表示永久存储（可通过接口修改）
+}
+
+// 上传文件请求
+message MsgUploadFileReq {
+    UploadReqPara1         para1         = 1;        // Ref
+    UploadReqPara2         para2         = 2;        // Ref
+    bytes                  data          = 3;        // 数据
+}
+
+// 文件上传响应参数1（仅用于分片上传文件时）
+message FileUploadRespPara {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint32                 part_id       = 2;        // 文件片ID
+}
+
+// 上传文件响应
+message MsgUploadFileResp {
+    ERpcResultCode         result        = 1;        // 结果码
+    FileUploadRespPara     para1         = 2;        // Ref
+    FidPara                para2         = 3;        // Ref，仅用于非分片文件上传
+    uint64                 access_hash   = 4;        // 仅用于非分片文件上传存储之后的访问hash
+}
+// ----------------------------------------------------
+
+// 下载文件请求
+message MsgDownloadFileReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+    uint32                 offset        = 3;        // 起始偏移，从0开始
+    uint32                 length        = 4;        // 长度
+    uint64                 reserve        = 5;
+    string                 reserve_string = 6;
+}
+
+// 下载文件响应参数1
+message DownloadFileRespPara1 {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint32                 offset        = 2;        // 起始偏移，从0开始
+    string                 file_name     = 3;        // 上传文件时的文件名
+}
+
+// 下载文件响应参数2
+message DownloadFileRespPara2 {
+    uint32                 length        = 2;        // 长度
+    bytes                  data          = 3;        // 数据
+}
+
+// 下载文件响应
+message MsgDownloadFileResp {
+    ERpcResultCode         result        = 1;        // 结果码
+    DownloadFileRespPara1  para1         = 2;        // Ref, 保留选用，当result = RRC_OK 且选用时有效
+    DownloadFileRespPara2  para2         = 3;        // Ref，当result = RRC_OK有效
+}
+// ----------------------------------------------------
+
+// 删除文件请求
+message MsgDeleteFileReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+    uint32                 ref_num       = 3;        // 引用数
+}
+
+// 删除文件响应
+message MsgDeleteFileResp {
+    FidPara                para          = 1;        // Ref, 保留选用
+    ERpcResultCode         result        = 2;        // 结果码
+}
+// ----------------------------------------------------
+
+// 取消文件分片上传请求（仅用于正准备或正在分片上传的文件场景）
+message MsgCancelUploadReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+}
+
+// 取消文件分片上传响应
+message MsgCancelUploadResp {
+    FidPara                para          = 1;        // Ref, 保留选用
+    ERpcResultCode         result        = 2;        // 结果码
+}
+// ----------------------------------------------------
+
+// 增加文件引用计数请求
+message MsgAddRefCountReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+    uint32                 ref_num       = 3;        // 引用数
+}
+
+// 增加文件引用计数响应
+message MsgAddRefCountResp {
+    FidPara                para          = 1;        // Ref, 保留选用
+    ERpcResultCode         result        = 2;        // 结果码
+}
+// ----------------------------------------------------
+
+// 修改fid的TTL请求
+message MsgModifyTTLReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+    uint32                 ttl           = 3;        // 文件存储周期（秒）, 为0时表示永久存储（可通过接口修改）
+}
+
+// 修改fid的TTL响应
+message MsgModifyTTLResp {
+    FidPara                para          = 1;        // Ref, 保留选用
+    ERpcResultCode         result        = 2;        // 结果码
+}
+// ----------------------------------------------------
+
+// 查询对象信息请求
+message MsgQueryObjInfoReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+}
+
+// 查询对象信息响应参数
+message QueryObjInfoRespPara {
+    string                 name          = 1;        // 文件名
+    uint64                 size          = 2;        // 文件大小（Byte）
+    uint64                 access_hash   = 3;        // 访问hash，仅针对机器人服务返回处理
+}
+
+// 查询对象信息响应
+message MsgQueryObjInfoResp {
+    QueryObjInfoRespPara   para          = 1;        // Ref
+    ERpcResultCode         result        = 2;        // 结果码
+}
+// ----------------------------------------------------
+
+// 网关上传文件请求
+message MsgFilePartsReq {
+    uint64                 keyid         = 1;        // Ref 消息协议
+    int64                  fileid        = 2;        // Ref 消息协议
+    uint32                 part_id       = 3;        // 文件片ID，备注：从0开始分配
+    uint32                 file_type     = 4;        // Ref 消息协议 1 small 2: big
+    uint32                 part_total    = 5;        // file_type为2时有效，大文件片总数，小文件没有
+    bytes                  data          = 6;        // 数据
+}
+
+// 网关上传文件响应
+message MsgFilePartsResp{
+    ERpcResultCode         result        = 1;        // 结果码
+}
+// ----------------------------------------------------
+
+// 网关取Fid请求
+message MsgGetFidReq {
+    uint64                 keyid         = 1;        // Ref 消息协议
+    int64                  fileid        = 2;        // Ref 消息协议
+    uint32                 file_type     = 3;        // Ref 消息协议 1 small 2: big
+    string                 md5           = 4;        // file_type为1时的文件hash，如果与服务实际收到不符丢掉；另外加密聊天客户端没有传md5,为空放弃校检
+    uint32                 part_total    = 5;        // file_type为2时的文件分片总数，如果与服务实际收到不符丢掉
+}
+
+// 网关取Fid响应
+message MsgGetFidResp{
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+    uint64                 file_size     = 3;        // 文件大小
+    ERpcResultCode         result        = 4;        // 结果码
+}
+// ----------------------------------------------------
+
+// 网关上传文件描述信息请求
+message MsgFileDescReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+    bytes                  data          = 3;        // 数据
+    int32                  from_id       = 4;        // 发送者id
+    int32                  with_id       = 5;        // 接受者id
+    string                 chat_type     = 6;        // 聊天类型
+    int32                  media_type    = 7;        // 媒体类型
+    int32                  message_id    = 8;        // 消息id
+}
+
+// 网关上传文件描述信息响应
+message MsgFileDescResp{
+    ERpcResultCode         result        = 1;        // 结果码
+}
+// ----------------------------------------------------
+
+// 网关获取文件描述信息请求
+message MsgGetFileDescReq {
+    uint64                 fid           = 1;        // 存储服务分配存储文件的唯一标识
+    uint64                 access_hash   = 2;        // 访问hash
+}
+
+// 网关获取文件描述信息响应
+message MsgGetFileDescResp{
+    ERpcResultCode         result        = 1;        // 结果码
+    bytes                  data          = 2;        // 数据
+}
+// ----------------------------------------------------
+
+// 存储裁剪图与原图映射请求
+message MsgCutPictureMapReq {
+    uint64                 fid           = 1;        // 原图fid
+    uint64                 access_hash   = 2;        // 访问hash
+    bytes                  data          = 3;        // 数据
+}
+
+// 存储裁剪图与原图映射响应
+message MsgCutPictureMapResp{
+    ERpcResultCode         result        = 1;        // 结果码
+}
+// ----------------------------------------------------
+
+// 获取裁剪图与原图映射请求
+message MsgGetCutPictureMapReq {
+    uint64                 fid           = 1;        // 原图fid
+    uint64                 access_hash   = 2;        // 访问hash
+}
+
+// 获取裁剪图与原图映射响应
+message MsgGetCutPictureMapResp{
+    ERpcResultCode         result        = 1;        // 结果码
+    bytes                  data          = 2;        // 数据
+}
+// ----------------------------------------------------
+
+// 删除裁剪图与原图映射请求
+message MsgDelCutPictureMapReq {
+    uint64                 fid           = 1;        // 原图fid
+    uint64                 access_hash   = 2;        // 访问hash
+}
+
+// 删除裁剪图与原图映射响应
+message MsgDelCutPictureMapResp{
+    ERpcResultCode         result        = 1;        // 结果码
+}
+// ----------------------------------------------------
+
+// GetWebPhoto
+message MsgGetWebPhotoReq {
+    string  PhotoType = 1;  //实际未用到
+    uint64  key_id    = 2;  //fileId 为0？
+    int32   dc_id     = 3;
+    bytes   data      = 4;  //数据
+}
+message MsgGetWebPhotoResp {
+    bytes OtherPhotoData    = 1;  //压缩的二进制
+    ERpcResultCode result   = 2;  //返回代码
+}
+// ----------------------------------------------------
+// GetSendPhotoSize
+message MsgGetSendPhotoSizeReq {
+    uint64                 keyid         = 1;        // Ref 消息协议
+    int64                  fileid        = 2;        // Ref 消息协议
+    uint32                 file_type     = 3;        // Ref 消息协议 1 small 2: big
+    string                 md5           = 4;        // file_type为1时的文件hash，如果与服务实际收到不符丢掉；另外加密聊天客户端没有传md5,为空放弃校检
+    uint32                 part_total    = 5;        // file_type为2时的文件分片总数，如果与服务实际收到不符丢
+    int32                  dc_id         = 6;
+}
+message MsgGetSendPhotoSizeResp {
+    bytes SelfPhotoData    = 1;
+    bytes OtherPhotoData   = 2;
+    ERpcResultCode result  = 3;
+}
+// ----------------------------------------------------
+// GetPhotoCachedSize
+message MsgGetPhotoCachedSizeReq { 
+    int64 key_id = 1;
+    int32 dc_id  = 2;
+    int64 new_id = 3;
+    int32 size   = 4;
+}
+message MsgGetPhotoCachedSizeResp {
+    bytes CachePhotoData =1;
+    ERpcResultCode result =2;
+}
+// ----------------------------------------------------
+     // GetPhoto
+message MsgGetPhotoReq { 
+    uint64                 keyid         = 1;        // Ref 消息协议
+    int64                  fileid        = 2;        // Ref 消息协议
+    uint32                 file_type     = 3;        // Ref 消息协议 1 small 2: big
+    string                 md5           = 4;        // file_type为1时的文件hash，如果与服务实际收到不符丢掉；另外加密聊天客户端没有传md5,为空放弃校检
+    uint32                 part_total    = 5;        // file_type为2时的文件分片总数，如果与服务实际收到不符丢
+    int32                  dc_id         = 6;
+}
+message MsgGetPhotoResp {
+    bytes OtherPhotoData  = 1;
+    ERpcResultCode result = 2;
+}

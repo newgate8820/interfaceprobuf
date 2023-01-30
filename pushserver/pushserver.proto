@@ -1,0 +1,30 @@
+//协议文件用途:  操作和获取用户基础信息和用户的联系人信息、黑名单列表信息
+//作者：
+//日期: 2017/6/22
+//版本：0.0.1
+//修改日期：
+//修改日志：
+
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pushserver/pushserver.proto
+syntax = "proto3";
+package pbpushserver;
+
+//import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+//*************************************API ******************************************************
+//user service 接口
+service PushServerService {
+  rpc LivePush (LivePushReq) returns (LivePushResult){
+  }
+}
+
+message LivePushReq {
+  repeated int32 user_ids = 1;
+  int32 self_id = 2;
+  string text = 3;
+  int32 type = 4;
+}
+
+message LivePushResult{
+  bool success = 1;
+}

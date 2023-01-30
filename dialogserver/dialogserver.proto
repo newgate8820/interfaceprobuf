@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package dialogserver;
+
+// 对话框微服务
+service DialogServer {
+    // InsertUserDialog 新增对话框
+    rpc InsertUserDialog(InsertUserDialogReq) returns(InsertUserDialogReply) {}
+
+    // UpdateUserDialog 更新对话框
+    rpc UpdateUserDialog(UpdateUserDialogReq) returns(UpdateUserDialogReply) {}
+
+    // GetUserDialog 获取一个对话框信息
+    rpc GetUserDialog(GetUserDialogReq) returns(GetUserDialogReply) {}
+
+    // GetUserAllDialog 获取用户所有对话框
+    rpc GetUserAllDialog(GetUserAllDialogReq) returns(GetUserAllDialogReply) {}
+
+    // GetUserPinedDialog 获取置顶dialog
+    rpc GetUserPinedDialog(GetUserPinedDialogReq) returns (GetUserPinedDialogReply) {}
+
+    // DeleteUserDialog 删除对话框
+    rpc DeleteUserDialog(DeleteUserDialogReq) returns(DeleteUserDialogReply) {}
+
+    // UpdateDialogPinned 置顶对话框或者取消对话框置顶
+    rpc UpdateDialogPinned(UpdateDialogPinnedReq) returns(UpdateDialogPinnedReply) {}
+
+    // GetUserDialogs 分页获取对话框列表
+    rpc GetUserDialogs(GetUserDialogsReq) returns (GetUserDialogsReply) {}
+
+    // GetUserDialogsV2 通过offsetDate去获取dialog
+    rpc GetUserDialogsV2(GetUserDialogsV2Req) returns (GetUserDialogsV2Reply) {}
+
+    // ClearDraft 清除草稿
+    rpc ClearDraft(ClearDraftReq) returns (ClearDraftReply) {}
+
+    // RevokeUnread 删除消息时撤销未读
+    rpc RevokeUnread(RevokeUnreadReq) returns (RevokeUnreadReply) {}
+
+    // ReorderPinnedDiaog 置顶对话框重排序
+    rpc ReorderPinnedDialog(ReorderPinnedDialogReq) returns(ReorderPinnedDialogReply) {}
+}
+
+message PeerType {
+    int32 WithID   = 1;
+    int32 WithType = 2;
+}
+
+message ReorderPinnedDialogReq {
+    int32 UserID                = 1;
+    repeated PeerType PeerTypes = 2;
+}
+
+message ReorderPinnedDialogReply {}
+
+message RevokeUnreadReq {
+    int32 UserID          = 1;
+    int32 WithID          = 2;
+    int32 WithType        = 3;
+    repeated int32 MsgIDs = 4;
+}
+
+message RevokeUnreadReply {}
+
+message ClearDraftReq {
+    int32 UserID   = 1;
+    int32 WithID   = 2;
+    int32 WithType = 3;
+}
+
+message ClearDraftReply {}
+
+message GetUserDialogsReq {
+    int32 UserID   = 1;
+    int32 WithID   = 2;
+    int32 WithType = 3;
+    int32 Limit    = 4;
+}
+
+message GetUserDialogsReply {
+    repeated UserDialog UserDialogs = 1;
+    int32 Count                     = 2; // 用户dialog的总个数
+}
+
+message GetUserDialogsV2Req {
+    int32 UserID     = 1;
+    int32 WithID     = 2;
+    int32 WithType   = 3;
+    int32 OffsetDate = 4;
+    int32 Limit      = 5;
+}
+
+message GetUserDialogsV2Reply {
+    repeated UserDialog UserDialogs = 1;
+    int32 Count                     = 2; // 用户dialog的总个数
+}
+
+message UpdateDialogPinnedReq {
+    int32 UserID   = 1;
+    int32 WithID   = 2;
+    int32 WithType = 3;
+    bool Pinned    = 4; // true 为置顶，false 取消置顶
+}
+
+message UpdateDialogPinnedReply {}
+
+message DeleteUserDialogReq {
+    int32 UserID   = 1;
+    int32 WithID   = 2;
+    int32 WithType = 3;
+}
+
+message DeleteUserDialogReply {}
+
+message GetUserPinedDialogReq {
+    int32 UserID = 1;
+}
+
+message GetUserPinedDialogReply {
+    repeated UserDialog UserDialogs = 1;
+}
+
+message GetUserDialogReq {
+    int32 UserID   = 1;
+    int32 WithID   = 2;
+    int32 WithType = 3;
+}
+
+message GetUserDialogReply {
+    UserDialog UserDialog = 1;
+}
+
+message UpdateUserDialogReq {
+    int32 UserID             = 1;  // 用户ID
+    int32 WithID             = 2;  // 消息交互方ID
+    int32 WithType           = 3;  // 对话框类型
+    int32 TopMessage         = 4;  // 每次替换 如果是0 则不处理
+    int32 ReadInboxMaxId     = 5;  // 每次自增 如果是0 则不处理
+    int32 ReadOutboxMaxId    = 6;  // 每次自增 如果是0 则不处理
+    int32 UnreadMetionsCount = 7;  // 每次自增 如果是0 则不处理， 如果是-1 则置为0
+    int32 UnreadCount        = 8;  // 每次自增 如果是0 则不处理， 如果是-1 则置为0
+    int32 Pts                = 9;  // pts每次自增 如果是0 则不处理
+    int32 UpdateDate         = 10; // 时间戳
+}
+
+message UpdateUserDialogReply {
+
+}
+
+message GetUserAllDialogReq{
+    int32 UserID = 1;
+}
+
+message GetUserAllDialogReply{
+    repeated UserDialog UserDialogs = 1;
+}
+
+message InsertUserDialogReq {
+    UserDialog UserDialog = 1;
+    bool UpdateScore      = 2;
+}
+
+message InsertUserDialogReply {
+
+}
+
+message UserDialog {
+    int32   UserId              = 1;  // 用户ID
+    int32   WithId              = 2;  // 消息交互方
+    int32   Type                = 3;  // 对话框类型 1 单聊 2 普通群 3 超级群/channel
+    int32   Flags               = 4;  // 标识
+    bool    Pinged              = 5;  // 是否置顶
+    int32   TopMessage          = 6;  // 顶部消息id
+    int32   ReadInboxMaxId      = 7;  // 已读最大id
+    int32   ReadOutboxMaxId     = 8;  // 双勾最大id
+    int32   UnreadMetionsCount  = 9;  // 未读@总数
+    int32   UnreadCount         = 10; // 未读总数
+    int32   NotifySettingsFlags = 11; // 设置标识
+    bool    ShowPreviews        = 12; // 是否显示完全 推送时
+    bool    Silent              = 13; // 是否静音
+    int32   MuteUntil           = 14; // 静音时间
+    string  Sound               = 15; // 声音
+    int32   Pts                 = 16; // 当前pts
+    bytes   Draft               = 17; // 草稿
+    int32   Readinpts           = 18; // 最后已读pts
+    int32   Readoutpts          = 19; // 最后双勾pts
+    repeated int32 LinkUser     = 20; // 涉及到的用户
+    int64   InsertDate          = 21; // 插入时间
+    int64   UpdateDate          = 22; // 更新时间
+    int32   Encry               = 23; // 是否加密 0: 不加密 1：加密
+    bool    Revoke              = 24; // 如果unread为0 是否是回退为0/已读为0
+}

@@ -1,0 +1,298 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+// sudo protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imgameapiservice/imgameapiservice.proto
+
+syntax = "proto3";
+
+package imgameapiservice;
+
+enum GameApiServiceResultCode {
+    ResultCode_Ok                                                        = 0;     // ok
+    ResultCode_Token_Invalid                                             = 1001;  // token无效
+    ResultCode_Parameter_Exception                                       = 1002;  // 参数异常
+    ResultCode_IM_Side_Service_Exception                                 = 1003;  // IM侧服务异常
+    ResultCode_Game_Side_Service_Exception                               = 1004;  // 游戏侧服务异常
+}
+
+// 游戏API服务
+service ImGameApiService{
+    // 注册
+    rpc Register(ReqRegister) returns (ReplyRegister) {};
+
+    // 登录
+    rpc Login(ReqLogin) returns (ReplyLogin) {};
+
+    // 获取会员当前余额
+    rpc FindMemberBalance(ReqMemberBalance) returns (ReplyMemberBalance) {};
+
+    // ---------------------------------- 以下为原服务协议, 暂时保留 ----------------------------------
+    // 获取帐户token
+    rpc GetAccountToken(GetAccountTokenMsg) returns (GetAccountTokenMsgReply) {};
+    
+    // 验证帐户token
+    rpc VerifyAccountToken(VerifyAccountTokenMsg)returns (VerifyAccountTokenMsgReply) {};
+    // ---------------------------------- 以下为原服务协议, 暂时保留 ----------------------------------
+}
+
+// ---------------------------------- 以下为原服务协议, 暂时保留 ----------------------------------
+// 获取帐户token消息请求参数
+message GetAccountTokenMsg{
+    int32                              UserId                            = 1;
+}
+
+// 获取帐户token消息响应参数
+message GetAccountTokenMsgReply{
+    GameApiServiceResultCode           ResultCode                        = 1;
+    string                             Token                             = 2;
+    string                             URL                               = 3;
+}
+
+// 验证帐户token消息请求参数
+message VerifyAccountTokenMsg{
+    int32                              UserId                            = 1;
+    string                             Token                             = 2;
+}
+
+// 验证帐户token消息响应参数
+message VerifyAccountTokenMsgReply{
+    GameApiServiceResultCode           ResultCode                        = 1;
+    int32                              UserId                            = 2;
+}
+
+// ---------------------------------- 以上为原服务协议, 暂时保留 ----------------------------------
+
+// 备注1：内部协议字段名大小写、类型等与游戏侧提供的接口一致, 避免重复定义JSON数据结构
+// 备注2：注意后续字段核对, 目前根据仅根据抓包数据定义, 文档全是string, 只能参考注释
+
+// 注册请求
+message ReqRegister{
+    string                             userAccount                       = 1;     // 用户账号, 是否必填(Y)
+    string                             userPassword                      = 2;     // 用户密码, 是否必填(Y)
+    string                             confirmPwd                        = 3;     // 确认密码, 是否必填(Y)
+    string                             userName                          = 4;     // 用户姓名, 是否必填(N)
+    string                             validCode                         = 5;     // 验证码, 是否必填(Y)
+    string                             email                             = 6;     // 用户邮箱, 是否必填(N)
+    string                             userQq                            = 7;     // 用户QQ, 是否必填(N)
+    string                             userWx                            = 8;     // 用户微信, 是否必填(N)
+    string                             telephone                         = 9;     // 用户手机, 是否必填(N)
+    string                             phoneCode                         = 10;    // 短信验证码, 是否必填(N)
+    string                             bundleVersionId                   = 11;    // APP版本标识, 是否必填(Y)
+    string                             token                             = 12;    // 令牌, 是否必填(Y)
+    string                             registerSourceName                = 13;    // 注册来源, 是否必填(Y)
+    string                             appUuid                           = 14;    // 应用UUID, 是否必填(N)
+    string                             proxyLinkCode                     = 15;    // 邀请码, 是否必填(N)
+    string                             registerMethodId                  = 16;    // 注册来源方法id, 是否必填(Y)
+}
+
+// 注册响应
+message ReplyRegister{
+    int32                              status                            = 1;     // 状态值：1 成功, 其他数值代表失败
+    string                             msg                               = 2;     // 接口请求的状态信息
+    RegisterRespData                   data                              = 3;
+}
+
+// 注册响应数据
+message RegisterRespData  {
+    int64                              creationTime                      = 1;     // 创建时间
+    string                             creationBy                        = 2;     // 创建人
+    int64                              lastUpdatedTime                   = 3;     // 更新时间
+    string                             lastUpdatedBy                     = 4;     // 更新人
+    string                             dataSourceKey                     = 5;     // 分库键
+    string                             currentUser                       = 6;     // 当前登录用户
+    int32                              userId                            = 7;     // 用户id
+    string                             userSystemId                      = 8;     // 系统生成的用户唯一标识(分库键+用户名)
+    string                             proxyLinkCode                     = 9;     // 代理链
+    int32                              parentId                          = 10;    // 上级id
+    string                             proxyAccount                      = 11;    // 父级代理信息
+    int32                              userLevelId                       = 12;    // 会员层级
+    string                             memberLevelName                   = 13;    // 会员层级名称
+    string                             userAccount                       = 14;    // 用户账号
+    string                             userPassword                      = 15;    // 密码
+    string                             oldUserPassword                   = 16;    // 旧的用户秘密
+    string                             registerIp                        = 17;    // 注册ip
+    string                             registerSource                    = 18;    // 注册来源【1:PC 2:IOS 3:安卓 4.H5】
+    string                             registerSourceName                = 19;    // 来源名称 APPNAME(App Id) 或PC DOMAIN
+    int32                              registerMethodId                  = 20;    // 注册方式
+    int32                              sex                               = 21;    // 性别【1男0女】
+    int32                              birthday                          = 22;    // 生日
+    string                             nickName                          = 23;    // 昵称
+    string                             email                             = 24;    // 电子邮件
+    string                             headPortrait                      = 25;    // 头像
+    string                             userName                          = 26;    // 姓名
+    string                             telephone                         = 27;    // 电话
+    string                             userQq                            = 28;    // Qq
+    string                             userWx                            = 29;    // 微信
+    int32                              isFrist                           = 30;    // 是否首充【0否1是】
+    int32                              isOwner                           = 31;    // 是否内部会员【0否1是】
+    int32                              isEnable                          = 32;    // 是否启用【0否1是】
+    int32                              isFrozen                          = 33;    // 是否冻结【0否1是】
+    string                             bundleVersionId                   = 34;    // App版本id
+    string                             appUuid                           = 35;    // App序号
+    string                             validCode                         = 36;    // 验证码
+    double                             balance                           = 37;    // 余额
+    double                             recharge                          = 38;    // 充值
+    string                             companyInfo                       = 39;    // 公司信息
+    string                             withdrawPassword                  = 40;    // 取款密码
+    string                             oldWithdrawPassword               = 41;    // 旧的取款密码
+    string                             loginIp                           = 42;    // 登录ip
+    string                             loginRealAddress                  = 43;    // 登录真实地址
+    string                             loginSource                       = 44;    // 登录源? 文档中没有
+    string                             loginSourceName                   = 45;    // 登录源名? 文档中没有
+    int64                              loginDate                         = 46;    // 登录时间
+    string                             platformMap                       = 47;    // 平台地图? 文档中没有
+    string                             FGQP                              = 48;    // 平台编码, 文档中有测试接口没有, 保留
+    string                             KAIYUAN600                        = 49;    // 平台编码, 文档中有测试接口没有, 保留
+    string                             ZILLIONAIRE                       = 50;    // 平台编码, 文档中有测试接口没有, 保留
+    string                             SSOCHESS                          = 51;    // 平台编码, 文档中有测试接口没有, 保留
+    string                             FGBY                              = 52;    // 平台编码, 文档中有测试接口没有, 保留
+    string                             KYQP                              = 53;    // 平台编码, 文档中有测试接口没有, 保留
+    int32                              startDate                         = 54;    // 开始日期
+    int32                              endDate                           = 55;    // 结束日期
+    int32                              memberLevelVO                     = 56;    // ? 文档中没有
+    int32                              moneyVO                           = 57;    // ? 文档中没有
+    int32                              memberLevelVIP                    = 58;    // 会员vip等级
+    int32                              memberLevelVIPID                  = 59;    // 会员vip等级id
+    string                             memberLevelVIPName                = 60;    // 会员vip等级名称
+    double                             depositTotalMax                   = 61;    // 最大总存款
+    double                             depositTotalMin                   = 62;    // 最小总存款
+    double                             withdrawTotalMax                  = 63;    // 最大总提款
+    double                             withdrawTotalMin                  = 64;    // 最小总提款
+    double                             totalPayoffMax                    = 65;    // 最大总盈利
+    double                             totalPayoffMin                    = 66;    // 最小总盈利
+    int32                              withdrawNumberMax                 = 67;    // 最大提款次数
+    int32                              withdrawNumberMin                 = 68;    // 最小提款次数
+    int32                              depositNumberMax                  = 69;    // 最大存款次数
+    int32                              depositNumberMin                  = 70;    // 最小存款次数
+    string                             suffix                            = 71;    // 表后缀
+    string                             note                              = 72;    // 备注
+    int32                              debitType                         = 73;    // 借方类型, 文档中没有注释
+    string                             token                             = 74;    // 认证信息
+    int32                              integralStartDate                 = 75;    // 打码量开始日期
+    int32                              integralEndDate                   = 76;    // 打码量结束日期
+    int32                              bankCardCount                     = 77;    // 绑定银行卡数量
+    int32                              isCapital                         = 78;    // 是否包含本金【0不包含1包含】
+    int32                              damaMultiple                      = 79;    // 打码倍数
+    int32                              needDama                          = 80;    // 更改需求打码
+    int32                              inspectionStatus                  = 81;    // 稽查状态【0：未稽查1：稽查通过2：稽查未通过】
+    int32                              inspectionId                      = 82;    // 打码主键
+    int32                              isHaveSubordinate                 = 83;    // 直属成员数量
+    int32                              teamCounts                        = 84;    // 下级成员数量
+    bool                               verifyRedis                       = 85;    // 判断是否是直接开户验证码校验
+    string                             orderCode                         = 86;    // 会员订单号
+    int32                              failId                            = 87;    // 失败标识? 文档中没有
+}
+
+message ReqLogin {
+    string username    = 1;  // 用户名
+    string password    = 2;  // 密码
+    string ip          = 3;  // 登录ip
+}
+
+message ReplyLogin  {
+    int32               Status    = 1;           			//状态值：1 成功，其他数值代表失败	1
+    string              Msg       = 2;           			//接口请求的状态信息	SUCCESS
+    LoginRespData       Data      = 3;
+}
+
+message LoginRespData  {
+    int64         creationTime         = 1;		    //创建时间	2011-11-11 11:11:11
+    string        creationBy           = 2;		    //创建人
+    int64         lastUpdatedTime      = 3;		    //新时间	2011-11-11 11:11:11
+    string        lastUpdatedBy        = 4;		    //更新人	Test1
+    string        dataSourceKey        = 5;		    //分库键	8bet
+    string        currentUser          = 6;		    //当前登录用户	Test1
+    int64         userId               = 7;		    //用户id	3423
+    string        userSystemId         = 8;		    //系统生成的用户唯一标识(分库键+用户名)	8bet_423424
+    string        proxyLinkCode        = 9;		    //代理链	_342423_423423
+    string        parentId             = 10;		//上级id	53453
+    string        proxyAccount         = 11;		//父级代理信息
+    int32         userLevelId          = 12;		//会员层级	1
+    string        memberLevelName      = 13;		//会员层级名称
+    string        userAccount          = 14;		//用户账号	Test1
+    string        userPassword         = 15;		//密码
+    string        oldUserPassword      = 16;		//旧的用户秘密
+    string        registerIp           = 17;		//注册ip	0.0.0.0
+    string        registerSource       = 18;		//注册来源1:PC 2:IOS 3:安卓 4.H5	1
+    string        registerSourceName   = 19;		//来源名称 APPNAME(App Id) 或PC DOMAIN 	DOMAIN
+    string        registerMethodId     = 20;		//注册方式	1
+    string        sex                  = 21;		//性别【1男0女】	1
+    string        birthday             = 22;		//生日	19990909
+    string        nickName             = 23;		//昵称	放松
+    string        email                = 24;		//电子邮件	131231@163.com
+    string        headPortrait         = 25;        //头像
+    string        userName             = 26;		//姓名	张三
+    string        telephone            = 27;		//电话	132312312
+    string        userQq               = 28;		//Qq	423423423
+    string        userWx               = 29;		//微信	23423423
+    int32         isFrist              = 30;		//是否首充【0否1是】	1
+    int32         isOwner              = 31;		//是否内部会员【0否1是】	1
+    int32         isEnable             = 32;		//是否启用【0否1是】	1
+    int32         isFrozen             = 33;		//是否冻结【0否1是】	1
+    string        bundleVersionId      = 34;		//App版本id	42342
+    string        appUuid              = 35;		//App序号	42342
+    string        validCode            = 36;		//验证码	23423
+    float         balance              = 37;		//余额	100
+    float         recharge             = 38;		//充值	100             // 返回 null
+    string        companyInfo          = 39;		//公司信息
+    string        withdrawPassword     = 40;		//取款密码
+    string        oldWithdrawPassword  = 41;		//旧的取款密码
+    string        loginIp              = 42;		//登录ip	0.0.0.0
+    string        loginRealAddress     = 43;		//登录真实地址	菲律宾
+    string        loginSource          = 44;        //
+    string        loginSourceName      = 45;        //
+    int64         loginDate            = 46;		//登录时间
+    string        platformMap          = 47;		//
+    string        startDate            = 48;		//开始日期	2011-11-11 11:11:11
+    string        endDate              = 49;		//结束日期	2011-11-11 11:11:11
+    string        memberLevelVO        = 50;        //
+    string        moneyVO              = 51;        //
+    string        memberLevelVIP       = 52;		//会员vip等级	1
+    string        memberLevelVIPID     = 53;		//会员vip等级id	13123
+    string        memberLevelVIPName   = 54;		//会员vip等级名称	VIP5
+    string        depositTotalMax      = 55;		//最大总存款	1
+    string        depositTotalMin      = 56;		//最小总存款	1
+    string        withdrawTotalMax     = 57;		//最大总提款	1
+    string        withdrawTotalMin     = 58;		//最小总提款	1
+    string        totalPayoffMax       = 59;		//最大总盈利	1
+    string        totalPayoffMin       = 60;		//最小总盈利	1
+    string        withdrawNumberMax    = 61;		//最大提款次数	1
+    string        withdrawNumberMin    = 62;		//最小提款次数	1
+    string        depositNumberMax     = 63;		//最大存款次数	1
+    string        depositNumberMin     = 64;		//最小存款次数	1
+    string        suffix               = 65;		//表后缀	0909
+    string        note                 = 66;		//备注	备注
+    string        debitType            = 67;        //
+    string        token                = 68;		//认证信息	aedc4ff7-f2e5-460b-b3de-9ad258b33a7f
+    string        integralStartDate    = 69;		//打码量开始日期	2011-11-11 11:11:11
+    string        integralEndDate      = 70;		//打码量结束日期	2011-11-11 11:11:11
+    int32         bankCardCount        = 71;		//绑定银行卡数量	3
+    string        isCapital            = 72;		//是否包含本金【0不包含1包含】	1
+    string        damaMultiple         = 73;		//打码倍数	1
+    string        needDama             = 74;		//更改需求打码	100
+    string        inspectionStatus     = 75;		//稽查状态【0：未稽查1：稽查通过2：稽查未通过】
+    string        inspectionId         = 76;		//打码主键	111
+    string        isHaveSubordinate    = 77;		//直属成员数量	1
+    string        teamCounts           = 78;		//下级成员数量	1
+    bool          verifyRedis          = 79;		//判断是否是直接开户验证码校验	false
+    string        orderCode            = 80;		//会员订单号	3123123
+    string        failId               = 81;        //
+    string        FGQP                 = 82;		//平台编码	T48BETFGQP3A116623
+    string        KAIYUAN600           = 83;		//平台编码	600w3A116623
+    string        ZILLIONAIRE          = 84;		//平台编码	8000233A116623
+    string        SSOCHESS             = 85;		//平台编码	2003223A116623
+    string        FGBY                 = 86;		//平台编码	T48BETFGBY3A116623
+    string        KYQP                 = 87;		//平台编码	713623A116623
+}
+
+
+message ReqMemberBalance {
+    string      token = 1;    // 用户的token
+    string      cookie = 2;   // 用户cookie
+    string      updateBlanceFlag = 3;  // 参数updateBlanceFlag为'0'代表不用同步平台余额，其它情况则同步平台余额
+}
+
+message ReplyMemberBalance {
+    int32     status = 1;   // 状态值：1 成功，其他数值代表失败
+    float    data   = 2;   //  会员余额
+    string     msg    = 3;   //  返回的SUCCESS
+}
+

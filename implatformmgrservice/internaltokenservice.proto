@@ -1,0 +1,63 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+// sudo protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/implatformmgrservice/internaltokenservice.proto
+
+syntax = "proto3";
+
+package implatformmgrservice;
+
+enum PlatformMgrResultCode {
+    ResultCode_Ok                           = 0;         // ok
+    ResultCode_Token_Invalid                = 1001;      // token无效
+    ResultCode_Parameter_Exception          = 1002;      // 参数异常
+    ResultCode_Bind_Token_Exception         = 1003;      // 绑定token异常
+}
+
+// 开放平台管理服务（包括IM内部Token服务）
+service ImPlatformMgrService{
+    // 获取token
+    rpc GetToken(GetTokenMsg) returns (GetTokenMsgReply) {};
+
+    // 用户绑定token
+    rpc UserBindToken(BindTokenMsg) returns (BindTokenMsgReply) {};
+    
+    // 验证token
+    rpc VerifyToken(VerifyTokenMsg)returns (VerifyTokenMsgReply) {};
+}
+
+// 获取token消息请求参数
+message GetTokenMsg{
+    uint64                             KeyId                             = 1;
+}
+
+// 获取token消息响应参数
+message GetTokenMsgReply{
+    PlatformMgrResultCode              ResultCode                        = 1;
+    uint64                             KeyId                             = 2;
+    uint64                             Expire                            = 3;  // 过期时间，单位：秒，暂定10分钟
+    string                             Token                             = 4;
+}
+
+// 用户绑定token消息请求参数
+message BindTokenMsg{
+    int32                              UserId                            = 1;
+    string                             Token                             = 2;
+}
+
+// 用户绑定token消息响应参数
+message BindTokenMsgReply{
+    PlatformMgrResultCode              ResultCode                        = 1;
+    int32                              UserId                            = 2;
+    uint64                             KeyId                             = 3;
+}
+
+// 验证token消息请求参数
+message VerifyTokenMsg{
+    string                             Token                             = 1;
+}
+
+// 验证token消息响应参数
+message VerifyTokenMsgReply{
+    PlatformMgrResultCode              ResultCode                        = 1;
+    uint64                             KeyId                             = 2;
+    int32                              UserId                            = 3;
+}

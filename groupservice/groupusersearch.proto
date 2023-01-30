@@ -1,0 +1,21 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/activeuserserver/activeuserserver.proto
+syntax = "proto3";
+
+package groupservice;
+import "gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto";
+
+//活跃用户信息服务
+service GroupUserSearch{
+    // 根据传入ID搜索用户
+    rpc SearchUsersByName(SearchUsersByNameReq) returns (SearchUsersByNameReply) {};
+}
+
+// 根据传入ID搜索用户
+message SearchUsersByNameReq {
+    repeated int32 UserIds =1;      //传入的群成员ID
+    string str=2;                   //需要匹配的字符串
+}
+message SearchUsersByNameReply {
+    repeated int32 UserIds =1;      //匹配到的用户ID
+    ActiveErrorCode ErrorCode =2;
+}

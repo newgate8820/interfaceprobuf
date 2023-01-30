@@ -1,0 +1,162 @@
+syntax="proto3";
+
+package route;
+
+//////////////////////////////////////////RPC///////////////////////////////
+service RouteTable{
+    rpc Del(DelUserRequest) returns (DelUserReply);
+    rpc Find(FindUserRequest) returns (FindUserReply);
+//    rpc Update(UpdateUserRequest) returns (UpdateUserReply);
+
+    rpc FindEx(FindUserExRequest) returns (FindUserExReply);
+//    rpc UpdateEx(UpdateUserExRequest) returns (UpdateUserExReply);
+    rpc FindUsers(FindUsersRequest) returns (FindUsersReply);
+    rpc UpdateExV2(UpdateUserExV2Request) returns (UpdateUserExV2Reply);
+    rpc UpdateUsers (UpdateUsersRequest) returns (UpdateUsersReply);
+}
+
+message DelUserRequest{
+    PeerUser peer = 1;
+    OpType how = 2;
+
+    enum OpType{
+        DelOne = 0;
+        DelOther = 1;
+    }
+}
+message DelUserReply{}
+
+message FindUserRequest{
+    PeerUser peer = 1;
+    OpType how = 2;
+
+    enum OpType{
+        FindAll = 0;
+        FindOne = 1;
+        FindOther = 2;
+    }
+}
+message FindUserReply{
+    repeated uint32 topic_identifiers = 1;
+}
+
+message UpdateUserRequest{
+    PeerUser peer = 1;
+    bool online = 2;
+    int64 updated = 3;
+    uint32 topic_id = 4;
+    bool delay_death = 5;
+}
+message UpdateUserReply{}
+
+message FindUserExRequest{
+    PeerUser peer = 1;
+    OpType how = 2;
+
+    enum OpType{
+        FindAll = 0;
+        FindOne = 1;
+        FindOther = 2;
+    }
+}
+
+message FindUserExReply{
+    repeated KeyInfo keys = 1;
+}
+
+message KeyInfo {
+    uint64 auth_key_id = 1;
+    uint32 topic_identifier = 2;
+    uint32 layer = 3;
+    string version = 4;
+    int32 api_id = 5;
+}
+
+message UpdateUserExRequest{
+    PeerUser peer = 1;
+    bool online = 2;
+    int64 updated = 3;
+    uint32 topic_id = 4;
+    bool delay_death = 5;
+    uint32 layer = 6;
+    string version = 7;
+    int32 api_id = 8;
+}
+message UpdateUserExReply{}
+
+message UpdateUserExV2Request{
+    PeerUser peer = 1;
+    bool online = 2;
+    int64 delay = 3;
+    uint32 topic_id = 4;
+    bool delay_death = 5;
+    uint32 layer = 6;
+    string version = 7;
+    int32 api_id = 8;
+}
+message UpdateUserExV2Reply{}
+
+message FindUsersRequest{
+    repeated PeerUser peers = 1;
+}
+message FindUsersReply{
+    map<int32, FindUserExReply> user_keys = 1;
+}
+
+message UpdateUsersRequest{
+    repeated UpdateUserExV2Request requests = 1;
+}
+message UpdateUsersReply{
+    map<int32, UpdateUserExV2Reply> replies = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////TCP////////////////////////////////
+message Route{
+    enum Kind{
+        RegisterUser = 0;
+        UnregisterUser = 1;
+        Data = 2;
+        RegisterClient = 3;
+    }
+}
+
+// router client
+message RegisterClient{
+    string host_name = 1;
+}
+
+message PeerUser{
+    int32 user_id = 1;
+    uint64 key_id = 2;
+}
+
+message RegisterUser{
+    PeerUser user = 1;
+    uint64 session_id = 2;
+}
+
+message UnregisterUser{
+    PeerUser user = 1;
+    uint64 session_id = 3;
+}
+
+message Message{
+    PeerUser user = 1;
+    bytes content = 2;
+    Kind kind = 3;
+
+    enum Kind{
+        SendUser = 0;
+        SendUserOne = 1;
+        SendUserOther = 3;
+    }
+}
+
+message MessageContent{
+    int64 shoot_time = 1;
+    bytes content = 2;
+}
+/////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,13 @@
+syntax="proto3";
+// protoc --gogofast_out=plugins=grpc:.
+package telmpateserver;
+
+service templateServerService{
+    rpc TestHello(Request)returns(Rsp){}
+}
+
+
+message Request{
+}
+
+message Rsp{}

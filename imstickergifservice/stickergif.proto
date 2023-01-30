@@ -1,0 +1,579 @@
+// protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imstickergifservice/stickergif.proto
+syntax = "proto3";
+
+package imstickergifservice;
+
+//StickerService
+service StickerService{
+
+
+}
+
+//StickerGif服务
+service StickerGifService {
+
+    //HandleLogic 处理调用sticker,gif及bots相关的协议逻辑
+    rpc HandleLogic (HandleLogicReq) returns (HandleLogicResult) {}
+
+    //##########################处理sticker相关协议##########################
+
+    //HandleLogicAddStickerToSet
+    rpc HandleLogicAddStickerToSet (HandleLogicAddStickerToSetReq) returns (HandleLogicResult) {}
+
+    //HandleLogicChangeStickerPosition
+    rpc HandleLogicChangeStickerPosition (HandleLogicChangeStickerPositionReq) returns (HandleLogicResult) {}
+
+    //HandleLogicClearRecentStickers
+    rpc HandleLogicClearRecentStickers (HandleLogicClearRecentStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicCreateStickerSet
+    rpc HandleLogicCreateStickerSet (HandleLogicCreateStickerSetReq) returns (HandleLogicResult) {}
+
+    //HandleLogicFaveStickers
+    rpc HandleLogicFaveStickers (HandleLogicFaveStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicGetAllStickers
+    rpc HandleLogicGetAllStickers (HandleLogicGetAllStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicGetArchivedStickers
+    rpc HandleLogicGetArchivedStickers (HandleLogicGetArchivedStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicGetAttachedStickers
+    rpc HandleLogicGetAttachedStickers (HandleLogicGetAttachedStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicGetFeaturedStickers
+    rpc HandleLogicGetFeaturedStickers (HandleLogicGetFeaturedStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicGetRecentStickers
+    rpc HandleLogicGetRecentStickers (HandleLogicGetRecentStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicGetStickerSet
+    rpc HandleLogicGetStickerSet (HandleLogicGetStickerSetReq) returns (HandleLogicResult) {}
+
+    //HandleLogicInstallStickerSet
+    rpc HandleLogicInstallStickerSet (HandleLogicInstallStickerSetReq) returns (HandleLogicResult) {}
+
+    //HandleLogicReadFeaturedStickers
+    rpc HandleLogicReadFeaturedStickers (HandleLogicReadFeaturedStickersReq) returns (HandleLogicResult) {}
+
+    //HandleLogicRemoveStickerFromSet
+    rpc HandleLogicRemoveStickerFromSet (HandleLogicRemoveStickerFromSetReq) returns (HandleLogicResult) {}
+
+    //HandleLogicReorderStickerSets
+    rpc HandleLogicReorderStickerSets (HandleLogicReorderStickerSetsReq) returns (HandleLogicResult) {}
+
+    //HandleLogicSaveRecentSticker
+    rpc HandleLogicSaveRecentSticker (HandleLogicSaveRecentStickerReq) returns (HandleLogicResult) {}
+
+    rpc HandleLogicSaveRecentStickerIos (HandleLogicSaveRecentStickerIosReq) returns (HandleLogicResult) {}
+    //HandleLogicUninstallStickerSet
+    rpc HandleLogicUninstallStickerSet (HandleLogicUninstallStickerSetReq) returns (HandleLogicResult) {}
+    //HandleLogicMaskStickers
+    rpc HandleLogicMaskStickers (HandleLogicMaskStickersReq) returns (HandleLogicResult) {}
+    //HandleLogicRecentStickers
+    rpc HandleLogicRecentStickers (HandleLogicRecentStickersReq) returns (HandleLogicResult) {}
+
+    rpc HandleLogicFavedStickers (HandleLogicFavedStickersReq) returns (HandleLogicResult) {}
+
+    rpc HandleLogicStickerSet (HandleLogicStickerSetReq) returns (HandleLogicResult) {}
+
+
+    rpc HandleLogicrReorderStickerSets (HandleLogicrReorderStickerSetsReq) returns (HandleLogicResult) {}
+    rpc HandleLogicSavedGifs (HandleLogicSavedGifsReq) returns (HandleLogicResult) {}
+    rpc HandleLogicSaveGif (HandleLogicSaveGifReq) returns (HandleLogicResult) {}
+    rpc HandleLogicSearchGifs (HandleLogicSearchGifsReq) returns (HandleLogicResult) {}
+
+    rpc HandleLogicBotsAdjustCollectedBots (HandleLogicBotsAdjustCollectedBotsReq) returns (HandleLogicResult) {}
+    rpc HandleLogicBotsAnswerWebhookJSONQuery (HandleLogicBotsAnswerWebhookJSONQueryReq) returns (HandleLogicResult) {}
+    rpc HandleLogicBotsCollectBot (HandleLogicBotsCollectBotReq) returns (HandleLogicResult) {}
+    rpc HandleLogicBotsGetBotList (HandleLogicBotsGetBotListReq) returns (HandleLogicResult) {}
+    rpc HandleLogicBotsGetCollectedBots (HandleLogicBotsGetCollectedBotsReq) returns (HandleLogicResult) {}
+    rpc HandleLogicBotsGetUserBotList (HandleLogicBotsGetUserBotListReq) returns (HandleLogicResult) {}
+    rpc HandleLogicBotsSendCustomRequest (HandleLogicBotsSendCustomRequestReq) returns (HandleLogicResult) {}
+
+    //StoreShopStickerSet 存储shop_sticker_set
+    rpc StoreShopStickerSet (StoreShopStickerSetReq) returns (StoreShopStickerSetResult) {}
+
+    //StoreStickerPackDoc 存储sticker_pack_document
+    rpc StoreStickerPackDoc (StoreStickerPackDocReq) returns (StoreStickerPackDocResult) {}
+
+    //StoreAuthorStickerSet 储存author_sticker_set
+    rpc StoreAuthorStickerSet (StoreAuthorStickerSetReq) returns (StoreAuthorStickerSetResult){}
+
+    //StoreUserStickerSet 储存user_sticker_set
+    rpc StoreUserStickerSet (StoreUserStickerSetReq) returns (StoreUserStickerSetResult){}
+
+    //GetStickerPackDocs 获取sticker_pack_document集合
+    rpc GetStickerPackDocs (GetStickerPackDocsReq) returns (GetStickerPackDocsResult){}
+
+    //GetShopStickerSet 获取shop_sticker_set
+    rpc GetShopStickerSet (GetShopStickerSetReq) returns (GetShopStickerSetResult){}
+
+    //GetAuthorAllStickerSets 获取author_sticker_set集合
+    rpc GetAuthorAllStickerSets (GetAuthorAllStickerSetsReq) returns (GetAuthorAllStickerSetsResult){}
+
+    //DelShopStickerSet 删除shop_sticker_set
+    rpc DeleteShopStickerSet (DeleteShopStickerSetReq) returns (DeleteShopStickerSetResult){}
+
+    //DeleteStickerPackDoc 删除sticker_pack_document
+    rpc DeleteStickerPackDoc (DeleteStickerPackDocReq) returns (DeleteStickerPackDocResult){}
+
+    //DeleteAuthorStickerSet 删除author_sticker_set
+    rpc DeleteAuthorStickerSet (DeleteAuthorStickerSetReq) returns (DeleteAuthorStickerSetResult){}
+
+    //UpdateShopStickerSetDoc 更新shop_sticker_set doc
+    rpc UpdateShopStickerSetDoc (UpdateShopStickerSetDocReq) returns (UpdateShopStickerSetDocResult){}
+
+    //BotInlineCall 机器人内联调用
+    rpc BotInlineCall (BotInlineCallReq) returns (BotInlineCallResult){}
+}
+
+//HandleLogicReq
+message HandleLogicClearRecentStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicAddStickerToSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicChangeStickerPositionReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicCreateStickerSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicFaveStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicGetAllStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicGetArchivedStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicGetAttachedStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicGetFeaturedStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicGetRecentStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicGetStickerSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicInstallStickerSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicReadFeaturedStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicRemoveStickerFromSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicReorderStickerSetsReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicSaveRecentStickerReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicUninstallStickerSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicMaskStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicRecentStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicFavedStickersReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicStickerSetReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicrReorderStickerSetsReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicSaveRecentStickerIosReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsAdjustCollectedBotsReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsAnswerWebhookJSONQueryReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsCollectBotReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsGetBotListReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsGetCollectedBotsReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsGetUserBotListReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicBotsSendCustomRequestReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicSavedGifsReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicSaveGifReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicSearchGifsReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+message HandleLogicReq {
+    bytes obj_bin = 1;      //请求二进制
+    int64 crc_id =2;        //crc协议值
+    int64 message_id= 3;    //message_id
+    int64 key_id = 4;       //key_id
+    int32 user_id = 5;      //user_id
+}
+
+//HandleLogicResult
+message HandleLogicResult {
+    bytes result = 1;       //返回二进制
+    int32 error_code = 2;   //返回错误码
+}
+
+//ShopStickerSet
+message ShopStickerSet {
+    int64 id = 1;
+    int64 access_hash = 2;
+    bool free = 3;
+    bool official = 4;
+    bool masks = 5;
+    string title = 6;
+    string short_name = 7;
+    int32 count = 8;
+    int64 hash =9;
+    string emoticon = 10;
+    string documents = 11;
+}
+
+//StickerPackDoc
+message StickerPackDoc {
+    int64 id = 1;
+    int64 attributes_sticker_set_id = 2;
+    int64 document_id = 3;
+    int64 access_hash = 4;
+    string mime_type = 5;
+    int32 size = 6;
+    string thumb = 7;
+    int32 dc_id = 8;
+    int32 date = 9;
+    int32 attributes_image_size_w = 10;
+    int32 attributes_image_size_h = 11;
+    string attributes_sticker_alt = 12;
+    int64 attributes_sticker_set_access_hash = 13;
+    string attributes_file_name = 14;
+}
+
+//AuthorStickerSet
+message AuthorStickerSet {
+    int32 user_id = 1;
+    int64 sticker_set_id = 2;
+    string short_name = 3;
+    bool archived = 4;
+    bool installed = 5;
+    bool disabled = 6;
+    int64 ordered = 7;
+    int32 create_time = 8;
+}
+
+//UserStickerSet
+message UserStickerSet {
+    int32 user_id = 1;
+    int64 sticker_set_id = 2;
+    bool archived = 3;
+    bool installed = 4;
+    bool disabled = 5;
+    int64 ordered = 6;
+}
+
+//StoreShopStickerSetReq
+message StoreShopStickerSetReq {
+    ShopStickerSet set = 1;
+    int32 user_id = 2;
+}
+
+//StoreShopStickerSetResult
+message StoreShopStickerSetResult {
+    int32 error_code = 1;   //返回错误码
+    int64 id = 2;           //返回id
+}
+
+//StoreStickerPackDocReq
+message StoreStickerPackDocReq{
+    StickerPackDoc doc = 1;
+}
+
+//StoreStickerPackDocResult
+message StoreStickerPackDocResult {
+    int32 error_code = 1;   //返回错误码
+    int64 id = 2;           //返回id
+}
+
+//StoreAuthorStickerSetReq
+message StoreAuthorStickerSetReq{
+    AuthorStickerSet set= 1;
+}
+
+//StoreAuthorStickerSetResult
+message StoreAuthorStickerSetResult {
+    int32 error_code = 1;   //返回错误码
+    int64 id = 2;           //返回id
+}
+
+//StoreUserStickerSetReq
+message StoreUserStickerSetReq{
+    UserStickerSet set = 1;
+}
+
+//StoreUserStickerSetResult
+message StoreUserStickerSetResult{
+    int32 error_code = 1;   //返回错误码
+    int64 id = 2;           //返回id
+}
+
+//GetStickerPackDocsReq
+message GetStickerPackDocsReq {
+    int64 set_id = 1;
+}
+
+//GetStickerPackDocsResult
+message GetStickerPackDocsResult {
+    int32 error_code = 1;          //返回错误码
+    repeated StickerPackDoc docs = 2 ;
+}
+
+//GetShopStickerSetReq
+message GetShopStickerSetReq {
+    int64 id = 1;
+    string short_name = 2;
+}
+
+//GetShopStickerSetResult
+message GetShopStickerSetResult {
+    int32 error_code = 1;       //返回错误码
+    ShopStickerSet set = 2;     //
+}
+
+//GetAuthorAllStickerSetsReq
+message GetAuthorAllStickerSetsReq {
+    int32 user_id = 1;
+}
+
+//GetAuthorAllStickerSetsResult
+message GetAuthorAllStickerSetsResult {
+    int32 error_code = 1;                   //返回错误码
+    repeated AuthorStickerSet Sets = 2;     //
+}
+
+//DeleteShopStickerSetReq
+message DeleteShopStickerSetReq {
+    int32 user_id = 1;
+    int64 set_id = 2;
+}
+
+//DeleteShopStickerSetResult
+message DeleteShopStickerSetResult{
+    int32 error_code = 1;    //返回错误码
+}
+
+//DeleteStickerPackDocReq
+message DeleteStickerPackDocReq{
+    int64 id = 1;
+    int64 set_id = 2;
+}
+
+//DeleteStickerPackDocResult
+message DeleteStickerPackDocResult{
+    int32 error_code = 1;   //返回错误码
+}
+
+//DeleteAuthorStickerSetReq
+message DeleteAuthorStickerSetReq {
+    int32 user_id = 1;
+    int64 set_id = 2;
+}
+
+//DeleteAuthorStickerSetResult
+message DeleteAuthorStickerSetResult {
+    int32 error_code = 1;   //返回错误码
+}
+
+//UpdateStickerPackDocReq
+message UpdateShopStickerSetDocReq {
+    int64 id = 1;
+    repeated int64 doc_ids = 2;
+}
+
+//UpdateShopStickerSetDocResult
+message UpdateShopStickerSetDocResult {
+    int32 error_code = 1;   //返回错误码
+}
+
+//BotInlineCallReq
+message BotInlineCallReq {
+    int32 user_id = 1;
+    int32 bot_id = 2;
+    int64 key_id = 3;
+    int64 message_id = 4;
+    bytes message_obj = 5;
+}
+
+//BotInlineCallResult
+message BotInlineCallResult {
+    int32 error_code = 1;   //返回错误码
+    InlineMeta meta = 2;    //
+}
+
+//InlineMeta
+message InlineMeta {
+    int32 msg_id = 1;
+    int32 from_id = 2;
+    int32 chat_id = 3;
+    int32 chat_type = 4;
+    int32 bot_id = 5;
+}
+
+

@@ -1,0 +1,188 @@
+syntax = "proto3";
+
+package imauthserver;
+
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+service AuthServer {
+    rpc CheckPhone (AuthMTPRequest) returns (AuthMTPReply);
+    rpc SendCode (AuthMTPRequest) returns (AuthMTPReply);
+    rpc SignUp (AuthMTPRequest) returns (AuthMTPReply);
+    rpc SignIn (AuthMTPRequest) returns (AuthMTPReply);
+    rpc LogOut (AuthMTPRequest) returns (AuthMTPReply);
+    rpc ResetAuthorizations (AuthMTPRequest) returns (AuthMTPReply);
+    rpc SendInvites (AuthMTPRequest) returns (AuthMTPReply);
+    rpc ExportAuthorization (AuthMTPRequest) returns (AuthMTPReply);
+    rpc ImportAuthorization (AuthMTPRequest) returns (AuthMTPReply);
+    rpc BindTempAuthKey (AuthMTPRequest) returns (AuthMTPReply);
+    rpc ImportBotAuthorization (AuthMTPRequest) returns (AuthMTPReply);
+    rpc CheckPassword (AuthMTPRequest) returns (AuthMTPReply);
+    rpc RequestPasswordRecovery (AuthMTPRequest) returns (AuthMTPReply);
+    rpc RecoverPassword (AuthMTPRequest) returns (AuthMTPReply);
+    rpc ResendCode (AuthMTPRequest) returns (AuthMTPReply);
+    rpc CancelCode (AuthMTPRequest) returns (AuthMTPReply);
+    rpc DropTempAuthKey (AuthMTPRequest) returns (AuthMTPReply);
+    // internal rpc
+    rpc RobotSignUp(RobotSignUpRequest) returns (RobotSignUpReply);
+}
+
+service AccountServer {
+    rpc GetPassword (AccountMTPRequest) returns (AccountMTPReply);
+    rpc GetPasswordSettings (AccountMTPRequest) returns (AccountMTPReply);
+    rpc UpdatePasswordSettings (AccountMTPRequest) returns (AccountMTPReply);
+    rpc SendUpdatePasswordSettingsCode (AccountMTPRequest) returns (AccountMTPReply);
+    rpc PTAccountUpdatePasswordSettings (AccountMTPRequest) returns (AccountMTPReply);
+    rpc ResetAuthroization (AccountMTPRequest) returns (AccountMTPReply);
+    rpc GetAuthorizations (AccountMTPRequest) returns (AccountMTPReply);
+    // internal rpc
+    rpc UserPassword(UserPasswordRequest) returns (UserPasswordReply);
+}
+
+message AuthMTPReply {
+    bytes rpc_result = 1;
+    ExtraReply extra = 2;
+}
+
+message Context{
+    int32 user_id = 1;
+    int64 auth_key_id = 2;
+    int64 req_message_id = 3;
+    int64 layer = 4;
+    ExtraContext extra = 5;
+    uint32 crc32 = 6;
+}
+
+message AuthMTPRequest{
+    Context ctx = 1;
+    bytes message_obj_bin = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message AccountMTPRequest{
+    Context ctx = 1;
+    bytes message_obj_bin = 2;
+    pbcomm.Debug debug = 3;
+}
+
+message AccountMTPReply{
+    bytes rpc_result = 1;
+}
+
+
+///////////////////////////////////////////// legacy code
+
+//message RobotSignUpRequest{
+//    string PhoneNumber = 1; //电话号码
+//    string PhoneCodeHash = 2;
+//    string PhoneCode = 3; //验证码
+//    int64 keyId = 5; //用户的keyId(端的标识)
+//    string FirstName = 6;
+//    string LastName = 7;
+//    bool is_bot = 8;
+//    int32 bot_info_version = 9;
+//    bool bot_chat_history = 10;
+//    bool bot_no_chats = 11;
+//    int32 dc_id = 12;
+//    pbcomm.Debug debug = 13;
+//    string country_code = 14; // 国家码
+//    string local_phone = 15; // 不带国家码的号码
+//}
+//message RobotSignUpReply{
+//    ResultCode code = 1;
+//    userInfo userInfo = 2;
+//    enum ResultCode {
+//        Success = 0;
+//        InternalError = 1; // 服务器内部错误
+//        PhoneNumberInvalid = 2; // 无效的电话号码
+//        PhoneNumberOccupied = 3; // 电话号码已注册
+//        CaptchaExpired = 4; // 验证码失效
+//        CaptchaInvalid = 5; // 验证码无效
+//        FloodWait = 6;
+//        SignUpRobotBlocked = 7; // 机器人注册接口暂时关闭
+//    }
+//}
+
+message PasswordReq{
+    int32 user_id = 1;
+    int64 key_id = 2;
+    int32 flags = 3;
+    bytes curr_pwd_hash = 4;
+    bytes new_pwd_hash = 5;
+    bytes salt = 6;
+    string hint = 7;
+    string email = 8;
+    int32 req_type = 9;
+}
+
+message VirtualPhoneNumberInfo{
+    string virtual_phone = 1;
+    string real_phone = 2;
+    uint32 activated = 3;
+    int64 bind_time = 4;
+    int64 activate_time = 5;
+    int32 activate_admin_id = 6;
+    int32 bind_admin_id = 7;
+    int32 owner_id = 8;
+    string initial_phone_code = 9;
+}
+
+message ExtraContext {
+    string device_model = 1;
+    string client_address = 2;
+}
+
+message ExtraReply {
+    bool signin_ok = 1;
+    int32 user_id = 2;
+    string phone_number = 3;
+    int32 group_id = 4;
+    bool password_needed = 5;
+    bool log_out_ok = 6;
+    bool request_password_recovery_ok = 7;
+}
+message RobotSignUpRequest{
+    string PhoneNumber = 1; //电话号码
+    string PhoneCodeHash = 2;
+    string PhoneCode = 3; //验证码
+    int64 keyId = 5; //用户的keyId(端的标识)
+    string FirstName = 6;
+    string LastName = 7;
+    bool is_bot = 8;
+    int32 bot_info_version = 9;
+    bool bot_chat_history = 10;
+    bool bot_no_chats = 11;
+    int32 dc_id = 12;
+    pbcomm.Debug debug = 13;
+    string country_code = 14; // 国家码
+    string local_phone = 15; // 不带国家码的号码
+}
+message RobotSignUpReply{
+    ResultCode code = 1;
+    bytes user_info = 2; // pbimuinfoserver.userInfo结构 protobuf序列化数据
+
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1; // 服务器内部错误
+        PhoneNumberInvalid = 2; // 无效的电话号码
+        PhoneNumberOccupied = 3; // 电话号码已注册
+        CaptchaExpired = 4; // 验证码失效
+        CaptchaInvalid = 5; // 验证码无效
+        FloodWait = 6;
+        SignUpRobotBlocked = 7; // 机器人注册接口暂时关闭
+    }
+}
+message UserPasswordRequest{
+    int32 user_id = 1;
+}
+message UserPasswordReply{
+    bytes password_hash = 1;
+    string hint = 2;
+    string email = 3;
+    int32 status = 4;
+    Code code = 5;
+
+    enum Code {
+        Success = 0;
+        NotFound = 1;
+    }
+}

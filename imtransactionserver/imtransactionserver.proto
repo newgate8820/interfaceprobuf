@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package imstransactionserver;
+
+////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imtransactionserver/imtransactionserver.proto
+service ServerService {
+    // 创建钱包单签地址
+    rpc CreateWalletAddress (CreateWalletAddressReq) returns (CreateWalletAddressRsp) {
+    };
+    //获取此次交易手续费
+    rpc GetRawTransactionFee (GetRawTransactionFeeReq) returns (GetRawTransactionFeeRsp) {
+    }
+    //發送 raw transaction
+    rpc SendRawTransaction (SendRawTransactionReq) returns (SendRawTransactionRsp) {
+    }
+    //根据交易ID 查看是否到账
+    rpc CheckRawTransactionDone (CheckRawTransactionDoneReq) returns (CheckRawTransactionDoneRsp) {
+    }
+    //获取地址余额
+    rpc GetAddressBalance (GetAddressBalanceReq) returns (GetAddressBalanceRsp) {
+    }
+    // 发送BTC/LTC类型的多签交易
+    rpc SendBtcTypeMultiSigTransaction (SendBtcTypeMultiSigTransactionReq) returns (SendMultiSigTransactionRsp) {
+    }
+    // 发送EHT/USDT类型的多签交易
+    rpc SendEthTypeMultiSigTransaction (SendEthTypeMultiSigTransactionReq) returns (SendMultiSigTransactionRsp) {
+    }
+    // 创建BTC/LTC类型的多签钱包地址
+    rpc CreateBtcTypeMultiSigWalletAddress (CreateBtcTypeMultiSigAddressReq) returns (CreateBtcTypeMultiSigAddressRsp) {
+    }
+    // 创建EHT/USDT类型的多签钱包地址
+    rpc CreateEthTypeMultiSigWalletAddress (CreateEthTypeMultiSigAddressReq) returns (CreateEthTypeMultiSigAddressRsp) {
+    }
+
+    rpc DivideMultiSig (DivideMultiSigReq) returns (DivideMultiSigRsp) {
+    }
+}
+
+
+message UserPrivate {
+    string Address = 1;
+    string EncryPriv = 2;
+}
+
+//获取此次交易手续费請求
+message DivideMultiSigReq {
+    int32 DivideId = 1; //數字貨幣類型
+    int32 CurrencyId = 2; // 發送方地址
+    string FromAddress = 3; // 加密的私鑰
+    int32 ToWalletType = 4; // 发送方的userId
+    string ToAddress = 5; //转向的地址
+    string Amount = 6; //交易余额  比如 BTC: 0.0001 BTC
+    int32 CreateTimestamp = 7;
+    repeated UserPrivate Signs = 8;
+    int32 M = 9;
+}
+
+//获取此次交易手续费返回
+message DivideMultiSigRsp {
+    ErrorCode errCode = 1; // 返回状态
+    string TxId = 2;
+
+}
+
+//數字貨幣類型
+enum DigtialType {
+    BTC = 0; // 比特币
+    LTC = 1; //莱特币
+    ETH = 2; //以太坊
+    USDT = 3;
+}
+
+//數字貨幣類型
+enum ErrorCode {
+    SUCCESS = 0; // 成功
+    FAILED = 1; //失敗
+    INSUFFICIENT = 2; //地址余额不足,转账币种余额不足
+    TRANSACTION_NOT_EXIST = 3; //交易不存在
+    INSUFFICIENT_TRANSFEE = 4; //像token转账,eth作手续费不足
+    INVALID_ADDRESS = 5;
+}
+
+message CheckRawTransactionDoneRsp {
+    ErrorCode errCode = 1; // 返回状态
+    bool isDone = 2; // 是否交易確認完成  true 完成 ，false  未完成
+
+}
+//获取地址余额
+message GetAddressBalanceReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    string address = 2; // 交易的ID
+}
+message GetAddressBalanceRsp {
+    ErrorCode errCode = 1; // 返回状态
+    string bal = 2; // 余额
+}
+message CheckRawTransactionDoneReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    string txid = 2; // 交易的ID
+}
+
+//发送rawtransaction交易
+message SendRawTransactionReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    //    string FromAddress = 2; // 發送方地址
+    //    string FromPrvKey = 3; // 加密的私鑰
+    //    int32 fromUserId = 4; // 发送方的userId
+    //    string ToAddress = 5; //转向的地址
+    //    string Amount = 6; //交易余额  比如 BTC: 0.0001 BTC
+    string RawData = 2;
+}
+//发送rawtransaction交易
+message SendRawTransactionRsp {
+    ErrorCode errCode = 1; // 返回状态
+    string Txid = 2; // 交易的ID
+}
+
+//获取此次交易手续费請求
+message GetRawTransactionFeeReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    string FromAddress = 2; // 發送方地址
+    string FromPrvKey = 3; // 加密的私鑰
+    int64 fromUserId = 4; // 发送方的userId
+    string ToAddress = 5; //转向的地址
+    string Amount = 6; //交易余额  比如 BTC: 0.0001 BTC
+}
+
+//获取此次交易手续费返回
+message GetRawTransactionFeeRsp {
+    ErrorCode errCode = 1; // 返回状态
+    string Fee = 2; // 手續費  比如  0.0001 BTc
+    string Bal = 3;
+    string TxId = 4;
+    string RawData = 5;
+}
+
+//公私鑰匙信息
+message PubPrvKeyInfo {
+    string PubKey = 1; //生成的公钥
+    string PrvKey = 2; //生成的私鑰匙
+    string mnemonic = 3; // 助記憶詞
+}
+
+//地址信息
+message AddressInfo {
+    string address = 1; //生成的地址
+    PubPrvKeyInfo pubPrv = 2; //公私钥信息
+}
+
+// 创建钱包单签地址 請求
+message CreateWalletAddressReq {
+    int64 user_id = 1; //用戶的UserID
+    string language = 2; // 客户端语言，cn 中国，en 英文
+    DigtialType DiatalType = 3;
+
+}
+
+// 创建钱包单签地址 返回
+message CreateWalletAddressRsp {
+    ErrorCode errCode = 1; // 返回状态
+    AddressInfo addressInfo = 2; //錢包地址信息
+}
+
+// 创建btc类型的多签地址
+message CreateBtcTypeMultiSigAddressReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    int32 WalletType = 2;
+    int32 M = 3;
+    repeated string PubKeys = 4;
+}
+
+// 创建btc类型的多签地址 返回
+message CreateBtcTypeMultiSigAddressRsp {
+    ErrorCode errCode = 1; // 返回状态
+    string Address = 2; // 多签地址
+    string RedeemScript = 3; // 赎回脚本
+}
+
+// 创建eth类型的多签地址
+message CreateEthTypeMultiSigAddressReq {
+    string creator = 1;
+    string private = 2;
+    int32 M = 3;
+    repeated string Owners = 4;
+    int32 DevideId = 5;
+    int32 CurrencyId = 6;
+    int32 WalletType = 7;
+}
+
+// 创建eth类型的多签地址 返回
+message CreateEthTypeMultiSigAddressRsp {
+    ErrorCode errCode = 1; // 返回状态
+    string TxId = 2; // 交易ID
+}
+
+// 加密秘钥信息
+message EncryPrvKeyInfo {
+    string encryPrvKey = 1;
+    int64 user_id = 2;
+    string address = 3;
+}
+
+//发送btc类型的多签交易
+message SendBtcTypeMultiSigTransactionReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    string FromAddr = 2; // 發送方地址
+    string ToAddr = 3; //转向的地址
+    string Amount = 4; //交易余额  比如 BTC: 0.0001 BTC
+    string RedeemScript = 5; //
+    repeated EncryPrvKeyInfo PrvKeys = 6; //
+}
+
+// 发送eth类型的多签交易
+message SendEthTypeMultiSigTransactionReq {
+    DigtialType DigType = 1; //數字貨幣類型
+    string ConAddr = 2; // 發送方地址
+    string ToAddr = 3; //转向的地址
+    string Amount = 4; //交易余额  比如 BTC: 0.0001 BTC
+    string USDTAddr = 5; //
+    repeated EncryPrvKeyInfo PrvKeys = 6; //
+}
+
+//发送交易
+message SendMultiSigTransactionRsp {
+    ErrorCode errCode = 1; // 返回状态
+    repeated string Txs = 2; // 交易的ID
+}

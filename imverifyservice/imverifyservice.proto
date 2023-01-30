@@ -1,0 +1,47 @@
+// protoc --gogofast_out=plugins=grpc:. *.proto
+// sudo protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imverifyservice/imverifyservice.proto
+
+syntax = "proto3";
+
+package imverifyservice;
+
+enum VerifyServiceResultCode {
+    ResultCode_Ok                                      = 0;         // ok
+    ResultCode_Token_Invalid                           = 1001;      // token无效
+    ResultCode_Parameter_Exception                     = 1002;      // 参数异常
+    ResultCode_Cailiao_Side_Service_Exception          = 1003;      // 彩聊侧服务异常
+    ResultCode_Game_Side_Service_Exception             = 1004;      // 游戏侧服务异常
+}
+ 
+// 验证服务
+service ImVerifyService{
+    // 获取帐户token
+    rpc GetAccountToken(GetAccountTokenMsg) returns (GetAccountTokenMsgReply) {};
+    
+    // 验证帐户token
+    rpc VerifyAccountToken(VerifyAccountTokenMsg)returns (VerifyAccountTokenMsgReply) {};
+}
+
+// 获取帐户token消息请求参数
+message GetAccountTokenMsg{
+    int32                              UserId                            = 1;
+}
+
+// 获取帐户token消息响应参数
+message GetAccountTokenMsgReply{
+    VerifyServiceResultCode            ResultCode                        = 1;
+    string                             Token                             = 2;
+    string                             URL                               = 3;
+}
+
+// 验证帐户token消息请求参数
+message VerifyAccountTokenMsg{
+    int32                              UserId                            = 1;
+    string                             Token                             = 2;
+}
+
+// 验证帐户token消息响应参数
+message VerifyAccountTokenMsgReply{
+    VerifyServiceResultCode            ResultCode                        = 1;
+    int32                              UserId                            = 2;
+}

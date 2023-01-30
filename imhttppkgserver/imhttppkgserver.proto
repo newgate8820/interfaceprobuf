@@ -1,0 +1,59 @@
+//protoc --gogofast_out=plugins=grpc:. *.proto
+syntax = "proto3";
+
+package imhttppkgserver;
+
+service ImHttpPkgServer {
+    rpc StoreHttpPkg (ReqStoreHttpPkg) returns (ReplyStoreHttpPkg) {
+    };
+    // 批量插入数据
+    rpc StoreHttpPkgList (ReqStoreHttpPkgList) returns (ReplyStoreHttpPkgList) {};
+
+    rpc GetHttpRequest (ReqGetHttpRequest) returns (ReplyGetHttpRequest) {};
+
+    rpc StoreHttpPkgByKeySessionId (ReqStoreHttpPkgByKeySession) returns (ReplyStoreHttpPkg) {};
+
+    rpc GetHttpByKeySessionId (ReqGetHttpRequestByKeySession) returns (ReplyGetHttpRequest) {};
+}
+
+message ReqStoreHttpPkgByKeySession {
+    uint64 keyId   = 1;
+    uint64 sessionId = 2;
+    bool   isMedia = 3; // true代表媒体,false 代表业务
+    repeated bytes  messages = 4; // 消息内容
+}
+
+message ReqGetHttpRequestByKeySession {
+    uint64 keyId   = 1;
+    uint64 sessionId = 2;
+    bool   isMedia = 3; // true代表媒体,false 代表业务
+}
+
+message ReqStoreHttpPkg {
+    uint64 keyId   = 1;
+    bool   isMedia = 2; // true代表媒体,false 代表业务
+    bytes  message = 3; // 消息内容
+}
+
+message ReqStoreHttpPkgList {
+    uint64 keyId   = 1;
+    bool   isMedia = 2; // true代表媒体,false 代表业务
+    repeated bytes messages = 3; // 消息内容
+}
+
+message ReplyStoreHttpPkgList {
+    bool  Success = 1; // true表示保存成功 false表示失败
+}
+
+message ReplyStoreHttpPkg {
+    bool  Success = 1; // true表示保存成功 false表示失败
+}
+
+message ReqGetHttpRequest {
+    uint64 keyId  = 1;
+    bool  isMedia = 2; // true代表媒体,false 代表业务
+}
+
+message ReplyGetHttpRequest {
+    repeated bytes messages = 1;
+}

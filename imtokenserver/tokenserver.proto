@@ -1,0 +1,72 @@
+// sudo protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imtokenserver/tokenserver.proto
+syntax = "proto3";
+
+package imtokenservice;
+
+enum TokenErrorCode {
+    Token_OK                = 0;         //ok
+    Token_REQ_PARAME_ERR    = 1001;      //请求参数错误
+    Token_CTEATE_TOKEN_FAIL = 1002;      //获取token失败
+    Token_ERR               = 1003;      //token错误
+    Token_EXPIRED           = 1004;      //token超时失效
+    Token_NOT_EXIST         = 1005;      //token不存在
+    Token_INTERNAL_ERR      = 1006;      //内部错误
+}
+
+service ImTokenService{
+    //获取token
+    rpc GetToken(ReqGetTokenMsg) returns (GetTokenReply) {};
+    //刷新token
+    rpc RefreshToken(ReqRefreshTokenMsg) returns (RefreshTokenReply) {};
+    //验证token
+    rpc ValidateToken(ReqValidateTokenMsg) returns (ValidateTokenReply) {};
+    //通过token 获取用户信息
+    rpc GetUInfoByToken(ReqGetUInfoByTokenMsg) returns (GetUInfoByTokenReply) {};
+
+}
+
+message ReqGetTokenMsg{
+ string KeyId = 1;
+    string UserId =2; //tokenType为2传空字符串
+    int32 tokenType =3; //1 数字钱包,2彩聊钱包
+}
+message GetTokenReply{
+    TokenErrorCode Code =1;
+    string Error =2;
+    string Token =3;
+    uint64 ExpirationTime =4;//过期时间戳（秒级）
+}
+message ReqRefreshTokenMsg{
+    string KeyId =1;
+    string UserId =2; //tokenType为2传空字符串
+    string OldToken =3;
+    int32 tokenType =4; //1 数字钱包,2彩聊钱包
+}
+message RefreshTokenReply{
+    TokenErrorCode Code =1;
+    string Error =2;
+    string NewToken =3;
+    uint64 ExpirationTime =4;//过期时间戳（秒级）
+}
+message ReqValidateTokenMsg{
+    string KeyId =1;
+    string UserId =2; //tokenType为2传空字符串
+    string Token =3;
+    uint64 ExpirationTime =4;//过期时间戳（秒级）
+    int32 tokenType =5; //1 数字钱包,2彩聊钱包
+}
+message ValidateTokenReply{
+    TokenErrorCode Code =1;
+    string Error =2;
+}
+
+message ReqGetUInfoByTokenMsg{
+    string Token =1;
+    int32 tokenType =2; //1 数字钱包,2彩聊钱包
+}
+message GetUInfoByTokenReply{
+    string KeyId =1;
+    string UserId =2;
+    TokenErrorCode Code =3;
+    string Error =4;
+}

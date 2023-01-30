@@ -1,0 +1,16 @@
+//protoc --gogofast_out=plugins=grpc:. *.proto
+syntax = "proto3";
+package pbcomm;
+
+// 日志格式结构
+message Debug {
+    int32 userid = 1;  // 用户id
+    string Phone = 2;  // 电话号码
+    string ip = 3;  // ip
+    uint64 key_id = 4;  // keyid
+    uint64 session_id = 5; // 连接id
+    int32  layer = 6;  // 层
+    uint32  ostype = 7; //1 是安卓 2 是Iphone/IPAD 3 是PC 4是web 5是机器人
+    uint32 current_crc = 8; // 当前协议的crc32
+    string app_version = 9; // 客户端版本
+}

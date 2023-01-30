@@ -1,0 +1,399 @@
+syntax = "proto3";
+
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+package imsecuritychatserver;
+
+
+service ImSecurityChatServer {
+
+    //----------------------------------------------------------------------------------------------
+
+    //发送加密聊天请求
+    rpc RequestEncryption (RequestEncryptionReq) returns (SecurityResult) {
+    }
+    //接收加密聊天
+    rpc AcceptEncryption (AcceptEncryptionReq) returns (SecurityResult) {
+    }
+    //发送加密聊天普通消息
+    rpc SendEncrypted (SendEncryptedReq) returns (SecurityResult) {
+    }
+    //发送加密聊天媒体消息
+    rpc SendEncryptedFile (SendEncryptedFileReq) returns (SecurityResult) {
+    }
+    //发送加密聊天action消息
+    rpc SendEncryptedService (SendEncryptedServiceReq) returns (SecurityResult) {
+    }
+    //发送加密聊天取消
+    rpc DiscardEncryption (DiscardEncryptionReq) returns (SecurityResult) {
+    }
+    //加密聊天双钩
+    rpc ReadEncryptedHistory (ReadEncryptedHistoryReq) returns (SecurityResult) {
+    }
+    //加密聊天settyping
+    rpc SetEncryptedTyping (SetEncryptedTypingReq) returns (SecurityResult) {
+    }
+    //LogOut后删除所有的加密聊天
+    rpc LogoutDisCardAllSecurity (LogoutDisCardAllSecurityReq) returns (LogoutDisCardAllSecurityResult) {
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    //获取加密聊天的randomId 们
+    rpc GetSecurityRandomIds (GetSecurityRandomIdsReq) returns (GetSecurityRandomIdsResult) {
+    }
+
+    //检测加密聊天是否已经被接收
+    rpc CheckEncryChatAccept (CheckEncryChatAcceptReq) returns (CheckEncryChatAcceptResult) {
+    }
+
+    //根据chatId判断加密聊天是否存在
+    rpc CheckSecurityChatExist (CheckSecurityChatExistReq) returns (CheckSecurityChatExistResult) {
+    }
+    //根据qts查询diff
+    rpc GetSecurityDiffByQts (GetSecurityDiffByQtsReq) returns (GetSecurityDiffByQtsResult) {
+    }
+    //加密聊天请求updates
+    rpc GetHandshakeUpdates (GetHandshakeUpdatesReq) returns (GetHandshakeUpdatesResult) {
+    }
+
+    //根据userid和keyid获取所有的chatId
+    rpc GetAllChatIdByUserIdKeyId (GetAllChatIdByUserIdKeyIdReq) returns (GetAllChatIdByUserIdKeyIdResult) {
+    }
+    //根据chatId获取chat的详细信息
+    rpc GetChatInfoByChatId (GetChatInfoByChatIdReq) returns (GetChatInfoByChatIdResult) {
+    }
+
+
+}
+
+message GetChatInfoByChatIdResult {
+    ResultCode code = 1;
+    ChatInfo chat_info = 2; //session信息
+    enum ResultCode {
+        Success = 0;
+        InternalError = 1;
+    }
+}
+
+//加密聊天chat信息
+message ChatInfo {
+    int32 chat_id = 1; //加密聊天的id
+    int32 chat_creator = 2;//加密聊天的发起者的userid
+    int64 access_hash = 3;//加密聊天的hash值
+    int32 chat_member = 4;//加密聊天的被邀请者的userid
+    int64 creator_key_id = 5;//加密聊天的发起者的key_id
+    int64 member_key_id = 6;//加密聊天的发起者的key_id
+    int32 date = 7;//加密聊天建立的时间
+    bool alread_accept = 8;//加密聊天是否已经建立成功
+    bool is_normal = 9;//是否是加密聊天normal流程
+}
+
+message GetChatInfoByChatIdReq {
+    int32 chat_id = 1;
+}
+message GetAllChatIdByUserIdKeyIdResult {
+    ErrorCode err_code = 1; //错误码
+    repeated int32 chat_id = 2;
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+message GetAllChatIdByUserIdKeyIdReq {
+    int32 user_id = 1;
+    int64 key_id = 2;
+}
+
+message GetHandshakeUpdatesResult {
+    ErrorCode err_code = 1; //错误码
+    repeated bytes update = 2;
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+message GetHandshakeUpdatesReq {
+    int32 user_id = 1;
+    int64 auth_key_id = 2;
+    int64 date = 3;
+}
+
+
+message SecurityResult {
+    bytes result = 1;
+    int32 errorCode = 2;
+}
+
+message GetSecurityDiffByQtsReq {
+    int32 from_id = 1;
+    uint64 key_id = 2;
+    int32 qts = 3;
+    pbcomm.Debug debug = 4;
+}
+
+message GetSecurityDiffByQtsResult {
+    ErrorCode err_code = 1; //错误码
+    repeated bytes update = 2;
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+
+message CheckSecurityChatExistReq {
+    int32 chat_id = 1;
+}
+message CheckSecurityChatExistResult {
+    bool result = 1;
+}
+
+message CheckEncryChatAcceptReq {
+    int32 chat_id = 1;
+}
+message CheckEncryChatAcceptResult {
+    bool result = 1;
+}
+
+//获取加密聊天的randomId的请求
+message GetSecurityRandomIdsReq {
+    int64 key_id = 1; //取消方的端的标识
+    int32 max_qts = 2; //获取需要的qts
+    pbcomm.Debug debug = 3;
+    bytes obj_bin = 4;
+    uint32 crc_id = 5;
+    int64 message_id =6;
+}
+
+//获取加密聊天的randomId 们的返回值
+message GetSecurityRandomIdsResult {
+    ErrorCode errcode = 1; //错误码
+    repeated int64 random_ids = 2; //查询到的Id的列表
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+
+//LogOut后删除所有的加密聊天的请求
+message LogoutDisCardAllSecurityReq {
+    int32 user_id = 1; //取消方的用户的Id
+    int64 key_id = 2; //取消方的端的标识
+    pbcomm.Debug debug = 3;
+    bytes obj_bin = 4;
+    uint32 crc_id = 5;
+    int64 message_id =6;
+}
+//LogOut后删除所有的加密聊天的返回
+message LogoutDisCardAllSecurityResult {
+    ErrorCode errcode = 1;
+    enum ErrorCode {
+        Success = 0;
+        Failed = 1;
+    }
+}
+
+//加密聊天settyping状态
+message SetEncryptedTypingReq {
+    int32 user_id = 1; //阅读消息方的Id
+    int64 key_id = 2; //阅读方的端标识
+    int32 chat_id = 3; //所读的加密聊天的Id
+    int64 access_hash = 4; //加密聊天哈希值
+    pbcomm.Debug debug = 5;
+    bytes obj_bin = 6;
+    uint32 crc_id = 7;
+    int64 message_id =8;
+}
+
+//加密聊天settyping返回
+message SetEncryptedTypingResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        failed = 1; //失败
+        AccessHashErr = 2; //错误的哈希值
+    }
+}
+
+//加密聊天双钩的请求
+message ReadEncryptedHistoryReq {
+    int32 user_id = 1; //阅读消息方的Id
+    int64 key_id = 2; //阅读方的端标识
+    int32 chat_id = 3; //所读的加密聊天的Id
+    int64 access_hash = 4; //加密聊天哈希值
+    int32 max_date = 5;
+    pbcomm.Debug debug = 6;
+    bytes obj_bin = 7;
+    uint32 crc_id = 8;
+    int64 message_id =9;
+}
+
+//加密聊天双钩的返回
+message ReadEncryptedHistoryResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        failed = 1; //失败
+        AccessHashErr = 2; //错误的哈希值
+    }
+}
+
+//加密聊天取消请求
+message DiscardEncryptionReq {
+    int32 user_id = 1; //取消方的用户的Id
+    int64 key_id = 2; //取消方的端的标识
+    int32 chat_id = 3; //需要取消的加密聊天id
+    pbcomm.Debug debug = 4;
+    bytes obj_bin = 5;
+    uint32 crc_id = 6;
+    int64 message_id =7;
+}
+
+//加密聊天取消返回
+message DiscardEncryptionResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        failed = 2; //删除失败
+        AccessHashErr = 3; //错误的哈希值
+    }
+}
+
+//发送加密聊天发送service请求
+message SendEncryptedServiceReq {
+    int32 send_id = 1; //消息发送者的Id
+    int64 key_id = 2; //消息发送者的key_id
+    int32 chat_id = 3; //加密聊天的id
+    int64 access_hash = 4; //加密聊天哈希值
+    int64 random_id = 5; //消息的randmon_id
+    bytes Data = 6; //加密聊天的发送的加密消息
+    pbcomm.Debug debug = 7;
+    bytes obj_bin = 8;
+    uint32 crc_id = 9;
+    int64 message_id =10;
+}
+
+//发送加密聊天发送service的返回
+message SendEncryptedServiceResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        Repeatedhandle = 1; //重复的处理
+        ChatNotExist = 2; //加密聊天已经不存在
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+    }
+}
+
+//发送加密聊天媒体消息
+message SendEncryptedFileReq {
+    int32 send_id = 1; //消息发送者的Id
+    int64 key_id = 2; //消息发送者的key_id
+    int32 chat_id = 3; //加密聊天的id
+    int64 access_hash = 4; //加密聊天哈希值
+    int64 random_id = 5; //消息的randmon_id
+    bytes Data = 6; //加密聊天的发送的加密消息
+    bytes file = 7; //加密聊天文件信息 mtproto.TL 的二进制
+    pbcomm.Debug debug = 8;
+    bytes obj_bin = 9;
+    uint32 crc_id = 10;
+    int64 message_id =11;
+}
+
+//发送媒体消息的返回
+message SendEncryptedFileResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        Repeatedhandle = 1; //重复的处理
+        ChatNotExist = 2; //加密聊天已经不存在
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+    }
+}
+
+//发送加密聊天发送普通文本消息的请求
+message SendEncryptedReq {
+    int32 send_id = 1; //消息发送者的Id
+    int64 key_id = 2; //消息发送者的key_id
+    int32 chat_id = 3; //加密聊天的id
+    int64 access_hash = 4; //加密聊天哈希值
+    int64 random_id = 5; //消息的randmon_id
+    bytes Data = 6; //加密聊天的发送的加密消息
+    pbcomm.Debug debug = 7;
+    bytes obj_bin = 8;
+    uint32 crc_id = 9;
+    int64 message_id =10;
+}
+
+//发送加密聊天发送普通文本消息的返回
+message SendEncryptedResult {
+    Errcode error_code = 1; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        Repeatedhandle = 1; //重复的处理
+        ChatNotExist = 2; //加密聊天已经不存在
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+
+    }
+}
+
+//B端接收的请求
+message AcceptEncryptionReq {
+    int32 participart_id = 1; //加密聊天请求接收者的Id
+    int64 participart_key_id = 2;
+    int32 chat_id = 3; //加密聊天的聊天id
+    int64 access_hash = 4; //加密聊天的哈希值
+    bytes G_b = 5; //接收方的公钥
+    int64 Key_fingerprint = 6; //加密聊天的指纹
+    pbcomm.Debug debug = 7;
+    bytes obj_bin = 8;
+    uint32 crc_id = 9;
+    int64 message_id =10;
+}
+
+//B端接收的请求的返回
+message AcceptEncryptionResult {
+    int32 admin_id = 1; //发起者的ID
+    bytes G_a_or_b = 2; //GA 发起方的秘钥
+    int64 keyFingerPrint2 = 3; //指纹(不是劫持流程就是原来的指纹)
+    int32 chat_id = 4; //机密聊天 的Id
+    int64 access_hash = 5; //加密聊天的哈希值
+    Errcode error_code = 6; //返回错误码
+    enum Errcode {
+        Success = 0; //成功
+        AlreadyAccept = 1; //加密聊天已经被自己的其他端接收
+        Repeatedhandle = 2; //重复的处理
+        DbError = 3; //数据库错误
+        AccessHashErr = 4; //错误的哈希值
+    }
+
+}
+
+//发起加密聊天请求
+message RequestEncryptionReq {
+    int32 admin_id = 1; //发起者的ID
+    int64 admin_key_id = 2; //发起方的端标识
+    int32 participant_id = 3; //被邀请者的ID
+    int64 access_hash = 4; //被邀请者的用户的哈希值
+    bytes g_a = 5; //发起方的指纹
+    pbcomm.Debug debug = 6;
+    bytes obj_bin = 7;
+    uint32 crc_id = 8;
+    int64 message_id =9;
+}
+
+//发起加密聊天的返回结果
+message RequestEncryptionResult {
+    int32 chat_id = 1; //加密聊天的id
+    int64 access_hash = 2; // 加密聊天的哈希值
+    ErroCode errorCode = 3; //错误码
+    enum ErroCode {
+        SusscessFull = 0; //发起成功
+        GenIdFailed = 1; //生成Id失败
+        DbError = 2; //数据库错误 (调用数据库存储加密聊天失败)
+        Restricted = 3; // blocked or privacy restricted
+        ParticipantBlocked = 4; // participant is blocked by you
+    }
+}

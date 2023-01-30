@@ -1,0 +1,30 @@
+/**
+ * 定义提供给消息服务使用的API
+ * 原则上只能由消息服务来调用
+ */
+// protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/im/iminterfaceprotobufs/botserver/userservice/userservice.proto
+syntax = "proto3";
+
+package userservice;
+
+// 定义机器人服务
+service Bot {
+    // GetBotDialog 获取机器人对话列表的用户ID数组
+    rpc GetBotDialogUserIds(GetBotDialogUserIdsRequest) returns (GetBotDialogUserIdsReply) {}
+}
+
+
+
+message GetBotDialogUserIdsRequest {
+    uint32 botId = 1;
+    uint32 pageNo = 2;
+    uint32 pageSize = 3;
+}
+
+message GetBotDialogUserIdsReply {
+    uint32 pageNo = 1;
+	uint32 pageSize = 2;
+	uint32 totalPage = 3;
+	uint32 totalCount = 4;
+    repeated uint32 list = 5;
+}

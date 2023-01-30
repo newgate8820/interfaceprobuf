@@ -1,0 +1,54 @@
+syntax = "proto3";
+package pbimofflineserver;
+
+import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+service OfflineServer {
+    // GetDifference 拉取离线数据
+    rpc GetDifference (GetDifferenceReq) returns (GetDifferenceResp) {}
+
+    // GetStateBin 获取当前状态,直接返回客户端
+    rpc GetStateBin(GetStateBinReq) returns (GetStateBinResp) {}
+
+    // GetState 获取当前状态， 具体内容
+    rpc GetState(GetStateReq) returns (GetStateResp) {}
+}
+
+message GetStateBinReq {
+    int32 UserID   = 1;
+    uint64 KeyID   = 2;
+    int64 ReqMsgID = 3;
+}
+
+message GetStateBinResp {
+    bytes UpdatesStateBin = 1;
+}
+
+message GetStateResp {
+    int32 Pts         = 1; // 用户当前自增序列 pts
+    int32 Qts         = 2; // 用户当前加密消息 qts
+    int32 Date        = 3; // 当前时间
+    int32 Seq         = 4; //
+    int32 UnreadCount = 5; // 当前总未读数
+}
+
+message GetStateReq {
+    int32 UserID = 1;
+    uint64 KeyID = 2;
+}
+
+message GetDifferenceReq {
+    pbcomm.Debug debug  = 1;
+    int64 ReqMsgID      = 2;
+    int32 UserID        = 4;
+    int32 Flags         = 5;
+    int32 Pts           = 6;
+    int32 PtsTotalLimit = 7;
+    int32 Date          = 8;
+    int32 Qts           = 9;
+}
+
+message GetDifferenceResp {
+    bytes UpdatesDifferenceBin = 1;       //返回二进制
+}
+

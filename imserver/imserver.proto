@@ -1,0 +1,95 @@
+syntax="proto3";
+
+package sequencer;
+
+service MTProtoServer{
+	rpc HandleMTP (stream HandleMTPRequest) returns (stream HandleMTPReply) {}
+}
+
+message HandleMTPRequest{
+	string client_addr = 1; // 客户端ip地址
+	int32 api_id = 2; // 客户端类型id
+	string device_model = 3; // 客户端机器型号
+	string system_version = 4; // 客户端系统
+	string app_version = 5; // 客户端版本号
+	int32 mt_layer = 6; // 客户端协议版本
+	string app_name = 7; // 
+	string proxy_addr = 8; // 代理ip地址
+	string lang_code = 9; // 客户端语言
+	
+	int32 user_id = 10; // 请求者id
+	string phone_number = 11; // 请求者当前号码
+	
+	
+	uint64 auth_key_id = 12; // 客户端标识
+	uint64 server_salt = 13; // 服务器盐
+	uint64 session_id = 14; // 请求session标识
+	uint64 message_id = 15; // 消息id
+	uint32 message_seq_no = 16; // 客户端seq计数
+	bool is_ack = 17;
+	bytes message_obj = 18; // 消息体
+	
+	Flag flag_in = 19; 
+	
+	enum Flag{
+		IsProxy = 0; 
+		FirstLogin = 1;
+		IsMainSession = 2; 
+		IsHttp = 3;
+		IsMediaConn = 4; 
+		UserIdChecked = 5;
+		WithAuthKey = 6;
+	}
+	
+	uint32 crc = 20; // crc32
+	bytes auth_key = 21; //
+}
+message HandleMTPReply{
+	bytes rpc_result = 1; // mt rpc result
+	Flag flag_out = 2;
+	int32 user_id = 3; 
+	string phone_number = 4;
+	bytes auth_key = 5;
+	int32 api_id = 6;
+	string app_version = 7;
+	string device_model = 8;
+	string lang_code = 9;
+	string system_version = 10;
+	int32 mt_layer = 11;
+	int32 os_type = 12;
+	
+	enum Flag{
+		SetUserId = 0;
+		SetPhoneNumber = 1;
+		SetAuthKey = 2;
+		SetApiId = 3;
+		SetAppVersion = 4;
+		SetDeviceModel = 5;
+		SetLangCode = 6;
+		SetSystemVersion = 7;
+		SetLayer = 8;
+		SetOSType = 9;
+		SetUserIdChecked = 10;
+		SetQuickIsACK = 11;
+		SetGroupID = 12;
+	}
+
+	int32 group_id = 13;
+}
+message RegisterGatewayRequest{
+	int32 gateway_id = 1; // 网关id
+}
+message Update{
+	OpType send_op = 1; // 发送类型
+	repeated int32 user_id_slice = 2; // 用户id列表 
+	uint64 auth_key_id = 3; // 指定的客户端
+	
+	enum OpType{
+		UserAll = 0; // 用户所有端
+		UserOneClient = 1; // 用户指定的端
+		UserExcludeOneClient = 2; // 排除用户指定端
+		InternalUserAll = 3; 
+		InternalOneClient = 4;
+		InternalExcludeOneClient = 5;
+	}
+}

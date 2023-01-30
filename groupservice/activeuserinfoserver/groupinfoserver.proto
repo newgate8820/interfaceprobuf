@@ -1,0 +1,455 @@
+//protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/activeuserserver/activeuserserver.proto
+syntax = "proto3";
+
+package groupservice;
+
+//返回错误码
+enum ActiveErrorCode {
+    Active_OK                           = 0;         //ok
+    Active_SYSERR                       = 1001;      //系统错误
+    Active_NOT_FIND                     = 1002;      //未找到数据
+}
+
+//username和邀请链接对应的对象类型
+enum PeerType {
+    PeerUser = 0;       //用户
+    PeerChat = 1;       //普通群
+    PeerChannel = 2;    //频道
+    PeerSuperChat = 3;  //超级群
+}
+
+//群成员搜索类型
+enum ChannelSearchType {
+    SearchAll = 0;      //所有用户
+    SearchAdmin = 1;    //管理员
+    SearchBanned = 2;   //被禁权
+    SearchBot = 3;      //机器人
+    SearchKicked = 4;   //被踢
+}
+
+//username存储结构
+message UserNameBase {
+    string Username =1;
+    int32 Id =2;
+    PeerType Type =3;
+}
+
+//超级群信息
+message ChatChannel{
+	int32 Channel_id                    = 1;
+	int64 Access_hash                   = 2;
+	bool Encry                          = 3;
+	bool Broadcast_or_megagroup         = 4;
+	bool Verified                       = 5;
+	bool Restricted                     = 6;
+	bool Democracy                      = 7;
+	bool Signatures                     = 8;
+	bool Min                            = 9;
+	string Title                        = 10;
+	string User_name                    = 11;
+	string About                        = 12;
+	string Photo                        = 13;
+	int32 Date                          = 14;
+	int32 Version                       = 15;
+	string Restriction_reason           = 16;
+	int32 Participants_count            = 17;
+	int32 Admins_count                  = 18;
+	int32 Kicked_count                  = 19;
+	int32 Banned_count                  = 20;
+	string Exported_invite_link         = 21;
+	int32 Bot_count                     = 22;
+	int32 Migrated_from_max_id          = 23;
+	int32 Migrated_from_chat_id         = 24;
+	int32 Pinned_msg_id                 = 25;
+	int32 Cluster                       = 26;
+	int32  Invite_Rule                  = 27;
+	int32 Creator                       = 28;
+	bool Everyone_quiet                 = 29;
+	bool Private_chat                   = 30;
+	int32 Id                            = 31;
+}
+
+//超级群用户信息   60个字节
+message ChannelParticipants {
+	int32 Channel_id            =1;
+	int32 User_id               =2;
+	bool Is_bot                 =3;
+	int32 Invite_id             =4;
+	bool Can_set_username       =5;
+	bool Can_view_participants  =6;
+	bool Is_creator             =7;
+	bool Is_admin               =8;
+	bool Is_ban                 =9;
+	int32 Promoted_by           =10;
+	bool Change_group_info      =11;
+	bool Delete_messages        =12;
+	bool Ban_users              =13;
+	bool Pin_messages           =14;
+	bool Add_new_admin          =15;
+	bool Can_read_messages      =16;
+	bool Can_send_message       =17;
+	bool Can_send_media         =18;
+	bool Can_send_sticker       =19;
+	bool Can_send_gifs          =21;
+	bool Can_send_games         =22;
+	bool Can_send_inline        =23;
+	bool Can_embed_links        =24;
+	int32 Kicked_by             =25;
+	int32 Until_date            =26;
+	int32 Join_time             =27;
+	bool Post_messages          =28;
+	bool Edit_Messages          =29;
+	bool Invite_users           =30;
+	bool Invite_link            =31;
+	string Export_invite_link   =32;
+	int32 Id                    =33;
+    int32 Start_msgid           =34; // add by qingsong at 2019-12-06
+}
+
+//被踢用户信息
+message ChannelKickedLeft {
+	int32 Channel_id        =1;
+	int32 User_id           =2;
+	bool Kicked_or_left     =3;
+	int32 Kicked_by         =4;
+	int32 Date              =5;
+	int32 Last_date         =6;
+	bool Is_ban             =7;
+	bool Can_read_messages  =8;
+	bool Can_send_message   =9;
+	bool Can_send_media     =10;
+	bool Can_send_inline    =11;
+	bool Can_send_games     =12;
+	bool Can_send_gifs      =13;
+	bool Can_send_sticker   =14;
+	bool Can_embed_links    =15;
+	int32 Id                =16;
+}
+
+//活跃用户信息服务
+service ActiveUserInfoService{
+    // 激活用户
+    rpc ActivateUser(ActivateUserReq) returns (ActivateUserReply) {};
+    // 更新用户Firstname Lastname
+    rpc UpdateFirstnameLastname(UpdateFirstnameLastnameReq) returns (UpdateFirstnameLastnameReply) {};
+    // 更新Username信息
+    rpc UpdateUsername(UpdateUsernameReq) returns (UpdateUsernameReply) {};
+    // 获取两个用户相同的群数量
+    rpc GetTwoUserChatsCount(GetTwoUserChatsCountReq) returns (GetTwoUserChatsCountReply) {};
+    // 获取两个用户相同的群
+    rpc GetTwoUserChats(GetTwoUserChatsReq) returns (GetTwoUserChatsReply) {};
+    // 根据群名称搜索自己所在的群
+    rpc SearchSelfGroup(SearchSelfGroupReq) returns (SearchSelfGroupReply) {};
+
+}
+
+//超级群信息服务
+service ChanelInfoService{
+    // 获取超级群活跃用户ID
+    rpc GetActiveUsers(GetActiveUsersReq)returns (GetActiveUsersReply) {};
+    // 获取超级群所有用户信息
+    rpc GetAllChannelUsers(GetAllChannelUsersReq)returns (GetAllChannelUsersReply) {};
+    // 新增修改超级群用户信息
+    rpc SetChannelParticipant(SetChannelParticipantReq) returns (SetChannelParticipantReply) {};
+    // 获取一个超级群用户信息
+    rpc GetChannelParticipant(GetChannelParticipantReq) returns (GetChannelParticipantReply) {};
+    // 删除一个超级群用户信息
+    rpc DelChannelParticipant(DelChannelParticipantReq) returns (DelChannelParticipantReply) {};
+    // 删除一个群内的所有用户
+    rpc DelAllChannelParticipant(DelAllChannelParticipantReq) returns (DelAllChannelParticipantReply) {};
+    // 重置一个超级群所有信息
+    rpc ResetChannel(ResetChannelParticipantReq) returns (ResetChannelParticipantReply) {};
+    // 搜索群成员
+    rpc SearchChannelParticipant(SearchChannelParticipantReq) returns (SearchChannelParticipantReply) {};
+    // 根据群名称搜索超级群
+    rpc SearchChannelByTitle(SearchChannelByTitleReq) returns (SearchChannelByTitleReply) {};
+    // 将用户所在的超级群设置为活跃用户
+    rpc AddActiveChannelUser(AddActiveChannelUserReq) returns (AddActiveChannelUserReply) {};
+    // 将用户所在的超级群设置为不活跃用户
+    rpc DelActiveChannelUser(DelActiveChannelUserReq) returns (DelActiveChannelUserReply) {};
+}
+
+//普通群信息服务
+service GroupInfoService{
+    // 根据群名称搜索普通群
+    rpc SearchGroupByTitle(SearchGroupByTitleReq) returns (SearchGroupByTitleReply) {};
+}
+
+//username搜索服务
+service UsernameSearchService{
+    // 更新Username信息
+    rpc UpdateUsername(UpdateUsernameReq) returns (UpdateUsernameReply) {};
+    // 完全匹配username
+    rpc GetUsername(GetUsernameReq) returns (GetUsernameReply) {};
+    // 模糊搜索username 和 自己所在的群
+    rpc SearchUsername(SearchUsernameReq) returns (SearchUsernameReply) {};
+}
+
+//超级群被踢用户信息服务
+service KickedLeftService{
+    // 分页获取被踢用户
+    rpc GetChannelKickedByLimit(GetChannelKickedByLimitReq) returns (GetChannelKickedByLimitReply) {};
+    // 获取单个被踢用户
+    rpc GetChannelKeckedLeft(GetChannelKeckedLeftReq) returns (GetChannelKeckedLeftReply) {};
+    // 设置被踢用户信息到缓存 以存在的直接替换
+    rpc AddLeftParticipant(AddLeftParticipantReq) returns (AddLeftParticipantReply) {};
+    // 删除缓存中的被踢用户信息
+    rpc DelLeftParticipant(DelLeftParticipantReq) returns (DelLeftParticipantReply) {};
+    // 删除缓存中的群Id对应的所有被踢用户信息
+    rpc DelAllLeftChatParticipant(DelAllLeftChatParticipantReq) returns (DelAllLeftChatParticipantReply) {};
+    // 搜索群成员
+    rpc SearchKickedParticipant(SearchKickedParticipantReq) returns (SearchKickedParticipantReply) {};
+}
+
+// 将用户所在的超级群设置为活跃用户
+message AddActiveChannelUserReq{
+    int32 UserId   =1;
+    repeated int32 ChannelIds =2;   //超级群、频道Id列表
+}
+message AddActiveChannelUserReply{
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 将用户所在的超级群设置为不活跃用户
+message DelActiveChannelUserReq{
+    int32 UserId   =1;
+    repeated int32 ChannelIds =2;   //超级群、频道Id列表
+}
+message DelActiveChannelUserReply{
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 激活用户
+message ActivateUserReq{
+    int64 KeyId    =1;
+    int32 UserId   =2;
+}
+message ActivateUserReply{
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 获取超级群活跃用户ID
+message GetActiveUsersReq{
+    int32 ChannelId =1;
+}
+message GetActiveUsersReply{
+    repeated int32 ActiveIds =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+//获取超级群所有用户信息
+message GetAllChannelUsersReq{
+    int32 ChannelId   =1;
+}
+message GetAllChannelUsersReply{
+    repeated int32 AllIds   =1;
+    repeated int32 ActiveIds   =2;
+    repeated ChannelParticipants Infos = 3;
+    repeated ChannelParticipants admins = 4;
+    repeated ChannelParticipants banners = 5;
+    repeated ChannelParticipants bots = 6;
+    ActiveErrorCode ErrorCode =7;
+}
+
+// 新增修改超级群用户信息
+message SetChannelParticipantReq{
+    ChannelParticipants UserInfo =1;
+}
+message SetChannelParticipantReply{
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 获取一个超级群用户信息
+message GetChannelParticipantReq{
+    int32 ChannelId =1;
+    int32 UserId   =2;
+}
+message GetChannelParticipantReply{
+    ChannelParticipants UserInfo =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 删除一个超级群用户信息
+message DelChannelParticipantReq {
+    int32 ChannelId   =1;
+    int32 UserId   =2;
+}
+message DelChannelParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 删除一个群内的所有用户
+message DelAllChannelParticipantReq {
+    int32 ChannelId   =1;
+}
+message DelAllChannelParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 更新用户Firstname Lastname
+message UpdateFirstnameLastnameReq {
+    int32 UserId   =1;
+    string Firstname =2;
+    string Lastname =3;
+}
+message UpdateFirstnameLastnameReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 更新Username信息
+message UpdateUsernameReq {
+    UserNameBase NewInfo =1;
+    string OldUsername =2;
+}
+message UpdateUsernameReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 完全匹配username
+message GetUsernameReq {
+    string Username   =1;
+}
+message GetUsernameReply {
+    UserNameBase Info =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 模糊搜索username
+message SearchUsernameReq {
+    string SearchStr =1;
+    int32 UserId =2;
+    int32 Limit =3;
+}
+message SearchUsernameReply {
+    repeated UserNameBase Info =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 根据群名称搜索自己所在的群
+message SearchSelfGroupReq {
+    string Title =1;
+    int32 UserId =2;
+}
+message SearchSelfGroupReply {
+    repeated int32 ChatIds =1;      //普通群Id列表
+    repeated int32 ChannelIds =2;   //超级群、频道Id列表
+    ActiveErrorCode ErrorCode =3;
+}
+
+// 根据群名称搜索超级群
+message SearchChannelByTitleReq {
+    string Title =1;
+    repeated int32 ChannelIds =2;
+}
+message SearchChannelByTitleReply {
+    repeated int32 ChannelIds =1;   //超级群、频道Id列表
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 根据群名称搜索普通群
+message SearchGroupByTitleReq {
+    string Title =1;
+    repeated int32 ChatIds =2;
+}
+message SearchGroupByTitleReply {
+    repeated int32 ChatIds =1;      //普通群Id列表
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 获取两个用户相同的群数量
+message GetTwoUserChatsCountReq {
+    int32 UserOne =1;
+    int32 UserTwo =2;
+}
+message GetTwoUserChatsCountReply {
+    int32 Count =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 获取两个用户相同的群
+message GetTwoUserChatsReq {
+    int32 UserOne =1;
+    int32 UserTwo =2;
+}
+message GetTwoUserChatsReply {
+    repeated int32 ChatIds =1;      //普通群Id列表
+    repeated int32 ChannelIds =2;   //超级群、频道Id列表
+    ActiveErrorCode ErrorCode =3;
+}
+
+// 搜索群成员
+message SearchKickedParticipantReq {
+    int32 ChannelId =1;
+    string SearchStr =2;
+    int32 Limit=3;
+}
+message SearchKickedParticipantReply {
+    repeated ChannelParticipants Users =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 搜索群成员
+message SearchChannelParticipantReq {
+    int32 ChannelId =1;
+    string SearchStr =2;
+    ChannelSearchType SearchType =3;
+    int32 Limit=4;
+}
+message SearchChannelParticipantReply {
+    repeated ChannelParticipants Users =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 分页获取被踢用户
+message GetChannelKickedByLimitReq {
+    int32 ChannelId =1;
+    int32 Offset =2;
+    int32 Limit =3;
+}
+message GetChannelKickedByLimitReply {
+    repeated ChannelKickedLeft Users =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 获取单个被踢用户
+message GetChannelKeckedLeftReq {
+    int32 ChannelId =1;
+    int32 UserId =2;
+}
+message GetChannelKeckedLeftReply {
+    ChannelKickedLeft UserInfo =1;
+    ActiveErrorCode ErrorCode =2;
+}
+
+// 设置被踢用户信息到缓存 以存在的直接替换
+message AddLeftParticipantReq {
+    ChannelKickedLeft UserInfo =1;
+}
+message AddLeftParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 删除缓存中的被踢用户信息
+message DelLeftParticipantReq {
+    int32 ChannelId =1;
+    int32 UserId =2;
+}
+message DelLeftParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 删除缓存中的群Id对应的所有被踢用户信息
+message DelAllLeftChatParticipantReq {
+    int32 ChannelId =1;
+}
+message DelAllLeftChatParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}
+
+// 重置一个超级群所有信息
+message ResetChannelParticipantReq {
+    int32 ChannelId =1;
+}
+message ResetChannelParticipantReply {
+    ActiveErrorCode ErrorCode =1;
+}

@@ -1,0 +1,27 @@
+/**
+ * 定义提供给机器人逻辑服务使用的API
+ * 只能由机器人逻辑服务来调用
+ */
+
+syntax = "proto3";
+
+package middleware;
+
+// 定义中间件服务
+service Middleware {
+    // RouteGetBotCallbackAnswer 路由获取回调应答
+    rpc RouteGetBotCallbackAnswer(RouteRequest) returns (RouteResponse) {}
+    // RouteSetBotCallbackAnswer 路由设置回调应答
+    rpc RouteSetBotCallbackAnswer(RouteRequest) returns (RouteResponse) {}
+}
+
+// 路由请求数据
+message RouteRequest {
+    uint32 target_dc = 1;   // 目标DC
+    bytes tldata = 2;       // 协议数据
+}
+
+// 路由响应数据
+message RouteResponse {
+    bytes tldata = 1;       // 协议数据
+}

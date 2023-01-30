@@ -1,0 +1,387 @@
+// protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/pbsearchserver/pbsearchserver.proto
+
+
+syntax = "proto3";
+import "gitlab.chatserver.im/im/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "gitlab.chatserver.im/im/iminterfaceprotobufs/messagedb/messagedb.proto";
+
+package pbsearchserver;
+
+enum PeerType {
+    Empty      = 0;
+    Self_User  = 1;
+    Chat       = 2;
+    Channel    = 3;
+}
+
+enum EMsgFlag {
+    USERMESSAGE    = 0;
+    CHANNELMESSAGE = 1;
+}
+
+
+message Message {
+    int32    user_id         = 1;
+    int32    with_id         = 2;
+    int32    with_id_type    = 3;
+    int32    msg_id          = 4;
+    int32    message_type    = 5;
+    string   message         = 6;
+    int32    from_id         = 7;
+    int32    to_id           = 8;
+    int32    media           = 9;
+    int32    date            = 10;
+    int64    uuid            = 11;
+    int32    flags           = 12;
+    bool     out             = 13;
+    bool     mentioned       = 14;
+    bool     mediaUnread     = 15;
+    bool     silent          = 16;
+    bool     post            = 17;
+    int32    pts             = 18;
+    string   fwd_from        = 19;
+    int32    via_bot_id      = 20;
+    int32    reply_to_msg_id = 21;
+    string   media_data      = 22;
+    string   reply_markup    = 23;
+    string   entities        = 24;
+    int32    views           = 25;
+    int32    edit_date       = 26;
+    string   action          = 27;
+    int64    random_id       = 28;
+    int32    insert_date     = 29;
+    int32    update_date     = 30;
+    int64    group_id        = 31;
+    string   combination     = 32;
+    int32    encry           = 33;
+    EMsgFlag flag            = 34;
+}
+
+message MessageInfo {
+    int32    user_id         = 1;
+    int32    with_id         = 2;
+    int32    with_id_type    = 3;
+    int32    msg_id          = 4;
+    string   message         = 5;
+    int32    from_id         = 6;
+    int32    media           = 7;
+    int32    date            = 8;
+    int32    encry           = 9;
+    int64    uuid            = 10;
+}
+
+//搜索协议请求
+message HandleSearchLogicReq{
+    int64 message_id     = 1;
+    int64 key_id         = 2;
+    int32 user_id        = 3;
+    int64 crc_id         = 4;
+    bytes obj_bin        = 5;
+    string phone_id      = 6;
+    int32 layer          = 7;
+    string app_version   = 8;
+}
+//搜索协议响应
+message HandleSearchLogicResp{
+    bytes result         = 1;
+    int32 err_code       = 2;
+    string err_msg       = 3;
+}
+
+//es 消息搜索结构体
+message MessageSearchReq{
+    int64  key_id        = 1;
+    int32  user_id       = 2;
+    int32  from_id       = 3;
+    PeerType peer_type   = 4;
+    int32  with_id       = 5;
+    int32  with_id_type  = 6;
+    string keyword       = 7;
+    int32  min_date      = 8;
+    int32  max_date      = 9;
+    int32  offset        = 10;
+    int32  max_id        = 11;
+    int32  limit         = 12;
+    int32  encry         = 13;
+    repeated int32 media_types = 14;
+}
+
+message NoUseResp {
+    uint32 reserved = 1;
+}
+//删除普通消息请求
+message DeleteUserMessageReq {
+    int32 user_id = 1;
+    int32 msg_id  = 2;
+}
+
+message DeleteChannelMessageReq {
+    int32 with_id = 1;
+    int32 msg_id  = 2;
+}
+
+message SearchCursor {
+    int32 date   = 1;
+    int32 u_w_id = 2;
+    int32 msg_id = 3;
+}
+
+message UserChannelMsgId {
+    int32 channel_id   = 1;
+    int32 msg_id_start = 2;
+}
+
+//全局搜索请求
+message SearchMessageReq {
+    uint64       key_id  = 1;
+    string       keyword = 2;
+    SearchCursor cursor  = 3;
+    int32        size    = 4;
+    int32        user_id = 5;
+    int32        from_id = 6;
+    EMsgFlag     searchtype = 7;
+    repeated UserChannelMsgId user_channel_msg_ids = 8;
+}
+
+message SearchResp {
+    repeated Message messages = 1;
+    int32 count                     = 2;
+    SearchCursor cursor             = 3;
+}
+
+message SearchUserMessageByMaxMsgIdReq {
+    uint64 key_id     = 1;
+    string keyword    = 2;
+    int32  size       = 3;
+    int32  user_id    = 4;
+    int32  with_id    = 5;
+    int32  from_id    = 6;
+    int32  max_msg_id = 7;
+}
+
+message SearchChannelMessageByMaxMsgIdReq {
+    uint64 key_id       = 1;
+    string keyword      = 2;
+    int32  size         = 3;
+    int32  user_id      = 4;
+    int32  with_id      = 5;
+    int32  from_id      = 6;
+    int32  msg_id_start = 7;
+    int32  max_msg_id   = 8;
+}
+
+message UpdateUserMessageMediaUnreadByMsgIdsReq {
+    bool media_unread      = 1;
+    int32 user_id          = 2;
+    repeated int32 msg_ids = 3;
+}
+
+message DeleteUserMessageByMsgIdsReq {
+    int32 user_id          = 1;
+    repeated int32 msg_ids = 2;
+}
+
+message DeleteUserMessageByUuidsReq {
+    int32 user_id        = 1;
+    repeated int32 uuids = 2;
+}
+
+message DeleteUserMessageByUWTReq {
+    int32    user_id      = 1;
+    int32    with_id      = 2;
+    int32    with_id_type = 3;
+}
+
+//批量删除超级群消息
+message DeleteChannelMessageByMsgIdsReq {
+    int32 with_id          = 1;
+    repeated int32 msg_ids = 2;
+}
+//删除具体超级群消息
+message DeleteChannelMessageByWithIdReq {
+    int32 with_id = 1;
+}
+//根据个人清除超级群消息
+message DeleteChannelMessageByUWMReq {
+    int32  user_id    = 1;
+    int32  with_id    = 2;
+    int32  max_msg_id = 3;
+}
+//搜索普通群媒体消息
+message SearchUserMessageMediaReq {
+    string         keyword     = 1;
+    int32          size        = 2;
+    int32          user_id     = 3;
+    int32          with_id     = 4;
+    int32          with_type   = 5;
+    int32          encry       = 6;
+    int32          max_msg_id  = 7;
+    int32          offset      = 8;
+    repeated int32 media_types = 9;
+    pbcomm.Debug   Debug       = 10;
+}
+//搜索超级群媒体消息
+message SearchChannelMessageMediaReq {
+    string         keyword     = 1;
+    int32          size        = 2;
+    int32          user_id     = 3;
+    int32          with_id     = 4;
+    int32          max_msg_id  = 5;
+    int32          encry       = 6;
+    int32          offset      = 7;
+    repeated int32 media_types = 8;
+    pbcomm.Debug   Debug       = 9;
+}
+
+message SearchMediaResp {
+    repeated messagedb.UserMsg messages = 1;
+    int32 count                     = 2;
+}
+
+service SearchService {
+
+
+    rpc SearchMessage(SearchMessageReq) returns (SearchResp) {}
+    rpc SearchUserMessageByMaxMsgId(SearchUserMessageByMaxMsgIdReq) returns (SearchResp) {}
+    rpc SearchChannelMessageByMaxMsgId(SearchChannelMessageByMaxMsgIdReq) returns (SearchResp) {}
+    rpc UpdateUserMessageMediaUnreadByMsgIds(UpdateUserMessageMediaUnreadByMsgIdsReq) returns (NoUseResp) {}
+
+    rpc SearchUserMessageMedia(SearchUserMessageMediaReq) returns (SearchMediaResp) {}
+    rpc SearchChannelMessageMedia(SearchChannelMessageMediaReq) returns (SearchMediaResp) {}
+
+    //搜索logic协议处理
+    rpc HandleSearchLogic(HandleSearchLogicReq)returns(HandleSearchLogicResp){}
+    //新增消息
+    rpc AddMessage(MessageInfo) returns (NoUseResp) {}
+    //单条删除普通消息
+    rpc DeleteUserMessage(DeleteUserMessageReq) returns (NoUseResp) {}
+    //单条删除超级群消息
+    rpc DeleteChannelMessage(DeleteChannelMessageReq) returns (NoUseResp) {}
+    //批量删除普通消息
+    rpc DeleteUserMessageByMsgIds(DeleteUserMessageByMsgIdsReq) returns (NoUseResp) {}
+    //根据Userid、WithId、WithType删除普通消息-(清除历史消息)
+    rpc DeleteUserMessageByUWT(DeleteUserMessageByUWTReq) returns (NoUseResp) {}
+    rpc DeleteUserMessageByUuids(DeleteUserMessageByUuidsReq) returns (NoUseResp) {}
+    //批量删除超级群消息
+    rpc DeleteChannelMessageByMsgIds(DeleteChannelMessageByMsgIdsReq) returns (NoUseResp) {}
+    //根据WithId删除超级群消息
+    rpc DeleteChannelMessageByWithId(DeleteChannelMessageByWithIdReq) returns (NoUseResp) {}
+    //超级群清除历史
+    rpc DeleteChannelMessageByUWM(DeleteChannelMessageByUWMReq) returns (NoUseResp) {}
+
+    // 添加群组成员
+    rpc InsertGroupUsers(InsertGroupUsersReq) returns (HandlerReply){};
+    // 移除群组成员
+    rpc DeleteGroupUsers(DeleteGroupUsersReq) returns (HandlerReply){};
+
+    // 更新群组用户
+    rpc UpdateGroupUser(UpdateGroupUserReq) returns (HandlerReply) {};
+    // 更新用户昵称
+    rpc RenameGroupUser(RenameGroupUserReq) returns (HandlerReply) {};
+
+    // 群组成员搜索(昵称模糊匹配)
+    rpc SearchGroupUsers(SearchGroupUsersReq) returns (SearchGroupUsersRsp){};
+
+    // @ add by qingsong at 2020-04-24 for fuzzy search channel by title or username /////////////////
+    // 新增群组名称信息 for create channel
+    rpc InsertChanName (InsertChanNameReq) returns (HandlerReply) {};
+
+    // 更新群组名称信息 for edit channel title or username column
+    rpc UpdateChanName (UpdateChanNameReq) returns (HandlerReply) {};
+
+    // 删除群组名称信息 for dismiss channel
+    rpc DeleteChanName (DeleteChanNameReq) returns (HandlerReply) {};
+
+    // 根据名称搜索群组
+    rpc SearchChannels (SearchChannelsReq) returns (SearchChannelsRsp) {};
+
+}
+
+
+enum ErrorCode {
+    RPC_OK = 0;
+    RPC_ERROR = 1;
+    CHAN_NOT_EXIST = 2;
+    USER_NOT_EXIST = 3;
+    USER_NOT_FOUND = 4;
+    Keyword_Illegal = 5;
+    Channel_Illegal = 6;
+}
+
+message HandlerReply {
+    ErrorCode   Reply_code = 1;
+    string      Reply_info = 2;
+}
+
+// 用户昵称信息
+message UserNameInfo {
+    int32   User_id    = 1;
+    string  First_name = 2;
+    string  Last_name  = 3;
+    bool    Is_kick  = 4; // add for kicked flag.
+}
+
+message InsertGroupUsersReq {
+    int32                   Group_id = 1;
+    repeated UserNameInfo   User_arr = 2;      // matched users
+}
+
+// 删除群组用户
+message DeleteGroupUsersReq {
+    int32            Group_id = 1;
+    repeated int32   User_ids = 2;      // matched users
+}
+
+message UpdateGroupUserReq {
+    int32         Group_id = 1;
+    UserNameInfo  User = 2;
+}
+
+message RenameGroupUserReq {
+    int32         Group_id = 1;
+    UserNameInfo  User = 2;      // matched users
+}
+
+// 群组用户昵称模糊匹配请求
+message SearchGroupUsersReq {
+    int32       Group_id = 1;     // group or channel id
+    bool        Kick_flg = 2;     //  true:kicked; false:normal;
+    string      Key_word = 3;     // fuzzy match key word
+    int32       Ret_rows = 4;     // reply max rows
+}
+
+// 群组用户昵称模糊匹配返回
+message SearchGroupUsersRsp {
+    ErrorCode       Err_code = 1;      // error no
+    string          Err_info = 2;      // error msg
+    repeated int32  User_ids = 3;      // matched users
+}
+
+
+// @ add by qingsong at 2020-04-24 for fuzzy search channel by title or username /////////////////
+// 新增群组名称信息 for create channel
+message InsertChanNameReq {
+    int32   Channel_id = 1;
+    string  Title = 2;
+    string  Uname = 3;
+}
+// 更新群组名称信息 for edit channel title or username column
+message UpdateChanNameReq {
+    int32   Channel_id = 1;
+    string  Title = 2;
+    string  Uname = 3;
+}
+// 删除群组名称信息 for dismiss channel
+message DeleteChanNameReq {
+    int32   Channel_id = 1;
+}
+// 根据名称搜索群组
+message SearchChannelsReq {
+    string  Key_word = 1;  //
+    int32   Ret_rows = 2;
+}
+message SearchChannelsRsp {
+    ErrorCode   Err_code = 1;
+    string      Err_info = 2;
+    repeated int32   Chan_ids = 3;
+}

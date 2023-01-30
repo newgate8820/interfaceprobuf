@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+//protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/botserver/basetypes/basetypes.proto
+package basetypes;
+
+// User 用户信息
+message User {
+    uint32 id           = 1; // 用户唯一ID
+    string first_name   = 2; // 用户First name
+    string last_name    = 3; // 用户Last name
+    string username     = 4; // 用户名
+}
+
+// ChatType 聊天类型
+enum ChatType {
+    ChatTypeZero    = 0;
+    PeerUser        = 1; // 用户聊天
+    PeerChat        = 2; // 普通群聊天
+    ChannelChat     = 3; // 超级群聊天
+}
+
+// Chat 聊天信息
+message Chat {
+    int32 id        = 1; // 唯一ID
+    ChatType type   = 2; // 聊天类型
+    string title    = 3; // 对话框标题
+}
+
+// EntityType 实体类型
+enum EntityType {
+    EntityTypeZero      = 0;
+    EntityBold          = 1; // 粗体
+    EntityItalic        = 2; // 斜体
+    EntityCode          = 3; // 代码高亮
+    EntityURL           = 4; // 超链接
+    EntityTextURL       = 5; // 文本链接
+    EntityMention       = 6; // 提及
+    EntityMentionName   = 7; // 提及名字
+    EntityEMail         = 8; // 邮箱地址
+    EntityBotCommand    = 9; // 机器人命令
+}
+
+// Entity 实体
+message Entity {
+   EntityType type  = 1; // Entity类型
+   uint32 user_id   = 2; // type为EntityMentionName时必填，表示@的目标用户ID
+   uint32 offset    = 3; // 偏移位置
+   uint32 length    = 4; // 长度(字节)
+   string url       = 5; // type为EntityTextUrl时必填，表示链接的URL
+}
