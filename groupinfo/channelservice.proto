@@ -13,13 +13,13 @@
 */
 
 syntax = "proto3";
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/groupinfo/chatcommon.proto";
+import "pbcomm/pbcomm.proto";
+import "chatcommon.proto";
 //import "gitlab.chatserver.im/interfaceprobuf/groupinfo/chatservice.proto" ;
 //import "gitlab.chatserver.im/im/iminterfaceprotobufs/infoserver/userserver.proto" ;
 package groupinfo;
 //---基础结构体-----------------------------------------------------------------------
-
+option go_package="interfaceprobuf/groupinfo";
 //群成员的基础信息
 message ChannelParticipant {
     int32   user_id             = 1; //群成员的iD

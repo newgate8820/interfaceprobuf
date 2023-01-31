@@ -12,10 +12,11 @@
 */
 
 syntax = "proto3";
-
-import "gitlab.chatserver.im/interfaceprobuf/storageservice/storage_pub.proto";
-
 package storageservice;
+import "storageservice/storage_pub.proto";
+option go_package = "interfaceprobuf/storageservice";
+
+
 
 // 文件存储RPC接口
 service FileStorageService {

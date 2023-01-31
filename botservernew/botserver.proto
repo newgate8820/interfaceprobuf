@@ -7,10 +7,10 @@
 
 syntax = "proto3";
 package pbbotserver;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/advertisemonitornew/advertisemonitor.proto";
+import "pbcomm/pbcomm.proto";
+import "advertisemonitornew/advertisemonitornew.proto";
 //import "gitlab.chatserver.im/interfaceprobuf/pbchannelserver/pbchannelserver.proto";
-
+option go_package="interfaceprobuf/pbbotserver";
 // ChatType 聊天类型
 enum ChatType {
     ChatTypeZero = 0;       //用户
@@ -61,10 +61,10 @@ service BotServer {
     rpc GetAdminGroups (ReqGetAdminGroups) returns (ReplyGetGroups) {}
 
     // 新增手動禁言名單
-    rpc SetManualBlockList(pbadvertisemonitor.ReqSetManualBlockList) returns (pbadvertisemonitor.ReplyData) {}
+    rpc SetManualBlockList(advertisemonitornew.ReqSetManualBlockList) returns (advertisemonitornew.ReplyData) {}
 
     // 刪除手動禁言名單
-    rpc DelManualBlockList(pbadvertisemonitor.ReqDelManualBlockList) returns (pbadvertisemonitor.ReplyData) {}
+    rpc DelManualBlockList(advertisemonitornew.ReqDelManualBlockList) returns (advertisemonitornew.ReplyData) {}
 
     // 讓使用者離開群(使用者後續還可以自動加入)
     //rpc LeaveChannel(ReqData) returns (pbchannelserver.ReplyChannelData) {}

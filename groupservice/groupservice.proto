@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 package groupservice;
-
+option go_package="interfaceprobuf/groupservice";
 //返回错误码
 enum ActiveErrorCode {
     Active_OK                           = 0;         //ok

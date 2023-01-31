@@ -8,7 +8,7 @@ package datacollect;
 
 option java_package = "im.bigdata.handling.domain.proto";
 option java_outer_classname="DataCollect";
-
+option go_package="interfaceprobuf/datacollect";
 //## 数据采集kafka_topic ## (使用enum string)
 enum CollectTopic{
     TOPIC_DEFAULT = 0;          // topic-默认

@@ -1,7 +1,7 @@
 syntax = "proto3";
 package groupinfo;
 
-
+option go_package="interfaceprobuf/groupinfo";
 // 
 enum ChatResultCode {
     Chat_RPC_OK                           = 0;         //成功

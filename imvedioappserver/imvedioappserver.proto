@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package imvedioappserver;
+option go_package="interfaceprobuf/imvedioappserver";
 
 //  protoc --gogofast_out=plugins=grpc:. *.proto
 

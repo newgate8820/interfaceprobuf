@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package imslowmodeserver;
+option go_package="interfaceprobuf/imslowmodeserver";
 
 ////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imslowmodeserver/imslowmodeserver.proto
 service ServerService {

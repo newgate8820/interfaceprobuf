@@ -2,8 +2,11 @@
 //protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/im/iminterfaceprotobufs/searchservice/search.proto
 syntax = "proto3";
 
-package pbadvertisemonitor;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+package advertisemonitor_v2;
+
+option go_package = "interfaceprobuf/advertisemonitor";
+
+import "pbcomm/pbcomm.proto";
 
 service AdvertiseMonitor {
 

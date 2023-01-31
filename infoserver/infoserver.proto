@@ -1,6 +1,8 @@
 syntax = "proto3";
 package infoserver;
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/infoserver/infoserver.proto
+option go_package="interfaceprobuf/infoserver";
+
 service ContactPushService {
     //更新自己朋友的未读状态
     rpc UpdateMoments(ReqUpdateMoments)returns(ResUpdateMoments){};

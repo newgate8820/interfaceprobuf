@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 package imhttppkgserver;
-
+option go_package="interfaceprobuf/imhttppkgserver";
 service ImHttpPkgServer {
     rpc StoreHttpPkg (ReqStoreHttpPkg) returns (ReplyStoreHttpPkg) {
     };

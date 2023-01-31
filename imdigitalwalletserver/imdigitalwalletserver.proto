@@ -5,8 +5,8 @@ syntax = "proto3";
 
 package imdigitalwalletserver;
 
-import  "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-
+import  "pbcomm/pbcomm.proto";
+option go_package = "interfaceprobuf/imdigitalwalletserver";
 enum Code {
   Success = 0;
   ErrorSystem = 1;

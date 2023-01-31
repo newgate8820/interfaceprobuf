@@ -3,9 +3,9 @@ syntax = "proto3";
 
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbmessagedb/messagedb.proto
 // 生成后 修改  Combination  *Combination `protobuf:"bytes,34,opt,name=Combination" json:"Combination,omitempty" xorm:"json"`
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 package messagedb;
-
+option go_package ="interfaceprobuf/pbmessagedb";
 service MessageDb {
 //=========================================== UserMsg =========================================================
     // 插入单条 usermsg 内容

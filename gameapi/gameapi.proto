@@ -3,6 +3,7 @@ syntax = "proto3";
 
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/gameapi/gameapi.proto
 package gameapi;
+option go_package="interfaceprobuf/gameapi";
 service gameapi {
     // 游戏登录
     rpc Login(ReqLogin) returns (ReplyLogin) {};

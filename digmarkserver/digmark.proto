@@ -2,7 +2,7 @@ syntax = "proto3";
 // protoc --gogofast_out=plugins=grpc:. *.proto
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/digmarkserver/digmark.proto
 package digmarkserver;
-
+option go_package="interfaceprobuf/digmarkserver";
 // 行情服务
 service DigMarkService {
     // 公共接口

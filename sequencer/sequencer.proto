@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package sequencer;
+option go_package="interfaceprobuf/sequencer";
 
 // IncreaseService 自增序列服务接口
 service SequenceService {

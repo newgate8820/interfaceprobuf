@@ -1,7 +1,8 @@
 syntax = "proto3";
 package pbimofflineserver;
 
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/pbimofflineserver";
 
 service OfflineServer {
     // GetDifference 拉取离线数据

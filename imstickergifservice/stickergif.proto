@@ -2,6 +2,7 @@
 syntax = "proto3";
 
 package imstickergifservice;
+option go_package="interfaceprobuf/imstickergifservice";
 
 //StickerService
 service StickerService{

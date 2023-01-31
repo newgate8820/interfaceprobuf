@@ -2,8 +2,8 @@
 syntax = "proto3";
 
 package groupservice;
-import "gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto";
-
+import "groupservice.proto";
+option go_package="interfaceprobuf/groupservice";
 //username搜索服务
 service UsernameSearchService{
     // 更新Username信息

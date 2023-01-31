@@ -1,6 +1,7 @@
 syntax="proto3";
 
-package sequencer;
+package imserver;
+option go_package="interfaceprobuf/imserver";
 
 service MTProtoServer{
 	rpc HandleMTP (stream HandleMTPRequest) returns (stream HandleMTPReply) {}

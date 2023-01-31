@@ -4,6 +4,7 @@
 syntax = "proto3";
 
 package implatformmgrservice;
+option go_package="interfaceprobuf/implatformmgrservice";
 
 enum PlatformMgrResultCode {
     ResultCode_Ok                           = 0;         // ok

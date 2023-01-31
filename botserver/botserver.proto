@@ -5,11 +5,11 @@
 //protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/botserver/botserver.proto
 
 syntax = "proto3";
-package pbbotserver;
-import "gitlab.chatserver.im/im/iminterfaceprotobufs/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/advertisemonitor/advertisemonitor.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbchannelserver/pbchannelserver.proto";
-
+package botserver;
+import "pbcomm/pbcomm.proto";
+import "advertisemonitor/advertisemonitor.proto";
+import "pbchannelserver/pbchannelserver.proto";
+option go_package= "interfaceprobuf/botserver";
 // ChatType 聊天类型
 enum ChatType {
     ChatTypeZero = 0;       //用户

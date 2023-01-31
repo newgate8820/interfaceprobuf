@@ -1,7 +1,7 @@
 syntax = "proto3";
 // protoc --gogofast_out=plugins=grpc:. *.proto
 package digcurrentserver;
-
+option go_package="interfaceprobuf/digcurrentserver";
 // 法币服务
 service DctCurrServer {
     // 法币通用协议

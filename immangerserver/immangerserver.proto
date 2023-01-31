@@ -5,7 +5,7 @@ syntax = "proto3";
 */
 
 package immangerserver;
-
+option go_package="interfaceprobuf/immangerserver";
 //错误代码的返回
 enum ErrorCode {
     Sucessful = 0; //操作成功

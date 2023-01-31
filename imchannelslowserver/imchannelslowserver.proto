@@ -1,7 +1,7 @@
 syntax = "proto3";
 //protoc --gogofast_out=plugins=grpc:. imchannelslowserver.proto
 package imchannelslowserver;
-
+option go_package = "interfaceprobuf/imchannelslowserver";
 service imChanneSlowServerService {
     // 更新调用慢速模式
     rpc updateChannelSlowModule (updateChannelSlowModuleReq) returns (updateChannelSlowModuleResp) {

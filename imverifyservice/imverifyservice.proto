@@ -4,6 +4,7 @@
 syntax = "proto3";
 
 package imverifyservice;
+option go_package="interfaceprobuf/imverifyservice";
 
 enum VerifyServiceResultCode {
     ResultCode_Ok                                      = 0;         // ok

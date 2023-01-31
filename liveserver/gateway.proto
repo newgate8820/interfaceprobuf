@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-package pb;
+package liveserver;
 
 // sudo protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/liveserver/gateway.proto
+option go_package="interfaceprobuf/liveserver";
 
 service GateWay{
    rpc LiveRouterForwarding(Request)returns(Response){};

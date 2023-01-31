@@ -12,10 +12,11 @@
 	protoc --gogofast_out=plugins=grpc:. *.proto
 */
 syntax = "proto3";
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/userserver.proto" ;
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/chatcommon.proto" ;
+import "iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "iminterfaceprotobufs/infoserver/userserver.proto" ;
+import "iminterfaceprotobufs/infoserver/chatcommon.proto" ;
 package infoserver;
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver";
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

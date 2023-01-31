@@ -12,11 +12,11 @@
 	protoc --gogofast_out=plugins=grpc:. *.proto
 */
 syntax = "proto3";
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/groupinfo/chatcommon.proto" ;
+import "pbcomm/pbcomm.proto";
+import "chatcommon.proto" ;
 
 package groupinfo;
-
+option go_package="interfaceprobuf/groupinfo";
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //创建群的请求数据

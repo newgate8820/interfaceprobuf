@@ -10,7 +10,7 @@ syntax = "proto3";
 package pbpushserver;
 
 //import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-
+option go_package="interfaceprobuf/pbpushserver";
 //*************************************API ******************************************************
 //user service 接口
 service PushServerService {

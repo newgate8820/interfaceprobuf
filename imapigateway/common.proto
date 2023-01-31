@@ -1,5 +1,6 @@
 syntax = "proto3";
 package imapigateway;
+option go_package = "interfaceprobuf/imapigateway";
 
 // 日志格式结构
 message Debug {

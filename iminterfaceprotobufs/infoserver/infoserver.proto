@@ -1,10 +1,11 @@
 //protoc --gogofast_out=plugins=grpc:. *.proto
 //gitlab.potato.im/iminterfaceprotobufs/
 syntax = "proto3";
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/userserver.proto";
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "iminterfaceprotobufs/infoserver/userserver.proto";
+import "iminterfaceprotobufs/pbcomm/pbcomm.proto";
 
 package infoserver;
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver";
 
 //发送短信的类型
 enum CodeType {

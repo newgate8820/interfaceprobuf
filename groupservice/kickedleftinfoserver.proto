@@ -2,8 +2,8 @@
 syntax = "proto3";
 
 package groupservice;
-import "gitlab.chatserver.im/interfaceprobuf/groupservice/groupservice.proto";
-
+import "groupservice.proto";
+option go_package="interfaceprobuf/groupservice";
 //超级群被踢用户信息服务
 service KickedLeftService{
     // 分页获取被踢用户

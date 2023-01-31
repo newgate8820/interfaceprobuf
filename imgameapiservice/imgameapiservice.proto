@@ -4,6 +4,7 @@
 syntax = "proto3";
 
 package imgameapiservice;
+option go_package="interfaceprobuf/imgameapiservice";
 
 enum GameApiServiceResultCode {
     ResultCode_Ok                                                        = 0;     // ok

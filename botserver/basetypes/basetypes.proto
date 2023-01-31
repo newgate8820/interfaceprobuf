@@ -2,6 +2,7 @@ syntax = "proto3";
 
 //protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/botserver/basetypes/basetypes.proto
 package basetypes;
+option go_package = "interfaceprobuf/botserver/basetypes";
 
 // User 用户信息
 message User {

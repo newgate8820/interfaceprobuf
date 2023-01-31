@@ -4,9 +4,10 @@
 //protoc -I. --swagger_out=logtostderr=true:. gitlab.chatserver.im/interfaceprobuf/imapigateway/*.proto
 syntax = "proto3";
 package imapigateway;
-import "gitlab.chatserver.im/interfaceprobuf/imapigateway/common.proto";
-import "gitlab.chatserver.im/interfaceprobuf/storageservice/storage_pub.proto";
-import "gitlab.chatserver.im/interfaceprobuf/storageservice/storage_proto.proto";
+option go_package = "interfaceprobuf/imapigateway";
+
+import "common.proto";
+import "storageservice/storage_proto.proto";
 
 // 网关服务
 service ApiGatewayService{
@@ -1540,7 +1541,7 @@ message MsgUploadFileReq {
 message MsgUploadFileResp {
     ERpcResultCode         result        = 1;        // 结果码
     storageservice.FileUploadRespPara     para1         = 2;        // Ref
-    storageservice.FidPara                para2         = 3;        // Ref，仅用于非分片文件上传
+    FidPara                para2         = 3;        // Ref，仅用于非分片文件上传
     uint64                 access_hash   = 4;        // 仅用于非分片文件上传存储之后的访问hash
 }
 

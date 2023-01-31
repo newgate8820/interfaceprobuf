@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package imshortvideoserver;
+option go_package="interfaceprobuf/imshortvideoserver";
 
 ////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imshortvideoserver/imshortvideoserver.proto
 service ServerService {

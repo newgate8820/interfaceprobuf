@@ -1,5 +1,6 @@
 syntax = "proto3";
 package infoserver;
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver";
 
 service ContactPushService {
     //更新自己朋友的未读状态

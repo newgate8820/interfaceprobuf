@@ -3,6 +3,7 @@ syntax = "proto3";
 package imsendsmsserver;
 
 // protoc -I . -I $GOPATH/src --gogofast_out=plugins=grpc:. *.proto
+option go_package="interfaceprobuf/imsendsmsserver";
 
 
 service SendSmsServer {

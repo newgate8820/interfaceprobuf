@@ -2,8 +2,8 @@
 syntax = "proto3";
 package pbimhistoryserver;
 
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/pbimhistoryserver";
 service HistoryServer {
     //    获取历史
     rpc GetHistory (GetHistoryReq) returns (GetHistoryResult) {

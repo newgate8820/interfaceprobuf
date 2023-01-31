@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 package imgeoserver;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 ////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imgeoserver/imgeoserver.proto
-
+option go_package="interfaceprobuf/imgeoserver";
 service ServerService {
 
     //超找附近的人或者群的操作

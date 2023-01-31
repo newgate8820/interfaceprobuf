@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package dialogserver;
+option go_package="interfaceprobuf/dialogserver";
 
 // 对话框微服务
 service DialogServer {

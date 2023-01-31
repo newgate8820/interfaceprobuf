@@ -2,7 +2,7 @@ syntax = "proto3";
 // protoc --gogofast_out=plugins=grpc:. *.proto
 // sudo protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/digtranserver/digtranserver.proto
 package digtranserver;
-
+option go_package="interfaceprobuf/digtranserver";
 // 币币交易服务
 service DigitalTransferService{
     // 币币交易业务通用协议

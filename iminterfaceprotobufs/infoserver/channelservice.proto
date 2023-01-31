@@ -12,11 +12,12 @@
 */
 
 syntax = "proto3";
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/chatcommon.proto" ;
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/chatservice.proto" ;
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/infoserver/userserver.proto" ;
+import "iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "iminterfaceprotobufs/infoserver/chatcommon.proto" ;
+import "iminterfaceprotobufs/infoserver/chatservice.proto" ;
+import "iminterfaceprotobufs/infoserver/userserver.proto" ;
 package infoserver;
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver";
 //---基础结构体-----------------------------------------------------------------------
 //群基础信息
 message ChannelInfoBase {

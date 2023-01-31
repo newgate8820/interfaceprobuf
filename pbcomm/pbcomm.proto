@@ -1,7 +1,7 @@
 //protoc --gogofast_out=plugins=grpc:. *.proto
 syntax = "proto3";
 package pbcomm;
-
+option go_package = "interfaceprobuf/pbcomm";
 // 日志格式结构
 message Debug {
     int32 userid = 1;  // 用户id

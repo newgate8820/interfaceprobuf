@@ -2,9 +2,9 @@
 syntax = "proto3";
 
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/messagedb/messagedb.proto
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 package messagedb;
-
+option go_package="interfaceprobuf/iminterfaceprotobufs/messagedb";
 service MessageDb {
 //=========================================== UserMsgId =========================================================
     // 插入或者更新 usermsgid

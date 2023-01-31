@@ -2,10 +2,10 @@
 //protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbmessageserver/pbmessageserver.proto
 syntax = "proto3";
 package pbmessageserver;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 // import "gitlab.chatserver.im/interfaceprobuf/pbcomm/usermsg.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbmessagedb/messagedb.proto";
-
+import "pbmessagedb/messagedb.proto";
+option go_package="interfaceprobuf/pbmessageserver";
 service MessageServer {
     // 机器人调用接口
     rpc BotCall (ReqBotCall) returns (ReplyBotCall) {

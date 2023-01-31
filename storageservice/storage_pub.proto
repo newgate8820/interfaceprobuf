@@ -10,6 +10,7 @@
 syntax = "proto3";
 
 package storageservice;
+option go_package = "interfaceprobuf/storageservice";
 
 // 结果码定义，后续在此添加 ...
 enum ERpcResultCode {

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package getserver;
-
+option go_package="interfaceprobuf/getserver";
 service ServerService {
     //原help下getconfig方法,主要提供IP
     rpc GetConfigServer (GetConfigServerReq) returns (SerRes) {

@@ -3,7 +3,7 @@
 syntax = "proto3";
 
 package imfrequencyservice;
-
+option go_package="interfaceprobuf/imfrequencyservice";
 //Frequency服务
 service FrequencyService {
 

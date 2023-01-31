@@ -1,8 +1,9 @@
 syntax = "proto3";
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 // protoc --gogofast_out=plugins=grpc:. *.proto
 //protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/pbimuinfoserver/imuinfoserver.proto
 package impayserver;
+option go_package="interfaceprobuf/impayserver";
 
 ////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/impayserver/impayclient/ImInterface.proto
 //protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/impayserver/impayserver.proto

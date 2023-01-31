@@ -1,6 +1,9 @@
 syntax = "proto3";
 package infoserver;
 // protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/im/iminterfaceprotobufs/infoserver/grouplive.proto
+
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver";
+
 message GroupLiveInfo {
     int32   BeginAt   = 1;
     int32   CloseAt   = 2;

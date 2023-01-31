@@ -3,6 +3,7 @@ syntax = "proto3";
 package imwebpageserver;
 
 // protoc --gogofast_out=plugins=grpc:. *.proto
+option go_package="interfaceprobuf/imwebpageserver";
 
 // 网页头信息 service
 service WebPageService {

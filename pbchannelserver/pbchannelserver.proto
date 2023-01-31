@@ -6,11 +6,11 @@
 
 syntax = "proto3";
 package pbchannelserver;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbmessagedb/messagedb.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbmessageserver/pbmessageserver.proto";
+import "pbcomm/pbcomm.proto";
+import "pbmessagedb/messagedb.proto";
+import "pbmessageserver/pbmessageserver.proto";
 // import "gitlab.chatserver.im/im/potatoprotobufs/pbmessageserver/pbmessageserver.proto";
-
+option go_package="interfaceprobuf/pbchannelserver";
 service ChannelServer {
     //###############################channel#####################################
     //    rpc SendChannelMessage (RequestSendMessage) returns (ReplySendMessage) {

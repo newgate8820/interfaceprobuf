@@ -7,6 +7,8 @@ syntax = "proto3";
 
 package userservice;
 
+option go_package = "interfaceprobuf/botserver/userservice";
+
 // 定义机器人服务
 service Bot {
     // GetBotDialog 获取机器人对话列表的用户ID数组

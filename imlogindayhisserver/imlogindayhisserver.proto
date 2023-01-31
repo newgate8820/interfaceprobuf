@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package imlogindayhisserver;
-
+option go_package="interfaceprobuf/imlogindayhisserver";
 service ImLoginDayHisServer {
     //设置本日登录
     rpc SetLoginHisDay (SetLoginHisDayReq) returns (SetLoginHisDayResult) {

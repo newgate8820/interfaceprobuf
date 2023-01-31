@@ -5,6 +5,7 @@ option java_multiple_files = true;
 option java_package = "im.ibi.protobufs.im"; //指定生成的java类所在的包
 option java_outer_classname = "ImService"; //指定生成的java类文件名称
 option objc_class_prefix = "ibi"; //生成类前缀
+option go_package="interfaceprobuf/impayserver/impayclient";
 
 //import "Common.proto";
 service ImInterface {

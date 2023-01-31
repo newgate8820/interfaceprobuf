@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package imauthserver;
 
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/imauthserver";
 service AuthServer {
     rpc CheckPhone (AuthMTPRequest) returns (AuthMTPReply);
     rpc SendCode (AuthMTPRequest) returns (AuthMTPReply);

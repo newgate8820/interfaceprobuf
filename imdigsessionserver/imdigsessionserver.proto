@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 package imdigsessionserver;
-
+option go_package="interfaceprobuf/imdigsessionserver";
 enum TokenErrorCode {
   Token_OK = 0;         //ok
   Token_REQ_PARAME_ERR = 1001;      //请求参数错误

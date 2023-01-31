@@ -1,7 +1,7 @@
 syntax = "proto3";
 // protoc --gogofast_out=plugins=grpc:. *.proto
 package digpollingserver;
-
+option go_package="interfaceprobuf/digpollingserver";
 service ServerService {
     //
     rpc ManualCollect (ManualCollectReq) returns (ManualCollectResp) {

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package imstransactionserver;
-
+option go_package="interfaceprobuf/imstransactionserver";
 ////protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imtransactionserver/imtransactionserver.proto
 service ServerService {
     // 创建钱包单签地址

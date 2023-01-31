@@ -2,10 +2,10 @@
 syntax = "proto3";
 
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/channeldb/channeldb.proto
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/usermsg.proto";
+import "pbcomm/pbcomm.proto";
+import "pbcomm/usermsg.proto";
 package channeldb;
-
+option go_package="interfaceprobuf/channeldb";
 service ChannelDB {
     //=========================================== UserLocalId =========================================================
     // 自增LocalId

@@ -2,10 +2,10 @@
 
 
 syntax = "proto3";
-import "gitlab.chatserver.im/im/iminterfaceprotobufs/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/im/iminterfaceprotobufs/messagedb/messagedb.proto";
-
+import "pbcomm/pbcomm.proto";
+import "pbcomm/usermsg.proto";
 package pbsearchserver;
+option go_package="interfaceprobuf/pbsearchserver";
 
 enum PeerType {
     Empty      = 0;
@@ -234,7 +234,7 @@ message SearchChannelMessageMediaReq {
 }
 
 message SearchMediaResp {
-    repeated messagedb.UserMsg messages = 1;
+    repeated pbcomm.UserMsg messages = 1;
     int32 count                     = 2;
 }
 

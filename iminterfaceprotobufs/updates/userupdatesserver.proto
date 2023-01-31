@@ -1,12 +1,12 @@
 syntax = "proto3";
 
 package updates;
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 
 // protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/updates/*.proto
 
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/messagedb/messagedb.proto";
-
+import "iminterfaceprotobufs/messagedb/messagedb.proto";
+option go_package="interfaceprobuf/iminterfaceprotobufs/updates";
 service UserUpdatesServer {
     // 单聊、普通群离线pts消息
     rpc StoreUserPtsHandle(ReqStoreUserPtsHandle) returns (ReplyStoreUserPtsHandle) {}

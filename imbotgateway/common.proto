@@ -1,6 +1,6 @@
 syntax = "proto3";
 package imbotgateway;
-
+option go_package="interfaceprobuf/imbotgateway";
 // 日志格式结构
 message Debug {
     int32 userid = 1;  // 用户id

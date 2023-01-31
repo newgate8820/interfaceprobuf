@@ -3,7 +3,8 @@ syntax = "proto3";
 // protoc --gogofast_out=plugins=grpc:. gitlab.chatserver.im/interfaceprobuf/imchannelserver/*.proto
 
 package imchannelserver;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/imchannelserver";
 
 service ServerService {
     //检查userName是否可用

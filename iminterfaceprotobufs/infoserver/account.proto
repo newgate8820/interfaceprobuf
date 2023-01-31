@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package infoserver;
 
-import "gitlab.chatserver.im/interfaceprobuf/iminterfaceprotobufs/pbcomm/pbcomm.proto";
-
+import "iminterfaceprotobufs/pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver";
 //account service 接口
 service Accounter {
     //获取用户id和用户hash id

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package imsession;
+option go_package="interfaceprobuf/imsession";
 
 
 //Session service 接口

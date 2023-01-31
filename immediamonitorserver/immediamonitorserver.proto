@@ -11,6 +11,7 @@
 */
 syntax = "proto3";
 package immediamonitorserver;
+option go_package="interfaceprobuf/immediamonitorserver";
 
 // 结果码定义
 enum ERpcResultCode {

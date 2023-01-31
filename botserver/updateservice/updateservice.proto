@@ -6,8 +6,9 @@
 syntax = "proto3";
 
 package updateservice;
+option go_package = "interfaceprobuf/botserver/updateservice";
 
-import "gitlab.chatserver.im/im/iminterfaceprotobufs/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 
 // 定义机器人服务
 service Bot {

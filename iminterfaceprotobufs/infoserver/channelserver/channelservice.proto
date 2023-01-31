@@ -1,7 +1,7 @@
 syntax = "proto3";
-import "chatcommon/chatcommon.proto";
+import "iminterfaceprotobufs/infoserver/chatcommon/chatcommon.proto";
 package channelserver;
-
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver/channelserver";
 //协议文件用途:  超级群、频道基础信息的获取和操作
 //作者：liuxinlei
 //日期: 2017/7/10

@@ -7,8 +7,9 @@
 //2017/12/1 hujian 增加日志  返回code  规范代码
 
 syntax = "proto3";
-import "chatcommon/chatcommon.proto";
+import "iminterfaceprotobufs/infoserver/chatcommon/chatcommon.proto";
 package chatserver;
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver/chatserver";
 
 //################# 测试数据结构 #############################
 message HelloMessage {

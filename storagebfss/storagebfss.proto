@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package storagebfss;
+option go_package="interfaceprobuf/storagebfss";
 
 // 文件存储RPC接口
 service FileStorageBFSS {

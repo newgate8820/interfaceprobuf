@@ -9,7 +9,8 @@
 syntax = "proto3";
 package pbimuinfoserver;
 
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/pbimuinfoserver";
 
 enum ReErrCode {
     Success = 0; //成功

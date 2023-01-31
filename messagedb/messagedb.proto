@@ -2,10 +2,10 @@
 syntax = "proto3";
 
 // protoc --gogofast_out=plugins=grpc:. ./gitlab.chatserver.im/interfaceprobuf/messagedb/messagedb.proto
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/usermsg.proto";
+import "pbcomm/pbcomm.proto";
+import "pbcomm/usermsg.proto";
 package messagedb;
-
+option go_package="interfaceprobuf/messagedb";
 service MessageDb {
     //=========================================== HeartBeating =========================================================
     // HeartBeating

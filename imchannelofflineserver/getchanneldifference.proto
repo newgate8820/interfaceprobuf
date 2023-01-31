@@ -1,8 +1,9 @@
 syntax = "proto3";
 
 package imchannelofflineserver;
-import "gitlab.chatserver.im/interfaceprobuf/dialogserver/dialogserver.proto";
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "dialogserver/dialogserver.proto";
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/imchannelofflineserver";
 service ChannelOfflineServerService {
     rpc GetChannelDifference (ReqGetChannelDifference) returns (RspGetChannelDifference) {
     };

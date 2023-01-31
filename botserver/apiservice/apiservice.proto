@@ -6,8 +6,9 @@
 syntax = "proto3";
 
 package apiservice;
+option go_package = "interfaceprobuf/botserver/apiservice";
 
-import "gitlab.chatserver.im/im/iminterfaceprotobufs/botserver/basetypes/basetypes.proto";
+import "botserver/basetypes/basetypes.proto";
 
 // 定义机器人服务
 service Bot {

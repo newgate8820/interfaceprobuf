@@ -1,7 +1,7 @@
 syntax = "proto3";
 package imchannelserver;
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
-
+import "pbcomm/pbcomm.proto";
+option go_package="interfaceprobuf/imchannelserver";
 
 // 返回channel
 message ReplyChannelData {

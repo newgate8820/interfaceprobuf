@@ -2,7 +2,7 @@
 
 syntax = "proto3";
 package walletidserver;
-
+option go_package="interfaceprobuf/walletidserver";
 enum ReErrCode {
   Success = 0; //成功
   InternalError = 1; //内部错误

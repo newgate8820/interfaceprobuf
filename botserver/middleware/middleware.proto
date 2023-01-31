@@ -6,6 +6,7 @@
 syntax = "proto3";
 
 package middleware;
+option go_package = "interfaceprobuf/botserver/middleware";
 
 // 定义中间件服务
 service Middleware {

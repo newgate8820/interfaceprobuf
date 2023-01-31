@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-import "gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+import "pbcomm/pbcomm.proto";
 
 package imsecuritychatserver;
+option go_package="interfaceprobuf/imsecuritychatserver";
 
 
 service ImSecurityChatServer {

@@ -1,6 +1,7 @@
 //protoc --gogofast_out=plugins=grpc:. *.proto
 syntax = "proto3";
 package pbcomm;
+option go_package="interfaceprobuf/iminterfaceprotobufs/infoserver/pbcomm";
 
 // 日志格式结构
 message Debug {

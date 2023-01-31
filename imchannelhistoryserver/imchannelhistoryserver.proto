@@ -1,7 +1,10 @@
 syntax = "proto3";
 
 package imchannelhistoryserver;
-import 	"gitlab.chatserver.im/interfaceprobuf/pbcomm/pbcomm.proto";
+
+option go_package = "interfaceprobuf/imchannelhistoryserver";
+
+
 
 service ChannelHistoryServerService {
     rpc GetChannelHistoryServer (ReqChanHistory) returns (ResChanHistory) {
