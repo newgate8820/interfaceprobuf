@@ -8,8 +8,8 @@ docker build -t protoc:laster .
 ### protoc 生成 proto grpc 文件 e.g script_path要生成的脚本路径 目录下放  文件名.proto
 ### cd ~/message
 ```shell
-script_path=channeldb
-docker run -it --rm -v "${PWD}":/src -d protoc:laster \
+script_path=updates
+docker run -it --rm -v "${PWD}":/src  protoc:laster \
 protoc -I "${script_path}" \
 --go_opt=paths=source_relative \
 --go-grpc_opt=paths=source_relative \

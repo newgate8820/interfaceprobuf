@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package updates;
-
+option go_package = "interfaceprobuf/updates";
 // protoc --gogofast_out=plugins=grpc:. ./*.proto
 
 service UserUpdatesServer {
