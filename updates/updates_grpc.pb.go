@@ -47,6 +47,8 @@ type UserUpdatesServerClient interface {
 	GetOtherInfoMsg(ctx context.Context, in *ReqGetOtherInfoMsg, opts ...grpc.CallOption) (*ReplyGetOtherInfoMsg, error)
 	// 用与实时交互查数据
 	Monitor(ctx context.Context, in *ReqMonitor, opts ...grpc.CallOption) (*ReplyMonitor, error)
+	// pts矫正
+	GetDiffByPts(ctx context.Context, in *ReqDiffByPts, opts ...grpc.CallOption) (*ReplyDiffByPts, error)
 }
 
 type userUpdatesServerClient struct {
@@ -165,6 +167,15 @@ func (c *userUpdatesServerClient) Monitor(ctx context.Context, in *ReqMonitor, o
 	return out, nil
 }
 
+func (c *userUpdatesServerClient) GetDiffByPts(ctx context.Context, in *ReqDiffByPts, opts ...grpc.CallOption) (*ReplyDiffByPts, error) {
+	out := new(ReplyDiffByPts)
+	err := c.cc.Invoke(ctx, "/updates.UserUpdatesServer/GetDiffByPts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserUpdatesServerServer is the server API for UserUpdatesServer service.
 // All implementations must embed UnimplementedUserUpdatesServerServer
 // for forward compatibility
@@ -194,6 +205,8 @@ type UserUpdatesServerServer interface {
 	GetOtherInfoMsg(context.Context, *ReqGetOtherInfoMsg) (*ReplyGetOtherInfoMsg, error)
 	// 用与实时交互查数据
 	Monitor(context.Context, *ReqMonitor) (*ReplyMonitor, error)
+	// pts矫正
+	GetDiffByPts(context.Context, *ReqDiffByPts) (*ReplyDiffByPts, error)
 	mustEmbedUnimplementedUserUpdatesServerServer()
 }
 
@@ -236,6 +249,9 @@ func (UnimplementedUserUpdatesServerServer) GetOtherInfoMsg(context.Context, *Re
 }
 func (UnimplementedUserUpdatesServerServer) Monitor(context.Context, *ReqMonitor) (*ReplyMonitor, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Monitor not implemented")
+}
+func (UnimplementedUserUpdatesServerServer) GetDiffByPts(context.Context, *ReqDiffByPts) (*ReplyDiffByPts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDiffByPts not implemented")
 }
 func (UnimplementedUserUpdatesServerServer) mustEmbedUnimplementedUserUpdatesServerServer() {}
 
@@ -466,6 +482,24 @@ func _UserUpdatesServer_Monitor_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserUpdatesServer_GetDiffByPts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReqDiffByPts)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserUpdatesServerServer).GetDiffByPts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/updates.UserUpdatesServer/GetDiffByPts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserUpdatesServerServer).GetDiffByPts(ctx, req.(*ReqDiffByPts))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserUpdatesServer_ServiceDesc is the grpc.ServiceDesc for UserUpdatesServer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -520,6 +554,10 @@ var UserUpdatesServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Monitor",
 			Handler:    _UserUpdatesServer_Monitor_Handler,
+		},
+		{
+			MethodName: "GetDiffByPts",
+			Handler:    _UserUpdatesServer_GetDiffByPts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

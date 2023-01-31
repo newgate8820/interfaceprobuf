@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package updates;
+import "pbcomm/pbcomm.proto";
 option go_package = "interfaceprobuf/updates";
 // protoc --gogofast_out=plugins=grpc:. ./*.proto
 
@@ -41,6 +42,9 @@ service UserUpdatesServer {
 
     // 用与实时交互查数据
     rpc Monitor(ReqMonitor) returns(ReplyMonitor) {}
+    // pts矫正
+    rpc GetDiffByPts (ReqDiffByPts) returns (ReplyDiffByPts) {
+    }
 }
 
 message ReqGetUserPtsHandleByMsgIDs {
@@ -48,6 +52,22 @@ message ReqGetUserPtsHandleByMsgIDs {
     repeated int32 MsgIDs = 2;
 }
 
+message ReplyDiffByPts {
+    bytes result = 1;
+    int32 error = 2; // 1. 获取普通历史失败 2. 获取其他特殊操作失败 3. 获取超级群失败 4. 获取加密聊天数据失败 5.服务器出错
+    int32 usetime = 3; // use time
+}
+// ############################# pts 矫正 ##########################
+message ReqDiffByPts {
+    int32 fromid = 1;
+    uint64 from_keyid = 2;
+    int32 pts = 3;
+    int32 flags = 4;
+    int32 Pts_total_limit = 5;
+    int32 Date = 6;
+    int32 Qts = 7;
+    pbcomm.Debug debug = 8;
+}
 message ReplyGetUserPtsHandleByMsgIDs {
     repeated PtsHandle PtsHandles = 1;
 }
